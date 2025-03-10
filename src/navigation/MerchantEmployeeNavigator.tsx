@@ -1,32 +1,31 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Customer Screens
-import HomeScreen from '../screens/customer/HomeScreen';
-import ProductDetailScreen from '../screens/customer/ProductDetailScreen';
-import ProfileScreen from '../screens/customer/ProfileScreen';
-import EditProfileScreen from '../screens/customer/EditProfileScreen';
-import SettingsScreen from '../screens/customer/SettingsScreen';
-import QRCodeScreen from '../screens/customer/QRCodeScreen';
-import CartScreen from '../screens/customer/CartScreen';
+// Merchant Employee Screens
+import TransactionDetailScreen from '../screens/merchantEmployee/TransactionDetailScreen';
+import EditProfileScreen from '../screens/merchantEmployee/EditProfileScreen';
+import SettingsScreen from '../screens/merchantEmployee/SettingsScreen';
+import ProfileScreen from '../screens/merchantEmployee/ProfileScreen';
+import ScanQRScreen from '../screens/merchantEmployee/ScanQRScreen';
+import HomeScreen from '../screens/merchantEmployee/HomeScreen';
 
 // Stack param lists
-export type CustomerHomeStackParamList = {
+export type MerchantEmployeeHomeStackParamList = {
   Home: undefined;
-  ProductDetail: {productId: string};
+  TransactionDetail: {transactionId: string};
 };
 
-export type CustomerProfileStackParamList = {
+export type MerchantEmployeeProfileStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
   Settings: undefined;
 };
 
 // Create the stack navigators
-const HomeStack = createStackNavigator<CustomerHomeStackParamList>();
-const ProfileStack = createStackNavigator<CustomerProfileStackParamList>();
+const HomeStack = createStackNavigator<MerchantEmployeeHomeStackParamList>();
+const ProfileStack =
+  createStackNavigator<MerchantEmployeeProfileStackParamList>();
 
 // Home Stack Navigator
 const HomeStackNavigator = () => {
@@ -38,9 +37,9 @@ const HomeStackNavigator = () => {
         options={{headerShown: false}}
       />
       <HomeStack.Screen
-        name="ProductDetail"
-        component={ProductDetailScreen}
-        options={{title: 'Product Details'}}
+        name="TransactionDetail"
+        component={TransactionDetailScreen}
+        options={{headerShown: false}}
       />
     </HomeStack.Navigator>
   );
@@ -72,7 +71,7 @@ const ProfileStackNavigator = () => {
 // Tab Navigator
 const Tab = createBottomTabNavigator();
 
-const CustomerNavigator = () => {
+const MerchantEmployeeNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -84,34 +83,23 @@ const CustomerNavigator = () => {
         component={HomeStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Home',
+          tabBarLabel: 'Dashboard',
           tabBarIcon: ({color, size}) => (
-            <Icon name="home" color={color} size={size} />
+            <Icon name="view-dashboard" color={color} size={size} />
           ),
         }}
       />
       <Tab.Screen
-        name="QRCode"
-        component={QRCodeScreen}
+        name="ScanQR"
+        component={ScanQRScreen}
         options={{
           headerShown: false,
-          tabBarLabel: 'QR Code',
+          tabBarLabel: 'Scan QR',
           tabBarIcon: ({color, size}) => (
-            <Icon name="qrcode" color={color} size={size} />
+            <Icon name="qrcode-scan" color={color} size={size} />
           ),
         }}
       />
-      {/* <Tab.Screen
-        name="Cart"
-        component={CartScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: 'Cart',
-          tabBarIcon: ({color, size}) => (
-            <Icon name="cart" color={color} size={size} />
-          ),
-        }}
-      /> */}
       <Tab.Screen
         name="ProfileTab"
         component={ProfileStackNavigator}
@@ -127,4 +115,4 @@ const CustomerNavigator = () => {
   );
 };
 
-export default CustomerNavigator;
+export default MerchantEmployeeNavigator;

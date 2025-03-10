@@ -1,16 +1,18 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
-import type { MerchantProfileStackParamList } from "../../navigation/MerchantNavigator"
+import type { MerchantEmployeeProfileStackParamList } from "../../navigation/MerchantEmployeeNavigator"
 import { useAuth } from "../../contexts/AuthContext"
 import { colors } from "../../theme/colors"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-type ProfileScreenNavigationProp = StackNavigationProp<MerchantProfileStackParamList, "Profile">
+type ProfileScreenNavigationProp = StackNavigationProp<MerchantEmployeeProfileStackParamList, "Profile">
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>()
   const { user, signOut } = useAuth()
+  const insets = useSafeAreaInsets()
 
   const navigateToEditProfile = () => {
     navigation.navigate("EditProfile")
@@ -30,25 +32,18 @@ const ProfileScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Merchant Profile</Text>
+    <View style={styles.content}>
+      <View style={{ ...styles.header, paddingTop: insets.top }}>
+        <Text style={styles.headerTitle}>My Profile</Text>
       </View>
 
       <View style={styles.userInfoSection}>
-        <Icon name="store" size={80} color={colors.primary} />
-        <Text style={styles.businessName}>{user?.businessName || "Business Name"}</Text>
-        <Text style={styles.userEmail}>{user?.email || "merchant@example.com"}</Text>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{user?.totalTransactions || 0}</Text>
-          <Text style={styles.statLabel}>Transactions</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{user?.totalPointsIssued || 0}</Text>
-          <Text style={styles.statLabel}>Points Issued</Text>
+        <Icon name="account-tie" size={80} color={colors.primary} />
+        <Text style={styles.userName}>{`${user?.firstName || ""} ${user?.lastName || ""}`}</Text>
+        <Text style={styles.userEmail}>{user?.email || user?.phone || ""}</Text>
+        <View style={styles.roleContainer}>
+          <Icon name="badge-account" size={20} color={colors.primary} />
+          <Text style={styles.roleText}>Merchant Employee</Text>
         </View>
       </View>
 
@@ -68,31 +63,35 @@ const ProfileScreen = () => {
           <Text style={[styles.actionText, { color: colors.error }]}>Sign Out</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
     backgroundColor: colors.background,
   },
   header: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
     backgroundColor: colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    marginBottom: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "700",
     color: "#FFFFFF",
+    marginBottom: 5,
+    textAlign: "center",
   },
   userInfoSection: {
     alignItems: "center",
-    marginBottom: 20,
+    marginVertical: 20,
   },
-  businessName: {
+  userName: {
     fontSize: 22,
     fontWeight: "bold",
     color: colors.text,
@@ -103,27 +102,24 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 5,
   },
-  statsContainer: {
+  roleContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-    paddingHorizontal: 16,
-  },
-  statItem: {
     alignItems: "center",
+    marginTop: 10,
+    backgroundColor: colors.primaryLight,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-  statValue: {
-    fontSize: 24,
-    fontWeight: "bold",
+  roleText: {
+    fontSize: 16,
+    fontWeight: "600",
     color: colors.primary,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 4,
+    marginLeft: 8,
   },
   actionsContainer: {
     paddingHorizontal: 16,
+    marginTop: 20,
   },
   actionButton: {
     flexDirection: "row",
@@ -133,6 +129,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   actionText: {
     fontSize: 16,

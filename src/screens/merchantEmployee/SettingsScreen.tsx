@@ -33,21 +33,17 @@ const SettingsScreen = () => {
   }
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      "Delete Account",
-      "Are you sure you want to delete your merchant account? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            // Implement account deletion logic here
-            Alert.alert("Feature Not Implemented", "Account deletion is not yet implemented.")
-          },
+    Alert.alert("Delete Account", "Are you sure you want to delete your account? This action cannot be undone.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          // Implement account deletion logic here
+          Alert.alert("Feature Not Implemented", "Account deletion is not yet implemented.")
         },
-      ],
-    )
+      },
+    ])
   }
 
   return (

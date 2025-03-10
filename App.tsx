@@ -1,11 +1,14 @@
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 import {StatusBar} from 'react-native';
-import AuthNavigator from './src/navigation/AuthNavigator';
+
+import MerchantEmployeeNavigator from './src/navigation/MerchantEmployeeNavigator';
 import CustomerNavigator from './src/navigation/CustomerNavigator';
-import MerchantNavigator from './src/navigation/MerchantNavigator';
 import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import SplashScreen from './src/screens/common/SplashScreen';
+import AuthNavigator from './src/navigation/AuthNavigator';
+import {CartProvider} from './src/contexts/CartContext';
 
 const AppContent = () => {
   const {isLoading, isAuthenticated, userType} = useAuth();
@@ -22,7 +25,7 @@ const AppContent = () => {
       ) : userType === 'customer' ? (
         <CustomerNavigator />
       ) : (
-        <MerchantNavigator />
+        <MerchantEmployeeNavigator />
       )}
     </NavigationContainer>
   );
@@ -32,8 +35,11 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <AppContent />
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
       </AuthProvider>
+      <Toast />
     </SafeAreaProvider>
   );
 };

@@ -22,46 +22,48 @@ const UserTypeSelectionScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Welcome to Loyalty App</Text>
-        <Text style={styles.subtitle}>Please select your account type</Text>
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Welcome to Loyalty App</Text>
+          <Text style={styles.subtitle}>Please select your account type</Text>
 
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            style={styles.option}
-            onPress={handleCustomerSelection}>
-            <View style={styles.iconContainer}>
-              <Image
-                source={require('../../assets/images/logo.jpg')}
-                style={styles.icon}
-                defaultSource={require('../../assets/images/logo.jpg')}
-              />
-            </View>
-            <Text style={styles.optionTitle}>Customer</Text>
-            <Text style={styles.optionDescription}>
-              Earn points, view rewards, and redeem offers
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              style={styles.option}
+              onPress={handleCustomerSelection}>
+              <View style={styles.iconContainer}>
+                <Image
+                  source={require('../../assets/images/logo.jpg')}
+                  style={styles.icon}
+                  defaultSource={require('../../assets/images/logo.jpg')}
+                />
+              </View>
+              <Text style={styles.optionTitle}>Customer</Text>
+              <Text style={styles.optionDescription}>
+                Earn points, view rewards, and redeem offers
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.option}
-            onPress={handleMerchantSelection}>
-            <View style={styles.iconContainer}>
-              <Image
-                source={require('../../assets/images/logo.jpg')}
-                style={styles.icon}
-                defaultSource={require('../../assets/images/logo.jpg')}
-              />
-            </View>
-            <Text style={styles.optionTitle}>Merchant</Text>
-            <Text style={styles.optionDescription}>
-              Scan customer codes and manage transactions
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.option}
+              onPress={handleMerchantSelection}>
+              <View style={styles.iconContainer}>
+                <Image
+                  source={require('../../assets/images/logo.jpg')}
+                  style={styles.icon}
+                  defaultSource={require('../../assets/images/logo.jpg')}
+                />
+              </View>
+              <Text style={styles.optionTitle}>Merchant</Text>
+              <Text style={styles.optionDescription}>
+                Scan customer codes and manage transactions
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
@@ -69,6 +71,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   content: {
     flex: 1,

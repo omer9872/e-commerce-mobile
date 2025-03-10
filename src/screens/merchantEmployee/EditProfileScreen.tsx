@@ -10,30 +10,29 @@ import { colors } from "../../theme/colors"
 const EditProfileScreen = () => {
   const navigation = useNavigation()
   const { user, updateUser } = useAuth()
-  const [businessName, setBusinessName] = useState(user?.businessName || "")
-  const [email, setEmail] = useState(user?.email || "")
-  const [phone, setPhone] = useState(user?.phone || "")
-  const [address, setAddress] = useState(user?.address || "")
+  const [firstName, setFirstName] = useState(user?.firstName || "")
+  const [lastName, setLastName] = useState(user?.lastName || "")
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
-      setBusinessName(user.businessName || "")
-      setEmail(user.email || "")
-      setPhone(user.phone || "")
-      setAddress(user.address || "")
+      setFirstName(user.firstName || "")
+      setLastName(user.lastName || "")
     }
   }, [user])
 
   const handleSave = async () => {
-    if (!businessName || !email) {
-      Alert.alert("Error", "Business name and email are required.")
+    if (!firstName || !lastName) {
+      Alert.alert("Error", "First name and last name are required.")
       return
     }
 
     setIsLoading(true)
     try {
-      const response = await api.put("/merchants/profile", { businessName, email, phone, address })
+      const response = await api.put("/user/me", {
+        firstName,
+        lastName,
+      })
       await updateUser(response.data)
       Alert.alert("Success", "Profile updated successfully")
       navigation.goBack()
@@ -48,15 +47,25 @@ const EditProfileScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Edit Merchant Profile</Text>
+        <Text style={styles.title}>Edit Profile</Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Business Name</Text>
+          <Text style={styles.label}>First Name</Text>
           <TextInput
             style={styles.input}
-            value={businessName}
-            onChangeText={setBusinessName}
-            placeholder="Enter your business name"
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="Enter your first name"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Last Name</Text>
+          <TextInput
+            style={styles.input}
+            value={lastName}
+            onChangeText={setLastName}
+            placeholder="Enter your last name"
           />
         </View>
 
@@ -64,8 +73,8 @@ const EditProfileScreen = () => {
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}
-            value={email}
-            onChangeText={setEmail}
+            value={user?.email}
+            editable={false}
             placeholder="Enter your email"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -76,21 +85,10 @@ const EditProfileScreen = () => {
           <Text style={styles.label}>Phone</Text>
           <TextInput
             style={styles.input}
-            value={phone}
-            onChangeText={setPhone}
+            value={user?.phone}
+            editable={false}
             placeholder="Enter your phone number"
             keyboardType="phone-pad"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Address</Text>
-          <TextInput
-            style={styles.input}
-            value={address}
-            onChangeText={setAddress}
-            placeholder="Enter your business address"
-            multiline
           />
         </View>
 

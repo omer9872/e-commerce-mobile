@@ -4,13 +4,14 @@ import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
-import type { MerchantTransactionStackParamList } from "../../navigation/MerchantNavigator"
 import { api } from "../../services/api"
 import { colors } from "../../theme/colors"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
+import type { MerchantEmployeeTransactionStackParamList } from "../../navigation/MerchantEmployeeNavigator"
+
 type TransactionHistoryScreenNavigationProp = StackNavigationProp<
-  MerchantTransactionStackParamList,
+  MerchantEmployeeTransactionStackParamList,
   "TransactionHistory"
 >
 

@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native"
 import { type RouteProp, useRoute } from "@react-navigation/native"
-import type { MerchantTransactionStackParamList } from "../../navigation/MerchantNavigator"
+import type { MerchantEmployeeHomeStackParamList } from "../../navigation/MerchantEmployeeNavigator"
 import { api } from "../../services/api"
 import { colors } from "../../theme/colors"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-type TransactionDetailScreenRouteProp = RouteProp<MerchantTransactionStackParamList, "TransactionDetail">
+type TransactionDetailScreenRouteProp = RouteProp<MerchantEmployeeHomeStackParamList, "TransactionDetail">
 
 interface TransactionDetail {
   id: string
@@ -27,6 +28,7 @@ const TransactionDetailScreen = () => {
   const [transaction, setTransaction] = useState<TransactionDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const insets = useSafeAreaInsets()
 
   useEffect(() => {
     fetchTransactionDetail()
@@ -64,11 +66,11 @@ const TransactionDetailScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
         <Icon
           name={transaction.type === "earn" ? "star-plus-outline" : "star-minus-outline"}
           size={40}
-          color={transaction.type === "earn" ? colors.success : colors.error}
+          color="#FFFFFF"
         />
         <Text style={styles.headerText}>{transaction.type === "earn" ? "Points Earned" : "Points Redeemed"}</Text>
         <Text style={styles.pointsText}>
@@ -132,6 +134,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     padding: 24,
     alignItems: "center",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   headerText: {
     fontSize: 18,
@@ -147,8 +151,15 @@ const styles = StyleSheet.create({
   },
   section: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    marginTop: 8,
+    marginHorizontal: 16,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   sectionTitle: {
     fontSize: 18,

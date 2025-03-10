@@ -33,6 +33,8 @@ const RegisterScreen = () => {
   const route = useRoute<RegisterScreenRouteProp>();
   const {userType} = route.params;
 
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -65,6 +67,8 @@ const RegisterScreen = () => {
       setIsLoading(true);
 
       const userData = {
+        firstName,
+        lastName,
         phone,
         password,
       };
@@ -109,6 +113,26 @@ const RegisterScreen = () => {
           </Text>
 
           <View style={styles.form}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>First Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your first name"
+                value={firstName}
+                onChangeText={setFirstName}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Last Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your last name"
+                value={lastName}
+                onChangeText={setLastName}
+              />
+            </View>
+
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Phone Number</Text>
               <TextInput

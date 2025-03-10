@@ -69,7 +69,7 @@ const EditProfileScreen = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Name</Text>
+          <Text style={styles.label}>Last Name</Text>
           <TextInput
             style={styles.input}
             value={lastName}

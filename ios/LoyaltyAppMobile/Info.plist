@@ -28,6 +28,10 @@
 
 		<key>NSCameraUsageDescription</key>
 		<string>Loyalty App needs access to your Camera.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Loyalty App needs access to your Microphone.</string>
+
+
 		<key>UIAppFonts</key>
 		<array>
 			<string>AntDesign.ttf</string>

@@ -4,13 +4,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Customer Screens
-import HomeScreen from '../screens/customer/HomeScreen';
 import ProductDetailScreen from '../screens/customer/ProductDetailScreen';
-import ProfileScreen from '../screens/customer/ProfileScreen';
 import EditProfileScreen from '../screens/customer/EditProfileScreen';
 import SettingsScreen from '../screens/customer/SettingsScreen';
+import ProfileScreen from '../screens/customer/ProfileScreen';
 import QRCodeScreen from '../screens/customer/QRCodeScreen';
 import CartScreen from '../screens/customer/CartScreen';
+import HomeScreen from '../screens/customer/HomeScreen';
 
 // Stack param lists
 export type CustomerHomeStackParamList = {
@@ -40,7 +40,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen
         name="ProductDetail"
         component={ProductDetailScreen}
-        options={{title: 'Product Details'}}
+        options={{headerShown: false}}
       />
     </HomeStack.Navigator>
   );
@@ -58,12 +58,12 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen
         name="EditProfile"
         component={EditProfileScreen}
-        options={{title: 'Edit Profile'}}
+        options={{headerShown: false}}
       />
       <ProfileStack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{title: 'Settings'}}
+        options={{headerShown: false}}
       />
     </ProfileStack.Navigator>
   );
@@ -101,7 +101,7 @@ const CustomerNavigator = () => {
           ),
         }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Cart"
         component={CartScreen}
         options={{
@@ -111,7 +111,7 @@ const CustomerNavigator = () => {
             <Icon name="cart" color={color} size={size} />
           ),
         }}
-      /> */}
+      />
       <Tab.Screen
         name="ProfileTab"
         component={ProfileStackNavigator}

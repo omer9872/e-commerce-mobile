@@ -19,13 +19,21 @@ const AppContent = () => {
 
   return (
     <NavigationContainer>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       {!isAuthenticated ? (
-        <AuthNavigator />
+        <>
+          <AuthNavigator />
+          <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+        </>
       ) : userType === 'customer' ? (
-        <CustomerNavigator />
+        <>
+          <CustomerNavigator />
+          <StatusBar barStyle="light-content" backgroundColor="#FFFFFF" />
+        </>
       ) : (
-        <MerchantEmployeeNavigator />
+        <>
+          <MerchantEmployeeNavigator />
+          <StatusBar barStyle="light-content" backgroundColor="#FFFFFF" />
+        </>
       )}
     </NavigationContainer>
   );

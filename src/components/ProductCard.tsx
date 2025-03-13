@@ -7,16 +7,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useCart} from '../contexts/CartContext';
 import Toast from 'react-native-toast-message';
 
+import {Product} from '../types/product';
 import {API_URL} from '../services/api';
 import {colors} from '../theme/colors';
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl?: string;
-}
 
 interface ProductCardProps {
   product: Product;
@@ -38,19 +31,20 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
 
   // Check if product is already in cart
   useEffect(() => {
-    const isInCart = items.some(item => item.product._id === product.id);
+    const isInCart = items.some(item => item.product._id === product._id);
     setIsAddedToCart(isInCart);
-  }, [items, product.id]);
+  }, [items, product._id]);
 
   const handleAddToCart = (event: any) => {
     event.stopPropagation();
     if (!isAddedToCart) {
       addToCart({
-        _id: product.id,
+        _id: product._id,
         name: product.name,
         description: product.description,
         price: product.price,
-        images: [product.imageUrl],
+        images: [product.images[0]],
+        points: product.points,
       } as any);
       setIsAddedToCart(true);
 
@@ -65,7 +59,7 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
 
   const handleRemoveFromCart = (event: any) => {
     event.stopPropagation();
-    removeFromCart(product.id);
+    removeFromCart(product._id);
     setIsAddedToCart(false);
 
     // Show toast message
@@ -80,7 +74,7 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image
         source={{
-          uri: `${API_URL}/image/${product.imageUrl}`,
+          uri: `${API_URL}/image/${product.images[0]}`,
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -101,7 +95,7 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
               {product.price} <Text style={styles.pointsLabel}>₺</Text>
             </Text>
           </View>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={[
               styles.addToCartButton,
               isAddedToCart
@@ -114,7 +108,7 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
               size={16}
               color="#FFFFFF"
             />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>

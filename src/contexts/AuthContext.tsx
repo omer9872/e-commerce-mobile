@@ -6,9 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {api} from '../services/api';
 import type {IUser} from '../types/user';
-import {LoyaltySummary} from 'src/types/loyaltySummary';
+import type {LoyaltySummary} from 'src/types/loyaltySummary';
 
-type UserType = 'customer' | 'merchant' | null;
+type UserType = 'customer' | 'merchant' | 'merchantEmployee' | null;
 
 interface AuthContextData {
   isAuthenticated: boolean;
@@ -52,24 +52,60 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
 
   async function loadStorageData(): Promise<void> {
     try {
+      setIsLoading(true);
       const [token, storedUser, storedUserType] = await Promise.all([
         AsyncStorage.getItem('@LoyaltyApp:token'),
         AsyncStorage.getItem('@LoyaltyApp:user'),
         AsyncStorage.getItem('@LoyaltyApp:userType'),
       ]);
 
-      if (token && storedUser && storedUserType) {
+      if (token) {
         api.defaults.headers.common.Authorization = `Bearer ${token}`;
-        setUser(JSON.parse(storedUser));
-        setUserType(storedUserType as UserType);
-        setIsAuthenticated(true);
-        await refreshLoyaltySummary();
+
+        try {
+          // Validate token by fetching user data
+          await fetchMe();
+
+          if (storedUserType) {
+            setUserType(storedUserType as UserType);
+          }
+
+          setIsAuthenticated(true);
+          await refreshLoyaltySummary();
+        } catch (error) {
+          console.error('Token validation failed:', error);
+          // Token is invalid or expired, clear storage and redirect to login
+          await handleAuthFailure();
+        }
       }
     } catch (error) {
       console.error('Error loading storage data:', error);
+      await handleAuthFailure();
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function handleAuthFailure(): Promise<void> {
+    // Clear all auth-related data from storage
+    await Promise.all([
+      AsyncStorage.removeItem('@LoyaltyApp:token'),
+      AsyncStorage.removeItem('@LoyaltyApp:refreshToken'),
+      AsyncStorage.removeItem('@LoyaltyApp:user'),
+      AsyncStorage.removeItem('@LoyaltyApp:userType'),
+      AsyncStorage.removeItem('@LoyaltyApp:roles'),
+      AsyncStorage.removeItem('@LoyaltyApp:permissions'),
+      AsyncStorage.removeItem('@LoyaltyApp:cart'),
+    ]);
+
+    // Reset auth state
+    setIsAuthenticated(false);
+    setUser(null);
+    setUserType(null);
+    setLoyaltySummary(null);
+    setPermissions([]);
+    setRoles([]);
+    delete api.defaults.headers.common.Authorization;
   }
 
   async function signInViaPhoneNumber(credentials: {
@@ -81,7 +117,13 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
         '/auth/login-via-phone-number',
         credentials,
       );
-      const {accessToken, refreshToken, roles, permissions} = response.data;
+      const {
+        accessToken,
+        refreshToken,
+        roles,
+        permissions,
+        userType: responseUserType,
+      } = response.data;
 
       setPermissions(permissions);
       setRoles(roles);
@@ -91,6 +133,10 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
         AsyncStorage.setItem('@LoyaltyApp:token', accessToken),
         AsyncStorage.setItem('@LoyaltyApp:refreshToken', refreshToken),
         AsyncStorage.setItem('@LoyaltyApp:roles', JSON.stringify(roles)),
+        AsyncStorage.setItem(
+          '@LoyaltyApp:userType',
+          responseUserType || 'customer',
+        ),
         AsyncStorage.setItem(
           '@LoyaltyApp:permissions',
           JSON.stringify(permissions),
@@ -114,7 +160,13 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   }): Promise<void> {
     try {
       const response = await api.post('/auth/login-via-email', credentials);
-      const {accessToken, refreshToken, roles, permissions} = response.data;
+      const {
+        accessToken,
+        refreshToken,
+        roles,
+        permissions,
+        userType: responseUserType,
+      } = response.data;
 
       setPermissions(permissions);
       setRoles(roles);
@@ -124,6 +176,10 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
         AsyncStorage.setItem('@LoyaltyApp:token', accessToken),
         AsyncStorage.setItem('@LoyaltyApp:refreshToken', refreshToken),
         AsyncStorage.setItem('@LoyaltyApp:roles', JSON.stringify(roles)),
+        AsyncStorage.setItem(
+          '@LoyaltyApp:userType',
+          responseUserType || 'merchant',
+        ),
         AsyncStorage.setItem(
           '@LoyaltyApp:permissions',
           JSON.stringify(permissions),
@@ -143,17 +199,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
 
   async function signOut(): Promise<void> {
     try {
-      await Promise.all([
-        AsyncStorage.removeItem('@LoyaltyApp:token'),
-        AsyncStorage.removeItem('@LoyaltyApp:user'),
-        AsyncStorage.removeItem('@LoyaltyApp:userType'),
-      ]);
-
-      setIsAuthenticated(false);
-      setUser(null);
-      setUserType(null);
-      setLoyaltySummary(null);
-      delete api.defaults.headers.common.Authorization;
+      await handleAuthFailure();
     } catch (error) {
       console.error('Sign out error:', error);
       throw error;
@@ -176,12 +222,18 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   async function fetchMe(): Promise<void> {
     const response = await api.get('/user/me');
     setUser(response.data);
+    await AsyncStorage.setItem(
+      '@LoyaltyApp:user',
+      JSON.stringify(response.data),
+    );
   }
 
   async function refreshLoyaltySummary(): Promise<void> {
     try {
-      const response = await api.get('/loyalty-summary/me');
-      setLoyaltySummary(response.data);
+      if (userType === 'customer') {
+        const response = await api.get('/loyalty-summary/me');
+        setLoyaltySummary(response.data);
+      }
     } catch (error) {
       console.error('Error fetching loyalty summary:', error);
     }

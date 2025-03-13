@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,52 +9,66 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
-  TextInput,
 } from 'react-native';
-import {Camera, useCameraDevices} from 'react-native-vision-camera';
-import {BarcodeFormat, useScanBarcodes} from 'vision-camera-code-scanner';
-import {api} from '../../services/api';
-import {colors} from '../../theme/colors';
+import {
+  Camera,
+  useCameraDevice,
+  useCodeScanner,
+} from 'react-native-vision-camera';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import TextInput from '../../components/TextInput';
+import {colors} from '../../theme/colors';
+import {api} from '../../services/api';
+
 const ScanQRScreen = () => {
-  const [hasPermission, setHasPermission] = useState(false);
   const [isScanning, setIsScanning] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [transactionAmount, setTransactionAmount] = useState('');
-  const devices = useCameraDevices();
-  const device = devices.back;
-  const camera = useRef<Camera>(null);
   const insets = useSafeAreaInsets();
 
-  const [frameProcessor, barcodes] = useScanBarcodes([BarcodeFormat.QR_CODE], {
-    checkInverted: true,
+  const device = useCameraDevice('back');
+
+  const codeScanner = useCodeScanner({
+    codeTypes: ['qr'],
+    onCodeScanned: codes => {
+      if (codes.length > 0 && isScanning) {
+        setIsScanning(false);
+        setScannedCode(codes[0].value ?? null);
+        setModalVisible(true);
+      }
+    },
   });
 
   useEffect(() => {
     (async () => {
-      const status = await Camera.requestCameraPermission();
-      setHasPermission(status === 'authorized');
+      const permission = await Camera.requestCameraPermission();
+      if (permission !== 'granted') {
+        Alert.alert(
+          'Permission Required',
+          'We need camera permission to scan QR codes',
+          [
+            {
+              text: 'OK',
+              onPress: async () => await Camera.requestCameraPermission(),
+            },
+          ],
+        );
+      }
     })();
   }, []);
 
-  useEffect(() => {
-    if (barcodes.length > 0 && isScanning && !isProcessing) {
-      handleBarCodeScanned(barcodes?.[0]?.displayValue);
-    }
-  }, [barcodes, isScanning, isProcessing]);
-
-  const handleBarCodeScanned = async (data: string | null | undefined) => {
-    if (!data) return;
-
-    setIsScanning(false);
-    setScannedCode(data);
-    setModalVisible(true);
-  };
+  if (!device) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.permissionText}>No camera device found</Text>
+      </View>
+    );
+  }
 
   const processTransaction = async (type: 'earn' | 'redeem') => {
     if (!scannedCode || !transactionAmount) {
@@ -117,37 +131,6 @@ const ScanQRScreen = () => {
     setTorchOn(!torchOn);
   };
 
-  if (!hasPermission) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.permissionContainer}>
-          <Text style={styles.permissionText}>
-            We need camera permission to scan QR codes
-          </Text>
-          <TouchableOpacity
-            style={styles.permissionButton}
-            onPress={async () => {
-              const status = await Camera.requestCameraPermission();
-              setHasPermission(status === 'authorized');
-            }}>
-            <Text style={styles.permissionButtonText}>Grant Permission</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  if (!device) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Loading camera...</Text>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <View style={[styles.header, {paddingTop: insets.top}]}>
@@ -156,12 +139,10 @@ const ScanQRScreen = () => {
 
       <View style={styles.cameraContainer}>
         <Camera
-          ref={camera}
           style={StyleSheet.absoluteFill}
           device={device}
-          isActive={isScanning && !isProcessing}
-          frameProcessor={frameProcessor}
-          frameProcessorFps={5}
+          isActive={isScanning}
+          codeScanner={codeScanner}
           torch={torchOn ? 'on' : 'off'}
         />
 
@@ -211,6 +192,7 @@ const ScanQRScreen = () => {
                 onChangeText={setTransactionAmount}
                 placeholder="Enter amount"
                 keyboardType="decimal-pad"
+                disableKeyboardShortcuts
                 autoFocus
               />
             </View>
@@ -272,11 +254,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cameraContainer: {
-    flex: 1,
     overflow: 'hidden',
     position: 'relative',
     margin: 20,
     borderRadius: 12,
+    width: StyleSheet.absoluteFill,
+    height: 400,
+    marginTop: '25%',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -285,11 +269,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scanArea: {
-    width: 250,
-    height: 250,
-    borderWidth: 2,
+    width: '60%',
+    height: '60%',
+    borderWidth: 5,
     borderColor: colors.primary,
     backgroundColor: 'transparent',
+    borderRadius: 12,
   },
   processingContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -359,9 +344,10 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
+    paddingTop: '35%',
   },
   modalContent: {
     backgroundColor: colors.card,

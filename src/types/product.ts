@@ -3,7 +3,10 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  points: number;
+  points: {
+    earn: number;
+    redeem: number;
+  };
   barcode: string;
   images: string[];
   createdAt: string;

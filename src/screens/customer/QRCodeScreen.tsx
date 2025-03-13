@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import QRCode from 'react-native-qrcode-svg';
 
+import LayoutHeader from '../../components/LayoutHeader';
 import {useAuth} from '../../contexts/AuthContext';
 import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
@@ -30,6 +31,7 @@ const QRCodeScreen = () => {
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   const insets = useSafeAreaInsets();
 
@@ -38,9 +40,14 @@ const QRCodeScreen = () => {
       setIsLoading(true);
       setError(null);
 
+      setShowQRCode(false);
+
       // Generate a new transaction code
       const response = await api.post<TransactionCodeResponse>(
         '/transaction-code',
+        {
+          type: 'points_earned_from_purchase',
+        },
       );
       setQrValue(response.data.code);
     } catch (error) {
@@ -74,9 +81,7 @@ const QRCodeScreen = () => {
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Generate Code</Text>
-        </View>
+        <LayoutHeader title="Generate Code" />
 
         <View style={styles.content}>
           <Text style={styles.title}>Your QR Code</Text>
@@ -100,11 +105,19 @@ const QRCodeScreen = () => {
               <>
                 <QRCode
                   value={qrValue || ''}
-                  size={200}
+                  size={220}
                   color={colors.text}
                   backgroundColor={colors.card}
                 />
-                <Text style={styles.codeText}>{qrValue}</Text>
+                {showQRCode ? (
+                  <Text style={styles.codeText}>{qrValue}</Text>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.showCodeButton}
+                    onPress={() => setShowQRCode(true)}>
+                    <Text style={styles.showCodeButtonText}>Show Code</Text>
+                  </TouchableOpacity>
+                )}
               </>
             )}
           </View>
@@ -137,21 +150,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
-    backgroundColor: colors.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 5,
-    textAlign: 'center',
-  },
   content: {
     padding: 40,
     flex: 1,
@@ -176,7 +174,7 @@ const styles = StyleSheet.create({
   },
   qrContainer: {
     backgroundColor: colors.card,
-    padding: 20,
+    padding: 15,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
@@ -189,11 +187,18 @@ const styles = StyleSheet.create({
     minWidth: 250,
   },
   codeText: {
-    marginTop: 20,
+    marginTop: 10,
     fontSize: 19,
     fontWeight: '800',
     color: colors.primary,
     letterSpacing: 4,
+  },
+  showCodeButton: {
+    marginTop: 10,
+  },
+  showCodeButtonText: {
+    color: colors.primary,
+    fontSize: 16,
   },
   errorContainer: {
     alignItems: 'center',

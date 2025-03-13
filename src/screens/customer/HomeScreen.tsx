@@ -15,6 +15,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
+import LayoutHeader from '../../components/LayoutHeader';
 import ProductCard from '../../components/ProductCard';
 import {useAuth} from '../../contexts/AuthContext';
 import type {Product} from 'src/types/product';
@@ -93,16 +94,7 @@ const HomeScreen = () => {
   };
 
   const renderProductItem = ({item}: {item: Product}) => (
-    <ProductCard
-      product={{
-        id: item._id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        imageUrl: item.images[0],
-      }}
-      onPress={() => handleProductPress(item._id)}
-    />
+    <ProductCard product={item} onPress={() => handleProductPress(item._id)} />
   );
 
   const renderFooter = () => {
@@ -117,20 +109,23 @@ const HomeScreen = () => {
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>
-              Hello, {user?.firstName || 'User'}
-            </Text>
-            <Text style={styles.pointsText}>
-              You have{' '}
-              <Text style={styles.pointsValue}>
-                {loyaltySummary?.currentBalance || 0}
-              </Text>{' '}
-              <Icon name="star" size={16} color={colors.card} />
-            </Text>
-          </View>
-        </View>
+        <LayoutHeader
+          title="Home"
+          customComponent={
+            <View>
+              <Text style={styles.greeting}>
+                Hello, {user?.firstName || 'User'}
+              </Text>
+              <Text style={styles.pointsText}>
+                You have{' '}
+                <Text style={styles.pointsValue}>
+                  {loyaltySummary?.currentBalance || 0}
+                </Text>{' '}
+                <Icon name="star" size={16} color={colors.card} />
+              </Text>
+            </View>
+          }
+        />
 
         <View style={styles.content}>
           <Text style={styles.sectionTitle}>Available Products</Text>

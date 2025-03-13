@@ -7,6 +7,7 @@ import {useNavigation} from '@react-navigation/native';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {useAuth} from '../../contexts/AuthContext';
 import {colors} from '../../theme/colors';
+import LayoutHeader from '../../components/LayoutHeader';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -37,9 +38,7 @@ const ProfileScreen = () => {
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Profile</Text>
-        </View>
+        <LayoutHeader title="My Profile" />
 
         <View style={styles.userInfoSection}>
           <Icon name="account-circle" size={80} color={colors.primary} />
@@ -92,21 +91,6 @@ const styles = StyleSheet.create({
   subContainer: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
-    backgroundColor: colors.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 5,
-    textAlign: 'center',
   },
   userInfoSection: {
     alignItems: 'center',

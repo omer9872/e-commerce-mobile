@@ -1,20 +1,23 @@
 'use client';
 
-import {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
+import {useState, useEffect} from 'react';
+
+import LayoutHeader from '../../components/LayoutHeader';
+import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
-import {api} from '../../services/api';
 import {colors} from '../../theme/colors';
+import {api} from '../../services/api';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -22,6 +25,7 @@ const EditProfileScreen = () => {
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
   const [isLoading, setIsLoading] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (user) {
@@ -54,73 +58,87 @@ const EditProfileScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Edit Profile</Text>
+    <View style={{...styles.container, paddingTop: insets.top}}>
+      <View style={styles.subContainer}>
+        <LayoutHeader title="Edit Profile" showBackButton />
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <Text style={styles.title}>Edit Profile</Text>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholder="Enter your first name"
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Name</Text>
+              <TextInput
+                style={styles.input}
+                value={firstName}
+                onChangeText={setFirstName}
+                placeholder="Enter your first name"
+              />
+            </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Last Name</Text>
-          <TextInput
-            style={styles.input}
-            value={lastName}
-            onChangeText={setLastName}
-            placeholder="Enter your last name"
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Last Name</Text>
+              <TextInput
+                style={styles.input}
+                value={lastName}
+                onChangeText={setLastName}
+                placeholder="Enter your last name"
+              />
+            </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={user?.email}
-            editable={false}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                value={user?.email}
+                editable={false}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Phone</Text>
-          <TextInput
-            style={styles.input}
-            value={user?.phone}
-            editable={false}
-            placeholder="Enter your phone number"
-            keyboardType="phone-pad"
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Phone</Text>
+              <TextInput
+                style={styles.input}
+                value={user?.phone}
+                editable={false}
+                placeholder="Enter your phone number"
+                keyboardType="phone-pad"
+              />
+            </View>
 
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleSave}
-          disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.saveButtonText}>Save Changes</Text>
-          )}
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleSave}
+              disabled={isLoading}>
+              {isLoading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.primary,
+  },
+  subContainer: {
+    flex: 1,
     backgroundColor: colors.background,
   },
+  scrollView: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+
   content: {
     padding: 20,
   },

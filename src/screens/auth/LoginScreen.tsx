@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
   Alert,
 } from 'react-native';
@@ -17,7 +16,9 @@ import {
   type RouteProp,
 } from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
+
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
 import {colors} from '../../theme/colors';
 
@@ -50,7 +51,7 @@ const LoginScreen = () => {
         await signInViaPhoneNumber({phone, password});
         // Auth context will handle navigation based on user type
       } catch (error) {
-        console.log(error)
+        console.log(error);
         Alert.alert(
           'Login Failed',
           'Invalid phone or password. Please try again.',

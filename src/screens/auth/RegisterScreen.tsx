@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
   Alert,
   ScrollView,
@@ -18,9 +17,11 @@ import {
   type RouteProp,
 } from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
+
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
-import {api} from '../../services/api';
+import TextInput from '../../components/TextInput';
 import {colors} from '../../theme/colors';
+import {api} from '../../services/api';
 
 type RegisterScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,

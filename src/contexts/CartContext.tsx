@@ -15,6 +15,8 @@ interface CartContextData {
   clearCart: () => Promise<void>;
   totalItems: number;
   totalPrice: number;
+  totalEarnPoints: number;
+  totalRedeemPoints: number;
 }
 
 const CartContext = createContext<CartContextData>({} as CartContextData);
@@ -108,6 +110,16 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
     0,
   );
 
+  const totalRedeemPoints = items.reduce(
+    (sum, item) => sum + item.product.points.redeem * item.quantity,
+    0,
+  );
+
+  const totalEarnPoints = items.reduce(
+    (sum, item) => sum + item.product.points.earn * item.quantity,
+    0,
+  );
+
   return (
     <CartContext.Provider
       value={{
@@ -118,6 +130,8 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
         clearCart,
         totalItems,
         totalPrice,
+        totalEarnPoints,
+        totalRedeemPoints,
       }}>
       {children}
     </CartContext.Provider>

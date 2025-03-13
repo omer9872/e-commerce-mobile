@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -9,21 +9,36 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
-import {useCart, type CartItem} from '../../contexts/CartContext';
-import {colors} from '../../theme/colors';
-import {API_URL} from '../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useNavigation} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import QRCode from 'react-native-qrcode-svg';
+
+import {TransactionCodeResponse} from '../../types/transactionCode';
+import {useCart, type CartItem} from '../../contexts/CartContext';
+import {api, API_URL} from '../../services/api';
+import {colors} from '../../theme/colors';
 
 const CartScreen = () => {
-  const {items, removeFromCart, updateQuantity, clearCart, totalPrice} =
-    useCart();
+  const {
+    items,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    totalPrice,
+    totalRedeemPoints,
+  } = useCart();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const [token, setToken] = React.useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [transactionCode, setTransactionCode] = useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchToken = async () => {
@@ -86,7 +101,7 @@ const CartScreen = () => {
     ]);
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (items.length === 0) {
       Alert.alert(
         'Empty Cart',
@@ -95,8 +110,45 @@ const CartScreen = () => {
       return;
     }
 
-    // Navigate to checkout or implement checkout logic
-    Alert.alert('Checkout', 'Checkout functionality will be implemented soon.');
+    try {
+      setIsCheckingOut(true);
+
+      // Format the cart items into the required payload format
+      const products = items.map(item => ({
+        product: item.product._id,
+        quantity: item.quantity,
+      }));
+
+      // Send the checkout request
+      const response = await api.post<TransactionCodeResponse>(
+        '/transaction-code',
+        {
+          type: 'points_redeemed_for_purchase',
+          products,
+        },
+      );
+
+      // Set the transaction code and show the modal
+      setTransactionCode(response.data.code);
+      setModalVisible(true);
+
+      // Clear the cart after successful checkout
+      await clearCart();
+    } catch (error) {
+      console.error('Checkout error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Checkout Failed',
+        text2: 'There was an error processing your checkout. Please try again.',
+      });
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setTransactionCode(null);
   };
 
   const renderCartItem = ({item}: {item: CartItem}) => (
@@ -182,9 +234,17 @@ const CartScreen = () => {
             <View style={styles.footer}>
               <View style={styles.totalContainer}>
                 <Text style={styles.totalLabel}>Total:</Text>
-                <Text style={styles.totalPrice}>${totalPrice.toFixed(2)}</Text>
+                <View style={styles.totalPriceContainer}>
+                  <View style={styles.totalRedeemPointsContainer}>
+                    <Text style={styles.totalPoints}>{totalRedeemPoints}</Text>
+                    <Icon name="star" size={20} color={colors.primary} />
+                  </View>
+                  <Text style={styles.orText}>or</Text>
+                  <Text style={styles.totalPrice}>
+                    ${totalPrice.toFixed(2)}
+                  </Text>
+                </View>
               </View>
-
               <TouchableOpacity
                 style={styles.checkoutButton}
                 onPress={handleCheckout}>
@@ -194,6 +254,48 @@ const CartScreen = () => {
           </>
         )}
       </View>
+
+      {/* Transaction Code Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Transaction Complete</Text>
+              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+                <Icon name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.codeContainer}>
+              <Text style={styles.codeLabel}>Your Transaction Code:</Text>
+              {transactionCode && (
+                <QRCode
+                  value={transactionCode}
+                  size={200}
+                  color={colors.text}
+                  backgroundColor={colors.card}
+                />
+              )}
+              <Text style={styles.codeValue}>{transactionCode}</Text>
+              <Text style={styles.codeInstructions}>
+                Please show this code to the merchant to complete your purchase.
+              </Text>
+            </View>
+
+            <View style={styles.iconContainer}>
+              <Icon name="check-circle" size={60} color={colors.success} />
+            </View>
+
+            <TouchableOpacity style={styles.doneButton} onPress={closeModal}>
+              <Text style={styles.doneButtonText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -332,10 +434,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: colors.text,
   },
+  totalPriceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  totalRedeemPointsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
   totalPrice: {
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.primary,
+  },
+  totalPoints: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
+  orText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.text,
   },
   checkoutButton: {
     backgroundColor: colors.primary,
@@ -344,6 +466,82 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 20,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  closeButton: {
+    padding: 5,
+  },
+  codeContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  codeLabel: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    marginBottom: 8,
+  },
+  codeValue: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: colors.primary,
+    letterSpacing: 2,
+    marginVertical: 16,
+  },
+  codeInstructions: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    paddingHorizontal: 10,
+  },
+  iconContainer: {
+    marginBottom: 10,
+  },
+  doneButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  doneButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',

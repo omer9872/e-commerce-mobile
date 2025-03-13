@@ -10,17 +10,19 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {colors} from '../../theme/colors';
-import {useAuth} from '../../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
+import LayoutHeader from '../../components/LayoutHeader';
+import {useAuth} from '../../contexts/AuthContext';
+import {colors} from '../../theme/colors';
 
 const SettingsScreen = () => {
-  const navigation = useNavigation();
   const {signOut} = useAuth();
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const togglePushNotifications = () =>
     setPushNotifications(previousState => !previousState);
@@ -67,66 +69,85 @@ const SettingsScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Push Notifications</Text>
-          <Switch
-            value={pushNotifications}
-            onValueChange={togglePushNotifications}
-            trackColor={{false: colors.border, true: colors.primary}}
-            thumbColor={pushNotifications ? colors.card : colors.background}
-          />
-        </View>
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Email Notifications</Text>
-          <Switch
-            value={emailNotifications}
-            onValueChange={toggleEmailNotifications}
-            trackColor={{false: colors.border, true: colors.primary}}
-            thumbColor={emailNotifications ? colors.card : colors.background}
-          />
-        </View>
-      </View>
+    <View style={{...styles.container, paddingTop: insets.top}}>
+      <View style={styles.subContainer}>
+        <LayoutHeader title="Settings" showBackButton />
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Appearance</Text>
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Dark Mode</Text>
-          <Switch
-            value={darkMode}
-            onValueChange={toggleDarkMode}
-            trackColor={{false: colors.border, true: colors.primary}}
-            thumbColor={darkMode ? colors.card : colors.background}
-          />
-        </View>
-      </View>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Notifications</Text>
+            <View style={styles.settingItem}>
+              <Text style={styles.settingLabel}>Push Notifications</Text>
+              <Switch
+                value={pushNotifications}
+                onValueChange={togglePushNotifications}
+                trackColor={{false: colors.border, true: colors.primary}}
+                thumbColor={pushNotifications ? colors.card : colors.background}
+              />
+            </View>
+            <View style={styles.settingItem}>
+              <Text style={styles.settingLabel}>Email Notifications</Text>
+              <Switch
+                value={emailNotifications}
+                onValueChange={toggleEmailNotifications}
+                trackColor={{false: colors.border, true: colors.primary}}
+                thumbColor={
+                  emailNotifications ? colors.card : colors.background
+                }
+              />
+            </View>
+          </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-          <Icon name="logout" size={24} color={colors.error} />
-          <Text style={[styles.buttonText, {color: colors.error}]}>
-            Sign Out
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleDeleteAccount}>
-          <Icon name="delete" size={24} color={colors.error} />
-          <Text style={[styles.buttonText, {color: colors.error}]}>
-            Delete Account
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Appearance</Text>
+            <View style={styles.settingItem}>
+              <Text style={styles.settingLabel}>Dark Mode</Text>
+              <Switch
+                value={darkMode}
+                onValueChange={toggleDarkMode}
+                trackColor={{false: colors.border, true: colors.primary}}
+                thumbColor={darkMode ? colors.card : colors.background}
+              />
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Account</Text>
+            <TouchableOpacity style={styles.button} onPress={handleSignOut}>
+              <Icon name="logout" size={24} color={colors.error} />
+              <Text style={[styles.buttonText, {color: colors.error}]}>
+                Sign Out
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleDeleteAccount}>
+              <Icon name="delete" size={24} color={colors.error} />
+              <Text style={[styles.buttonText, {color: colors.error}]}>
+                Delete Account
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.primary,
+  },
+  subContainer: {
+    flex: 1,
     backgroundColor: colors.background,
   },
+  scrollView: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+
   section: {
     padding: 20,
     borderBottomWidth: 1,

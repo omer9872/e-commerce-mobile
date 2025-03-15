@@ -4,13 +4,17 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Customer Screens
+import HomeScreen from '../screens/customer/HomeScreen';
 import ProductDetailScreen from '../screens/customer/ProductDetailScreen';
+import ProfileScreen from '../screens/customer/ProfileScreen';
 import EditProfileScreen from '../screens/customer/EditProfileScreen';
 import SettingsScreen from '../screens/customer/SettingsScreen';
-import ProfileScreen from '../screens/customer/ProfileScreen';
 import QRCodeScreen from '../screens/customer/QRCodeScreen';
 import CartScreen from '../screens/customer/CartScreen';
-import HomeScreen from '../screens/customer/HomeScreen';
+import AddressListScreen from '../screens/customer/AddressListScreen';
+import AddressFormScreen from '../screens/customer/AddressFormScreen';
+import PaymentCardListScreen from '../screens/customer/PaymentCardListScreen';
+import PaymentCardFormScreen from '../screens/customer/PaymentCardFormScreen';
 
 // Stack param lists
 export type CustomerHomeStackParamList = {
@@ -22,6 +26,10 @@ export type CustomerProfileStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
   Settings: undefined;
+  AddressList: undefined;
+  AddressForm: {addressId?: string};
+  PaymentCardList: undefined;
+  PaymentCardForm: {cardId?: string};
 };
 
 // Create the stack navigators
@@ -40,7 +48,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen
         name="ProductDetail"
         component={ProductDetailScreen}
-        options={{headerShown: false}}
+        options={{title: 'Product Details'}}
       />
     </HomeStack.Navigator>
   );
@@ -64,6 +72,34 @@ const ProfileStackNavigator = () => {
         name="Settings"
         component={SettingsScreen}
         options={{headerShown: false}}
+      />
+      <ProfileStack.Screen
+        name="AddressList"
+        component={AddressListScreen}
+        options={{title: 'My Addresses'}}
+      />
+      <ProfileStack.Screen
+        name="AddressForm"
+        component={AddressFormScreen}
+        options={({route}) => ({
+          title: route.params?.addressId ? 'Edit Address' : 'Add New Address',
+          headerBackTitle: 'Back',
+        })}
+      />
+      <ProfileStack.Screen
+        name="PaymentCardList"
+        component={PaymentCardListScreen}
+        options={{title: 'Payment Methods'}}
+      />
+      <ProfileStack.Screen
+        name="PaymentCardForm"
+        component={PaymentCardFormScreen}
+        options={({route}) => ({
+          title: route.params?.cardId
+            ? 'Edit Payment Method'
+            : 'Add Payment Method',
+          headerBackTitle: 'Back',
+        })}
       />
     </ProfileStack.Navigator>
   );

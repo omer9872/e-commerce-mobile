@@ -19,7 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import QRCode from 'react-native-qrcode-svg';
 
-import {TransactionCodeResponse} from '../../types/transactionCode';
+import type {TransactionCodeResponse} from '../../types/transactionCode';
 import {useCart, type CartItem} from '../../contexts/CartContext';
 import {api, API_URL} from '../../services/api';
 import {colors} from '../../theme/colors';
@@ -36,9 +36,12 @@ const CartScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [token, setToken] = useState<string | null>(null);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isRedeemingPoints, setIsRedeemingPoints] = useState(false);
+  const [isPayingWithCard, setIsPayingWithCard] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [transactionCode, setTransactionCode] = useState<string | null>(null);
+  const [paymentInitiated, setPaymentInitiated] = useState(false);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchToken = async () => {
@@ -101,7 +104,7 @@ const CartScreen = () => {
     ]);
   };
 
-  const handleCheckout = async () => {
+  const handleRedeemPoints = async () => {
     if (items.length === 0) {
       Alert.alert(
         'Empty Cart',
@@ -111,7 +114,7 @@ const CartScreen = () => {
     }
 
     try {
-      setIsCheckingOut(true);
+      setIsRedeemingPoints(true);
 
       // Format the cart items into the required payload format
       const products = items.map(item => ({
@@ -135,27 +138,83 @@ const CartScreen = () => {
       // Clear the cart after successful checkout
       await clearCart();
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('Redeem points error:', error);
       Toast.show({
         type: 'error',
-        text1: 'Checkout Failed',
-        text2: 'There was an error processing your checkout. Please try again.',
+        text1: 'Redemption Failed',
+        text2:
+          'There was an error processing your points redemption. Please try again.',
       });
     } finally {
-      setIsCheckingOut(false);
+      setIsRedeemingPoints(false);
+    }
+  };
+
+  const handlePayWithCard = async () => {
+    if (items.length === 0) {
+      Alert.alert(
+        'Empty Cart',
+        'Your cart is empty. Add some items before checkout.',
+      );
+      return;
+    }
+
+    try {
+      setIsPayingWithCard(true);
+
+      // Format the cart items into the required payload format - just the product IDs
+      const productIds = items.map(item => item.product._id);
+
+      // Send the payment init request
+      const response = await api.post('/payment/init', {
+        products: productIds,
+      });
+
+      console.log(response);
+
+      // Handle the payment response
+      if (response.data && response.data._id) {
+        setPaymentId(response.data._id);
+        setPaymentInitiated(true);
+        setModalVisible(true);
+
+        // Clear the cart after successful payment initiation
+        await clearCart();
+
+        Toast.show({
+          type: 'success',
+          text1: 'Payment Initiated',
+          text2: 'Your payment has been successfully initiated.',
+        });
+      } else {
+        throw new Error('Invalid payment response');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Payment Failed',
+        text2: 'There was an error processing your payment. Please try again.',
+      });
+    } finally {
+      setIsPayingWithCard(false);
     }
   };
 
   const closeModal = () => {
     setModalVisible(false);
     setTransactionCode(null);
+    setPaymentInitiated(false);
+    setPaymentId(null);
   };
 
   const renderCartItem = ({item}: {item: CartItem}) => (
     <View style={styles.cartItem}>
       <Image
         source={{
-          uri: `${API_URL}/image/${item.product.images[0]}`,
+          uri: item.product.images[0]
+            ? `${API_URL}/image/${item.product.images[0]}`
+            : undefined,
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -234,22 +293,39 @@ const CartScreen = () => {
             <View style={styles.footer}>
               <View style={styles.totalContainer}>
                 <Text style={styles.totalLabel}>Total:</Text>
-                <View style={styles.totalPriceContainer}>
-                  <View style={styles.totalRedeemPointsContainer}>
-                    <Text style={styles.totalPoints}>{totalRedeemPoints}</Text>
-                    <Icon name="star" size={20} color={colors.primary} />
-                  </View>
-                  <Text style={styles.orText}>or</Text>
-                  <Text style={styles.totalPrice}>
-                    ${totalPrice.toFixed(2)}
-                  </Text>
-                </View>
+                <Text style={styles.totalPrice}>${totalPrice.toFixed(2)}</Text>
               </View>
-              <TouchableOpacity
-                style={styles.checkoutButton}
-                onPress={handleCheckout}>
-                <Text style={styles.checkoutButtonText}>Checkout</Text>
-              </TouchableOpacity>
+
+              <View style={styles.pointsContainer}>
+                <Icon name="star" size={16} color={colors.primary} />
+                <Text style={styles.pointsText}>
+                  Or redeem with {totalRedeemPoints || totalPrice * 10} points
+                </Text>
+              </View>
+
+              <View style={styles.checkoutButtonsContainer}>
+                <TouchableOpacity
+                  style={[styles.checkoutButton, styles.redeemButton]}
+                  onPress={handleRedeemPoints}
+                  disabled={isRedeemingPoints || isPayingWithCard}>
+                  {isRedeemingPoints ? (
+                    <ActivityIndicator color="#FFFFFF" size="small" />
+                  ) : (
+                    <Text style={styles.checkoutButtonText}>Redeem Points</Text>
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.checkoutButton, styles.payButton]}
+                  onPress={handlePayWithCard}
+                  disabled={isRedeemingPoints || isPayingWithCard}>
+                  {isPayingWithCard ? (
+                    <ActivityIndicator color="#FFFFFF" size="small" />
+                  ) : (
+                    <Text style={styles.checkoutButtonText}>Pay with Card</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </>
         )}
@@ -264,31 +340,49 @@ const CartScreen = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Transaction Complete</Text>
+              <Text style={styles.modalTitle}>
+                {paymentInitiated
+                  ? 'Payment Successful'
+                  : 'Transaction Complete'}
+              </Text>
               <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                 <Icon name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
-            <View style={styles.codeContainer}>
-              <Text style={styles.codeLabel}>Your Transaction Code:</Text>
-              {transactionCode && (
-                <QRCode
-                  value={transactionCode}
-                  size={200}
-                  color={colors.text}
-                  backgroundColor={colors.card}
-                />
-              )}
-              <Text style={styles.codeValue}>{transactionCode}</Text>
-              <Text style={styles.codeInstructions}>
-                Please show this code to the merchant to complete your purchase.
-              </Text>
-            </View>
-
-            <View style={styles.iconContainer}>
-              <Icon name="check-circle" size={60} color={colors.success} />
-            </View>
+            {paymentInitiated ? (
+              <View style={styles.paymentSuccessContainer}>
+                <View style={styles.iconContainer}>
+                  <Icon name="check-circle" size={80} color={colors.success} />
+                </View>
+                <Text style={styles.paymentSuccessText}>
+                  Your payment has been successfully processed.
+                </Text>
+                <Text style={styles.paymentIdText}>
+                  Payment ID: {paymentId}
+                </Text>
+                <Text style={styles.paymentInstructionsText}>
+                  You will receive a confirmation email shortly.
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.codeContainer}>
+                <Text style={styles.codeLabel}>Your Transaction Code:</Text>
+                {transactionCode && (
+                  <QRCode
+                    value={transactionCode}
+                    size={200}
+                    color={colors.text}
+                    backgroundColor={colors.card}
+                  />
+                )}
+                <Text style={styles.codeValue}>{transactionCode}</Text>
+                <Text style={styles.codeInstructions}>
+                  Please show this code to the merchant to complete your
+                  purchase.
+                </Text>
+              </View>
+            )}
 
             <TouchableOpacity style={styles.doneButton} onPress={closeModal}>
               <Text style={styles.doneButtonText}>Done</Text>
@@ -428,42 +522,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   totalLabel: {
     fontSize: 18,
     color: colors.text,
-  },
-  totalPriceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  totalRedeemPointsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
   },
   totalPrice: {
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.primary,
   },
-  totalPoints: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.primary,
+  pointsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginBottom: 16,
+    gap: 4,
   },
-  orText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
+  pointsText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  checkoutButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
   },
   checkoutButton: {
-    backgroundColor: colors.primary,
+    flex: 1,
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  redeemButton: {
+    backgroundColor: colors.secondary || '#6B7280',
+  },
+  payButton: {
+    backgroundColor: colors.primary,
   },
   checkoutButtonText: {
     color: '#FFFFFF',
@@ -528,6 +625,29 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 10,
+  },
+  paymentSuccessContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  paymentSuccessText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    textAlign: 'center',
+    marginTop: 16,
+  },
+  paymentIdText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: 8,
+  },
+  paymentInstructionsText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 16,
   },
   iconContainer: {
     marginBottom: 10,

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -18,6 +19,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Carousel from 'react-native-reanimated-carousel';
 import Toast from 'react-native-toast-message';
 
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
@@ -27,7 +29,7 @@ import {api, API_URL} from '../../services/api';
 import type {Product} from 'src/types/product';
 import {colors} from '../../theme/colors';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import LayoutHeader from '../../components/LayoutHeader';
+
 type ProductDetailScreenRouteProp = RouteProp<
   CustomerHomeStackParamList,
   'ProductDetail'
@@ -43,7 +45,7 @@ const ProductDetailScreen = () => {
   const {addToCart, removeFromCart, items} = useCart();
   const [token, setToken] = useState<string | null>(null);
   const navigation = useNavigation();
-
+  const width = Dimensions.get('window').width;
   const insets = useSafeAreaInsets();
 
   const fetchProductDetails = async () => {
@@ -119,6 +121,23 @@ const ProductDetailScreen = () => {
     });
   };
 
+  const renderCarouselItem = (item: string) => {
+    return (
+      <View style={styles.carouselItemContainer}>
+        <Image
+          source={{
+            uri: `${API_URL}/image/${item}`,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }}
+          style={styles.productImage}
+          defaultSource={require('../../assets/images/logo.jpg')}
+        />
+      </View>
+    );
+  };
+
   const currentBalance = useMemo(
     () => loyaltySummary?.currentBalance || 0,
     [loyaltySummary],
@@ -153,85 +172,93 @@ const ProductDetailScreen = () => {
   }
 
   return (
-    <View style={{...styles.container, paddingTop: insets.top}}>
-      <View style={styles.subContainer}>
-        <LayoutHeader title="Product Details" showBackButton />
-
-        <ScrollView style={styles.scrollView}>
-          <Image
-            source={{
-              uri: `${API_URL}/image/${product.images[0]}`,
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+    <ScrollView style={styles.container}>
+      {product.images && product.images.length > 0 && (
+        <View style={styles.carouselContainer}>
+          <Carousel
+            loop={false}
+            width={width}
+            height={300}
+            autoPlay={false}
+            data={product.images}
+            scrollAnimationDuration={1000}
+            renderItem={({item}) => renderCarouselItem(item)}
+            mode={'horizontal-stack'}
+            modeConfig={{
+              snapDirection: 'left',
+              stackInterval: 18,
+              rotateZDeg: 1,
             }}
-            style={styles.productImage}
-            defaultSource={require('../../assets/images/logo.jpg')}
+            customConfig={() => ({type: 'positive', viewCount: 5})}
           />
-          <View style={styles.contentContainer}>
-            <Text style={styles.productName}>{product.name}</Text>
-            <Text style={styles.pointsRequired}>{product.price} ₺</Text>
-            <Text style={styles.description}>{product.description}</Text>
+        </View>
+      )}
+      <View style={styles.contentContainer}>
+        <Text style={styles.productName}>{product.name}</Text>
+        <Text style={styles.pointsRequired}>{product.price} ₺</Text>
+        <Text style={styles.description}>{product.description}</Text>
 
-            <TouchableOpacity
-              style={[
-                styles.redeemButton,
-                {opacity: currentBalance >= product.price ? 1 : 0.5},
-              ]}
-              onPress={handleRedeemProduct}
-              disabled={currentBalance < product.price}>
-              <Text style={styles.redeemButtonText}>
-                {currentBalance >= product.price
-                  ? 'Redeem Now'
-                  : 'Not Enough Points'}
-              </Text>
-            </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.redeemButton,
+            {opacity: currentBalance >= product.price ? 1 : 0.5},
+          ]}
+          onPress={handleRedeemProduct}
+          disabled={currentBalance < product.price}>
+          <Text style={styles.redeemButtonText}>
+            {currentBalance >= product.price
+              ? 'Redeem Now'
+              : 'Not Enough Points'}
+          </Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.addToCartButton,
-                isAddedToCart
-                  ? {backgroundColor: colors.error}
-                  : {backgroundColor: colors.primary},
-              ]}
-              onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}>
-              <Icon
-                name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
-                size={20}
-                color="#FFFFFF"
-              />
-              <Text style={styles.buttonText}>
-                {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
-              </Text>
-            </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.addToCartButton,
+            isAddedToCart
+              ? {backgroundColor: colors.error}
+              : {backgroundColor: colors.primary},
+          ]}
+          onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}>
+          <Icon
+            name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
+            size={20}
+            color="#FFFFFF"
+          />
+          <Text style={styles.buttonText}>
+            {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
+          </Text>
+        </TouchableOpacity>
 
-            {currentBalance < product.points && (
-              <Text style={styles.pointsNeeded}>
-                You need {product.points - currentBalance} more points to redeem
-                this product.
-              </Text>
-            )}
-          </View>
-        </ScrollView>
+        {currentBalance < product.points.redeem && (
+          <Text style={styles.pointsNeeded}>
+            You need {product.points.redeem - currentBalance} more points to
+            redeem this product.
+          </Text>
+        )}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
-  },
-  subContainer: {
-    flex: 1,
     backgroundColor: colors.background,
   },
-  scrollView: {
-    flex: 1,
-    backgroundColor: colors.background,
+  carouselContainer: {
+    marginTop: 20,
   },
-
+  carouselItemContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    borderRadius: 10,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -245,14 +272,6 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: colors.error,
-  },
-  productImage: {
-    width: '100%',
-    marginTop: 20,
-    paddingHorizontal: 20,
-    height: 300,
-    resizeMode: 'cover',
-    borderRadius: 10,
   },
   contentContainer: {
     padding: 20,

@@ -1,7 +1,6 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createStackNavigator} from '@react-navigation/stack';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {createStackNavigator} from '@react-navigation/stack';
 
 // Customer Screens
 import HomeScreen from '../screens/customer/HomeScreen';
@@ -15,6 +14,8 @@ import AddressListScreen from '../screens/customer/AddressListScreen';
 import AddressFormScreen from '../screens/customer/AddressFormScreen';
 import PaymentCardListScreen from '../screens/customer/PaymentCardListScreen';
 import PaymentCardFormScreen from '../screens/customer/PaymentCardFormScreen';
+import TransactionHistoryScreen from '../screens/customer/TransactionHistoryScreen';
+import TransactionDetailScreen from '../screens/customer/TransactionDetailScreen';
 
 // Stack param lists
 export type CustomerHomeStackParamList = {
@@ -30,6 +31,8 @@ export type CustomerProfileStackParamList = {
   AddressForm: {addressId?: string};
   PaymentCardList: undefined;
   PaymentCardForm: {cardId?: string};
+  TransactionHistory: undefined;
+  TransactionDetail: {transactionId: string};
 };
 
 // Create the stack navigators
@@ -90,6 +93,16 @@ const ProfileStackNavigator = () => {
         name="PaymentCardList"
         component={PaymentCardListScreen}
         options={{title: 'Payment Methods'}}
+      />
+      <ProfileStack.Screen
+        name="TransactionHistory"
+        component={TransactionHistoryScreen}
+        options={{title: 'Transaction History'}}
+      />
+      <ProfileStack.Screen
+        name="TransactionDetail"
+        component={TransactionDetailScreen}
+        options={{title: 'Transaction Detail'}}
       />
       <ProfileStack.Screen
         name="PaymentCardForm"

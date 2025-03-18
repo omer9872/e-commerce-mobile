@@ -43,6 +43,10 @@ const ProfileScreen = () => {
     navigation.navigate('PaymentCardList');
   };
 
+  const navigateToTransactionHistory = () => {
+    navigation.navigate('TransactionHistory');
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -94,6 +98,13 @@ const ProfileScreen = () => {
               onPress={navigateToPaymentCards}>
               <Icon name="credit-card" size={24} color={colors.primary} />
               <Text style={styles.actionText}>Payment Methods</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={navigateToTransactionHistory}>
+              <Icon name="history" size={24} color={colors.primary} />
+              <Text style={styles.actionText}>Transaction History</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

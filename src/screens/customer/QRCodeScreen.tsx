@@ -46,7 +46,7 @@ const QRCodeScreen = () => {
       const response = await api.post<TransactionCodeResponse>(
         '/transaction-code',
         {
-          type: 'points_earned_from_purchase',
+          type: 'earn',
         },
       );
       setQrValue(response.data.code);

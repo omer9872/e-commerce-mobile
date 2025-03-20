@@ -16,6 +16,10 @@ import PaymentCardListScreen from '../screens/customer/PaymentCardListScreen';
 import PaymentCardFormScreen from '../screens/customer/PaymentCardFormScreen';
 import TransactionHistoryScreen from '../screens/customer/TransactionHistoryScreen';
 import TransactionDetailScreen from '../screens/customer/TransactionDetailScreen';
+import EmailVerificationScreen from '../screens/customer/EmailVerificationScreen';
+import EmailVerificationCodeScreen from '../screens/customer/EmailVerificationCodeScreen';
+import PhoneVerificationScreen from '../screens/customer/PhoneVerificationScreen';
+import PhoneVerificationCodeScreen from '../screens/customer/PhoneVerificationCodeScreen';
 
 // Stack param lists
 export type CustomerHomeStackParamList = {
@@ -33,6 +37,10 @@ export type CustomerProfileStackParamList = {
   PaymentCardForm: {cardId?: string};
   TransactionHistory: undefined;
   TransactionDetail: {transactionId: string};
+  EmailVerification: undefined;
+  EmailVerificationCode: {email: string};
+  PhoneVerification: undefined;
+  PhoneVerificationCode: {phone: string};
 };
 
 // Create the stack navigators
@@ -69,12 +77,12 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen
         name="EditProfile"
         component={EditProfileScreen}
-        options={{headerShown: false}}
+        options={{title: 'Edit Profile'}}
       />
       <ProfileStack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{headerShown: false}}
+        options={{title: 'Settings'}}
       />
       <ProfileStack.Screen
         name="AddressList"
@@ -113,6 +121,26 @@ const ProfileStackNavigator = () => {
             : 'Add Payment Method',
           headerBackTitle: 'Back',
         })}
+      />
+      <ProfileStack.Screen
+        name="EmailVerification"
+        component={EmailVerificationScreen}
+        options={{title: 'Verify Email'}}
+      />
+      <ProfileStack.Screen
+        name="EmailVerificationCode"
+        component={EmailVerificationCodeScreen}
+        options={{title: 'Verification Code'}}
+      />
+      <ProfileStack.Screen
+        name="PhoneVerification"
+        component={PhoneVerificationScreen}
+        options={{title: 'Verify Phone'}}
+      />
+      <ProfileStack.Screen
+        name="PhoneVerificationCode"
+        component={PhoneVerificationCodeScreen}
+        options={{title: 'Verification Code'}}
       />
     </ProfileStack.Navigator>
   );

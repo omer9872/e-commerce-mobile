@@ -1,5 +1,8 @@
 import {api} from './api';
-import type {TransactionResponse, Transaction} from '../types/transaction';
+import type {
+  TransactionResponse,
+  TransactionDetail,
+} from '../types/transaction';
 
 export const fetchTransactions = async (
   page = 0,
@@ -18,7 +21,7 @@ export const fetchTransactions = async (
 
 export const fetchTransactionById = async (
   id: string,
-): Promise<Transaction> => {
+): Promise<TransactionDetail> => {
   try {
     const response = await api.get(`/transaction/my-transaction/${id}`);
     return response.data;

@@ -13,7 +13,6 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import LayoutHeader from '../../components/LayoutHeader';
 import {useAuth} from '../../contexts/AuthContext';
 import {colors} from '../../theme/colors';
 
@@ -69,11 +68,9 @@ const SettingsScreen = () => {
   };
 
   return (
-    <View style={{...styles.container, paddingTop: insets.top}}>
-      <View style={styles.subContainer}>
-        <LayoutHeader title="Settings" showBackButton />
-
-        <ScrollView style={styles.scrollView}>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.content}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Notifications</Text>
             <View style={styles.settingItem}>
@@ -128,8 +125,8 @@ const SettingsScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -137,19 +134,16 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
-  },
-  subContainer: {
-    flex: 1,
     backgroundColor: colors.background,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: colors.background,
+  },
+  content: {
+    padding: 20,
   },
 
   section: {
-    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },

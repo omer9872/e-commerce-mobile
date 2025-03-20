@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -173,6 +174,7 @@ const ProductDetailScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
       {product.images && product.images.length > 0 && (
         <View style={styles.carouselContainer}>
           <Carousel

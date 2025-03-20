@@ -15,7 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactions} from '../../services/transactionService';
-import type {Transaction} from '../../types/transaction';
+import {TransactionType, type Transaction} from '../../types/transaction';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
@@ -89,7 +89,9 @@ const TransactionHistoryScreen = () => {
   }, [loadTransactions]);
 
   const renderTransactionItem = ({item}: {item: Transaction}) => {
-    const isEarn = item.type === 'earn';
+    const isEarn =
+      item.type === TransactionType.EARN ||
+      item.type === TransactionType.PURCHASE;
     const date = new Date(item.createdAt);
     const formattedDate = dayjs(date).format('MMMM ddd, YYYY');
     const formattedTime = dayjs(date).format('hh:mm');

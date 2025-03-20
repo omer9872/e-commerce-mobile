@@ -17,7 +17,7 @@ import {
 } from '@react-navigation/native';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactionById} from '../../services/transactionService';
-import type {Transaction} from '../../types/transaction';
+import {TransactionType, type TransactionDetail} from '../../types/transaction';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
@@ -31,7 +31,9 @@ const TransactionDetailScreen = () => {
   const route = useRoute<TransactionDetailScreenRouteProp>();
   const navigation = useNavigation();
   const {transactionId} = route.params;
-  const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [transaction, setTransaction] = useState<TransactionDetail | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,6 +41,7 @@ const TransactionDetailScreen = () => {
       try {
         setLoading(true);
         const data = await fetchTransactionById(transactionId);
+        console.log(data);
         setTransaction(data);
       } catch (error) {
         console.log(error);
@@ -77,7 +80,9 @@ const TransactionDetailScreen = () => {
     );
   }
 
-  const isEarn = transaction.type === 'earn';
+  const isEarn =
+    transaction.type === TransactionType.EARN ||
+    transaction.type === TransactionType.PURCHASE;
   const date = new Date(transaction.createdAt);
   const formattedDate = dayjs(date).format('MMMM dddd, YYYY');
   const formattedTime = dayjs(date).format('hh:mm');
@@ -115,7 +120,7 @@ const TransactionDetailScreen = () => {
           </Text>
           {transaction.totalAmount > 0 && (
             <Text style={styles.moneyAmount}>
-              ${transaction.totalAmount.toFixed(2)}
+              ${(transaction?.totalAmount ?? 0).toFixed(2)}
             </Text>
           )}
         </View>
@@ -184,8 +189,10 @@ const TransactionDetailScreen = () => {
             <Text style={styles.itemsTitle}>Items</Text>
             {transaction.items.map((item, index) => (
               <View key={index} style={styles.itemRow}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+                <Text style={styles.itemName}>{item.product.name}</Text>
+                <Text style={styles.itemPrice}>
+                  ${(item?.product?.price ?? 0).toFixed(2)} x {item.quantity}
+                </Text>
               </View>
             ))}
           </View>

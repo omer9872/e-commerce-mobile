@@ -1,13 +1,13 @@
 'use client';
 
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useCart} from '../contexts/CartContext';
 import Toast from 'react-native-toast-message';
 
 import {Product} from '../types/product';
+import Image from '../components/Image';
 import {API_URL} from '../services/api';
 import {colors} from '../theme/colors';
 
@@ -17,17 +17,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({product, onPress}: ProductCardProps) => {
-  const [token, setToken] = useState<string | null>(null);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const {addToCart, removeFromCart, items} = useCart();
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      const token = await AsyncStorage.getItem('@LoyaltyApp:token');
-      setToken(token);
-    };
-    fetchToken();
-  }, []);
 
   // Check if product is already in cart
   useEffect(() => {
@@ -73,12 +64,7 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image
-        source={{
-          uri: `${API_URL}/image/${product.images[0]}`,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }}
+        id={product.images[0]}
         style={styles.image}
         defaultSource={require('../assets/images/logo.jpg')}
       />

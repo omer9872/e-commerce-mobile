@@ -208,9 +208,10 @@ const AddressListScreen = () => {
               data={userInfo.addresses}
               renderItem={renderAddressItem}
               keyExtractor={item => item._id!}
-              contentContainerStyle={styles.listContainer}
+              contentContainerStyle={styles.list}
               onRefresh={handleRefresh}
               refreshing={refreshing}
+              style={styles.listContainer}
             />
           )}
           <TouchableOpacity style={styles.addButton} onPress={handleAddAddress}>
@@ -227,12 +228,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: 16,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  list: {
+    padding: 16,
   },
   listContainer: {
     paddingBottom: 80, // Space for the add button

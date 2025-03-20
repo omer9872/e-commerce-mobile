@@ -5,7 +5,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
@@ -13,15 +12,16 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {colors} from '../../theme/colors';
 import type {PaymentCardFormData} from '../../types/paymentCard';
-import Toast from 'react-native-toast-message';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {addPaymentCard} from '../../services/paymentCardService';
+import TextInput from '../../components/TextInput';
+import {colors} from '../../theme/colors';
 
 type PaymentCardFormScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,

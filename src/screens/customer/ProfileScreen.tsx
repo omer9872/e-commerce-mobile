@@ -13,9 +13,11 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {useAuth} from '../../contexts/AuthContext';
-import {colors} from '../../theme/colors';
 import LayoutHeader from '../../components/LayoutHeader';
+import {adjustColor} from '../../utils/colorUtils';
+import {useAuth} from '../../contexts/AuthContext';
+import Avatar from '../../components/Avatar';
+import {colors} from '../../theme/colors';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -47,6 +49,14 @@ const ProfileScreen = () => {
     navigation.navigate('TransactionHistory');
   };
 
+  const navigateToEmailVerification = () => {
+    navigation.navigate('EmailVerification');
+  };
+
+  const navigateToPhoneVerification = () => {
+    navigation.navigate('PhoneVerification');
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -61,21 +71,76 @@ const ProfileScreen = () => {
       <View style={styles.subContainer}>
         <LayoutHeader title="My Profile" />
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.userInfoSection}>
-            <Icon name="account-circle" size={80} color={colors.primary} />
-            <Text style={styles.userName}>{`${user?.firstName || ''} ${
-              user?.lastName || ''
-            }`}</Text>
-            <Text style={styles.userEmail}>
-              {user?.email || user?.phone || ''}
-            </Text>
-            <View style={styles.pointsContainer}>
-              <Icon name="star" size={24} color={colors.primary} />
-              <Text style={styles.pointsText}>
-                {loyaltySummary?.currentBalance ?? 0} Points
-              </Text>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={styles.scrollView}>
+          <View style={styles.userSection}>
+            <Avatar id={user?.image} size={100} />
+            <View style={styles.userInfoSection}>
+              <Text style={styles.userName}>{`${user?.firstName || ''} ${
+                user?.lastName || ''
+              }`}</Text>
+              <View style={styles.userInfoRow}>
+                <Icon name="email" size={20} color={colors.primary} />
+                <Text style={styles.userEmail}>{user?.email || ''}</Text>
+              </View>
+              <View style={styles.userInfoRow}>
+                <Icon name="phone" size={20} color={colors.primary} />
+                <Text style={styles.userEmail}>{user?.phone || ''}</Text>
+              </View>
             </View>
+          </View>
+
+          <View style={styles.validationSection}>
+            {user?.verification?.email ? (
+              <TouchableOpacity
+                onPress={navigateToEmailVerification}
+                style={[
+                  styles.validationItem,
+                  {backgroundColor: adjustColor(colors.success, 250)},
+                ]}>
+                <Icon name="check-circle" size={20} color={colors.primary} />
+                <Text style={styles.validationText}>Email Verified</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={navigateToEmailVerification}
+                style={[
+                  styles.validationItem,
+                  {backgroundColor: adjustColor(colors.error, 325)},
+                ]}>
+                <Icon name="close-circle" size={20} color={colors.error} />
+                <Text style={styles.validationText}>Email Not Verified</Text>
+              </TouchableOpacity>
+            )}
+            {user?.verification?.phone ? (
+              <TouchableOpacity
+                onPress={navigateToPhoneVerification}
+                style={[
+                  styles.validationItem,
+                  {backgroundColor: adjustColor(colors.success, 250)},
+                ]}>
+                <Icon name="check-circle" size={20} color={colors.primary} />
+                <Text style={styles.validationText}>Phone Verified</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={navigateToPhoneVerification}
+                style={[
+                  styles.validationItem,
+                  {backgroundColor: adjustColor(colors.error, 325)},
+                ]}>
+                <Icon name="close-circle" size={20} color={colors.error} />
+                <Text style={styles.validationText}>Phone Not Verified</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.pointsContainer}>
+            <Icon name="star" size={24} color={colors.primary} />
+            <Text style={styles.pointsText}>
+              {loyaltySummary?.currentBalance ?? 0} Points
+            </Text>
           </View>
 
           <View style={styles.actionsContainer}>
@@ -138,29 +203,79 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  userInfoSection: {
+  scrollView: {
+    flex: 1,
+    padding: 10,
+  },
+  userSection: {
+    borderRadius: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
+    gap: 6,
+    marginVertical: 10,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  image: {
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+  },
+  userInfoSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  userInfoRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
   },
   userName: {
     fontSize: 22,
     fontWeight: 'bold',
     color: colors.text,
-    marginTop: 10,
   },
   userEmail: {
     fontSize: 16,
     color: colors.textSecondary,
-    marginTop: 5,
   },
+  validationSection: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  validationItem: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
+    padding: 10,
+    borderRadius: 10,
+  },
+  validationText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
+
   pointsContainer: {
+    width: 'auto',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    justifyContent: 'center',
+    marginVertical: 10,
     backgroundColor: colors.primaryLight,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
+    padding: 15,
+    borderRadius: 10,
   },
   pointsText: {
     fontSize: 18,
@@ -169,7 +284,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   actionsContainer: {
-    paddingHorizontal: 16,
     paddingBottom: 20,
   },
   actionButton: {

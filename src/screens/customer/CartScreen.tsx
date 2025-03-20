@@ -162,15 +162,13 @@ const CartScreen = () => {
     try {
       setIsPayingWithCard(true);
 
-      // Format the cart items into the required payload format - just the product IDs
-      const productIds = items.map(item => item.product._id);
-
       // Send the payment init request
       const response = await api.post('/payment/init', {
-        products: productIds,
+        products: items.map(item => ({
+          product: item.product._id,
+          quantity: item.quantity,
+        })),
       });
-
-      console.log(response);
 
       // Handle the payment response
       if (response.data && response.data._id) {

@@ -10,14 +10,17 @@ import type {LoyaltySummary} from 'src/types/loyaltySummary';
 
 type UserType = 'customer' | 'merchant' | 'merchantEmployee' | null;
 
+type User = IUser & {verification: {email: boolean; phone: boolean}};
+
 interface AuthContextData {
   isAuthenticated: boolean;
   isLoading: boolean;
   userType: UserType;
-  user: IUser;
+  user: User | null;
   loyaltySummary: LoyaltySummary | null;
   permissions: string[];
   roles: string[];
+  fetchMe: () => Promise<void>;
   signInViaPhoneNumber: (credentials: {
     phone: string;
     password: string;
@@ -27,7 +30,7 @@ interface AuthContextData {
     password: string;
   }) => Promise<void>;
   signOut: () => Promise<void>;
-  updateUser: (data: Partial<IUser>) => Promise<void>;
+  updateUser: (data: Partial<User>) => Promise<void>;
   refreshLoyaltySummary: () => Promise<void>;
 }
 
@@ -39,7 +42,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userType, setUserType] = useState<UserType>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loyaltySummary, setLoyaltySummary] = useState<LoyaltySummary | null>(
     null,
   );
@@ -206,13 +209,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
     }
   }
 
-  async function updateUser(data: Partial<IUser>): Promise<void> {
+  async function updateUser(data: Partial<User>): Promise<void> {
     try {
-      setUser((prevState: IUser) => ({...prevState, ...data}));
-      await AsyncStorage.setItem(
-        '@LoyaltyApp:user',
-        JSON.stringify({...user, ...data}),
-      );
+      const newUser = {
+        ...user,
+        ...data,
+      };
+      setUser(newUser as User);
+      await AsyncStorage.setItem('@LoyaltyApp:user', JSON.stringify(newUser));
     } catch (error) {
       console.error('Update user error:', error);
       throw error;
@@ -249,6 +253,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
         loyaltySummary,
         permissions,
         roles,
+        fetchMe,
         signInViaPhoneNumber,
         signInViaEmail,
         signOut,

@@ -41,9 +41,10 @@ const ProductDetailScreen = () => {
   const {productId} = route.params;
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const {user, loyaltySummary} = useAuth();
-  const {addToCart, removeFromCart, items} = useCart();
+  const {addToCart, removeFromCart, items, isLoading: isCartLoading} = useCart();
   const [token, setToken] = useState<string | null>(null);
   const navigation = useNavigation();
   const width = Dimensions.get('window').width;
@@ -90,36 +91,64 @@ const ProductDetailScreen = () => {
     }
   };
 
-  const handleAddToCart = () => {
-    if (!product || isAddedToCart) return;
+  const handleAddToCart = async () => {
+    if (!product || isAddedToCart || isAddingToCart) return;
 
-    addToCart(product);
-    setIsAddedToCart(true);
+    try {
+      setIsAddingToCart(true);
+      await addToCart(product);
+      setIsAddedToCart(true);
 
-    // Show toast message
-    Toast.show({
-      type: 'success',
-      text1: 'Added to Cart',
-      text2: `${product.name} has been added to your cart`,
-      position: 'bottom',
-      visibilityTime: 2000,
-    });
+      // Show toast message
+      Toast.show({
+        type: 'success',
+        text1: 'Added to Cart',
+        text2: `${product.name} has been added to your cart`,
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to add item to cart. Please try again.',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
-  const handleRemoveFromCart = () => {
-    if (!product || !isAddedToCart) return;
+  const handleRemoveFromCart = async () => {
+    if (!product || !isAddedToCart || isAddingToCart) return;
 
-    removeFromCart(product._id);
-    setIsAddedToCart(false);
+    try {
+      setIsAddingToCart(true);
+      await removeFromCart(product._id);
+      setIsAddedToCart(false);
 
-    // Show toast message
-    Toast.show({
-      type: 'success',
-      text1: 'Added to Cart',
-      text2: `${product.name} has been removed from your cart`,
-      position: 'bottom',
-      visibilityTime: 2000,
-    });
+      // Show toast message
+      Toast.show({
+        type: 'success',
+        text1: 'Removed from Cart',
+        text2: `${product.name} has been removed from your cart`,
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error('Error removing from cart:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to remove item from cart. Please try again.',
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const renderCarouselItem = (item: string) => {
@@ -202,19 +231,17 @@ const ProductDetailScreen = () => {
         <TouchableOpacity
           style={[
             styles.addToCartButton,
-            isAddedToCart
-              ? {backgroundColor: colors.error}
-              : {backgroundColor: colors.primary},
+            isAddedToCart ? styles.removeFromCartButton : null,
           ]}
-          onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}>
-          <Icon
-            name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
-            size={20}
-            color="#FFFFFF"
-          />
-          <Text style={styles.buttonText}>
-            {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
-          </Text>
+          onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
+          disabled={isAddingToCart || isCartLoading}>
+          {isAddingToCart || isCartLoading ? (
+            <ActivityIndicator color="#FFFFFF" size="small" />
+          ) : (
+            <Text style={styles.addToCartButtonText}>
+              {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
+            </Text>
+          )}
         </TouchableOpacity>
 
         {currentBalance < product.points.redeem && (
@@ -308,10 +335,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 10,
   },
-  addedToCartButton: {
-    backgroundColor: '#4CAF50', // Success green color
+  removeFromCartButton: {
+    backgroundColor: colors.error,
   },
-  buttonText: {
+  addToCartButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',

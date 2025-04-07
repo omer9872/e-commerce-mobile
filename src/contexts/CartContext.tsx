@@ -1,12 +1,8 @@
 import React, {createContext, useContext, useState, useEffect} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Product} from '../types/product';
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
+import {cartService} from '../services/cartService';
+import type {Cart, CartItem} from '../types/cart';
+import type {Product} from '../types/product';
+import Toast from 'react-native-toast-message';
 interface CartContextData {
   items: CartItem[];
   addToCart: (product: Product, quantity?: number) => Promise<void>;
@@ -15,8 +11,11 @@ interface CartContextData {
   clearCart: () => Promise<void>;
   totalItems: number;
   totalPrice: number;
+  subtotal: number;
+  totalDiscount: number;
   totalEarnPoints: number;
   totalRedeemPoints: number;
+  isLoading: boolean;
 }
 
 const CartContext = createContext<CartContextData>({} as CartContextData);
@@ -24,114 +23,129 @@ const CartContext = createContext<CartContextData>({} as CartContextData);
 export const CartProvider: React.FC<{children: React.ReactNode}> = ({
   children,
 }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<Cart | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load cart from AsyncStorage on mount
+  // Load cart from API on mount
   useEffect(() => {
     const loadCart = async () => {
       try {
-        const storedCart = await AsyncStorage.getItem('@LoyaltyApp:cart');
-        if (storedCart) {
-          setItems(JSON.parse(storedCart));
-        }
+        setIsLoading(true);
+        const cartData = await cartService.getCart();
+        setCart(cartData);
       } catch (error) {
-        console.error('Error loading cart from storage:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to load cart. Please try again.',
+          text2: 'Please try again.',
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadCart();
   }, []);
 
-  // Save cart to AsyncStorage whenever it changes
-  useEffect(() => {
-    const saveCart = async () => {
-      try {
-        await AsyncStorage.setItem('@LoyaltyApp:cart', JSON.stringify(items));
-      } catch (error) {
-        console.error('Error saving cart to storage:', error);
-      }
-    };
-
-    saveCart();
-  }, [items]);
-
   const addToCart = async (product: Product, quantity = 1) => {
-    setItems(prevItems => {
-      const existingItemIndex = prevItems.findIndex(
-        item => item.product._id === product._id,
-      );
-
-      if (existingItemIndex >= 0) {
-        // If item already exists, update quantity
-        const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += quantity;
-        return updatedItems;
-      } else {
-        // Otherwise add new item
-        return [
-          ...prevItems,
-          {
-            product,
-            quantity,
-          },
-        ];
-      }
-    });
+    try {
+      setIsLoading(true);
+      const updatedCart = await cartService.addToCart(product._id, quantity);
+      setCart(updatedCart);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to add item to cart. Please try again.',
+        text2: 'Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const removeFromCart = async (productId: string) => {
-    setItems(prevItems =>
-      prevItems.filter(item => item.product._id !== productId),
-    );
+    try {
+      setIsLoading(true);
+      const updatedCart = await cartService.removeFromCart(productId, 1);
+      setCart(updatedCart);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to remove item from cart. Please try again.',
+        text2: 'Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const updateQuantity = async (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      await removeFromCart(productId);
-      return;
+    try {
+      setIsLoading(true);
+      const updatedCart = await cartService.updateQuantity(productId, quantity);
+      setCart(updatedCart);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to update quantity. Please try again.',
+        text2: 'Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.product._id === productId ? {...item, quantity} : item,
-      ),
-    );
   };
 
   const clearCart = async () => {
-    setItems([]);
-    await AsyncStorage.removeItem('@LoyaltyApp:cart');
+    try {
+      setIsLoading(true);
+      const updatedCart = await cartService.clearCart();
+      setCart(updatedCart);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to clear cart. Please try again.',
+        text2: 'Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems =
+    (cart?.items ?? []).reduce((sum, item) => sum + item.quantity, 0) || 0;
 
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0,
-  );
+  const totalPrice = cart?.total || 0;
 
-  const totalRedeemPoints = items.reduce(
-    (sum, item) => sum + item.product.points.redeem * item.quantity,
-    0,
-  );
+  const totalRedeemPoints =
+    cart?.items.reduce(
+      (sum, item) => sum + (item.product.points?.redeem || 0) * item.quantity,
+      0,
+    ) || 0;
 
-  const totalEarnPoints = items.reduce(
-    (sum, item) => sum + item.product.points.earn * item.quantity,
-    0,
-  );
+  const totalEarnPoints =
+    cart?.items.reduce(
+      (sum, item) => sum + (item.product.points?.earn || 0) * item.quantity,
+      0,
+    ) || 0;
+
+  const subtotal = cart?.subtotal || 0;
+  const totalDiscount = cart?.totalDiscount || 0;
 
   return (
     <CartContext.Provider
       value={{
-        items,
+        items: cart?.items || [],
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         totalItems,
         totalPrice,
+        subtotal,
+        totalDiscount,
         totalEarnPoints,
         totalRedeemPoints,
+        isLoading,
       }}>
       {children}
     </CartContext.Provider>

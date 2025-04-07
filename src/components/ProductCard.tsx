@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleProp,
   ViewStyle,
+  ActivityIndicator,
 } from 'react-native';
 import {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -25,7 +26,8 @@ interface ProductCardProps {
 
 const ProductCard = ({product, onPress, style}: ProductCardProps) => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
-  const {addToCart, removeFromCart, items} = useCart();
+  const [isLoading, setIsLoading] = useState(false);
+  const {addToCart, removeFromCart, items, isLoading: isCartLoading} = useCart();
 
   // Check if product is already in cart
   useEffect(() => {
@@ -33,43 +35,73 @@ const ProductCard = ({product, onPress, style}: ProductCardProps) => {
     setIsAddedToCart(isInCart);
   }, [items, product._id]);
 
-  const handleAddToCart = (event: any) => {
+  const handleAddToCart = async (event: any) => {
     event.stopPropagation();
-    if (!isAddedToCart) {
-      addToCart({
-        _id: product._id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        images: [product.images[0]],
-        points: product.points,
-      } as any);
-      setIsAddedToCart(true);
+    if (!isAddedToCart && !isLoading) {
+      try {
+        setIsLoading(true);
+        await addToCart({
+          _id: product._id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          images: [product.images[0]],
+          points: product.points,
+        } as any);
+        setIsAddedToCart(true);
 
-      // Show toast message
-      Toast.show({
-        type: 'success',
-        text1: 'Added to Cart',
-        text2: `${product.name} has been added to your cart`,
-      });
+        // Show toast message
+        Toast.show({
+          type: 'success',
+          text1: 'Added to Cart',
+          text2: `${product.name} has been added to your cart`,
+        });
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to add item to cart. Please try again.',
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
-  const handleRemoveFromCart = (event: any) => {
+  const handleRemoveFromCart = async (event: any) => {
     event.stopPropagation();
-    removeFromCart(product._id);
-    setIsAddedToCart(false);
+    if (isAddedToCart && !isLoading) {
+      try {
+        setIsLoading(true);
+        await removeFromCart(product._id);
+        setIsAddedToCart(false);
 
-    // Show toast message
-    Toast.show({
-      type: 'success',
-      text1: 'Removed from Cart',
-      text2: `${product.name} has been removed from your cart`,
-    });
+        // Show toast message
+        Toast.show({
+          type: 'success',
+          text1: 'Removed from Cart',
+          text2: `${product.name} has been removed from your cart`,
+        });
+      } catch (error) {
+        console.error('Error removing from cart:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to remove item from cart. Please try again.',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   return (
-    <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
+    <TouchableOpacity 
+      style={[styles.container, style]} 
+      onPress={onPress}
+      disabled={isLoading || isCartLoading}
+    >
       <Image
         id={product.images[0]}
         style={styles.image}
@@ -95,12 +127,17 @@ const ProductCard = ({product, onPress, style}: ProductCardProps) => {
                 ? {backgroundColor: colors.error}
                 : {backgroundColor: colors.primary},
             ]}
-            onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}>
-            <Icon
-              name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
-              size={16}
-              color="#FFFFFF"
-            />
+            onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
+            disabled={isLoading || isCartLoading}>
+            {isLoading || isCartLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Icon
+                name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
+                size={16}
+                color="#FFFFFF"
+              />
+            )}
           </TouchableOpacity>
         </View>
       </View>

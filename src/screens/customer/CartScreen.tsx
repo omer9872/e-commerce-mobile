@@ -6,11 +6,9 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  Image,
   TouchableOpacity,
   Alert,
   Modal,
-  ActivityIndicator,
 } from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,12 +19,14 @@ import QRCode from 'react-native-qrcode-svg';
 
 import {fetchUserInformation} from '../../services/userInformationService';
 import type {TransactionCodeResponse} from '../../types/transactionCode';
-import {useCart, type CartItem} from '../../contexts/CartContext';
 import type {PaymentCard} from '../../types/paymentCard';
 import type {UserInformation} from '../../types/address';
+import {useCart} from '../../contexts/CartContext';
 import type {Address} from '../../types/address';
-import {api, API_URL} from '../../services/api';
+import type {CartItem} from '../../types/cart';
+import Image from '../../components/Image';
 import {colors} from '../../theme/colors';
+import {api} from '../../services/api';
 
 const CartScreen = () => {
   const {
@@ -35,7 +35,10 @@ const CartScreen = () => {
     updateQuantity,
     clearCart,
     totalPrice,
+    totalDiscount,
+    subtotal,
     totalRedeemPoints,
+    isLoading,
   } = useCart();
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
@@ -252,24 +255,25 @@ const CartScreen = () => {
 
   const renderCartItem = ({item}: {item: CartItem}) => (
     <View style={styles.cartItem}>
-      <Image
-        source={{
-          uri: item.product.images[0]
-            ? `${API_URL}/image/${item.product.images[0]}`
-            : undefined,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }}
-        style={styles.productImage}
-        defaultSource={require('../../assets/images/logo.jpg')}
-      />
+      <Image id={item?.product?.images?.[0]} style={styles.productImage} />
 
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.product.name}</Text>
-        <Text style={styles.productPrice}>
-          ${item.product.price.toFixed(2)}
+        <Text style={styles.productPrice}>{item.price.toFixed(2)} ₺</Text>
+        <Text style={styles.itemTotal}>
+          Total: {(item.price * item.quantity).toFixed(2)} ₺
         </Text>
+
+        {item.appliedCampaigns.length > 0 && (
+          <View style={styles.campaignsContainer}>
+            {item.appliedCampaigns.map(campaign => (
+              <View key={campaign._id} style={styles.campaignItem}>
+                <Icon name="gift" size={16} color={colors.primary} />
+                <Text style={styles.campaignText}>{campaign.name}</Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={styles.quantityContainer}>
           <TouchableOpacity
@@ -299,6 +303,45 @@ const CartScreen = () => {
       </TouchableOpacity>
     </View>
   );
+
+  // if (isLoading) {
+  //   return (
+  //     <View style={[styles.container, {paddingTop: insets.top}]}>
+  //       <View style={styles.subContainer}>
+  //         <View style={styles.header}>
+  //           <Text style={styles.headerTitle}>Shopping Cart</Text>
+  //         </View>
+  //         <View style={styles.loadingContainer}>
+  //           <ActivityIndicator size="large" color={colors.primary} />
+  //         </View>
+  //       </View>
+  //     </View>
+  //   );
+  // }
+
+  // if (error) {
+  //   return (
+  //     <View style={[styles.container, {paddingTop: insets.top}]}>
+  //       <View style={styles.subContainer}>
+  //         <View style={styles.header}>
+  //           <Text style={styles.headerTitle}>Shopping Cart</Text>
+  //         </View>
+  //         <View style={styles.errorContainer}>
+  //           <Icon name="alert-circle" size={48} color={colors.error} />
+  //           <Text style={styles.errorText}>{error}</Text>
+  //           <TouchableOpacity
+  //             style={styles.retryButton}
+  //             onPress={() => {
+  //               // Reload cart
+  //               loadCart();
+  //             }}>
+  //             <Text style={styles.retryButtonText}>Retry</Text>
+  //           </TouchableOpacity>
+  //         </View>
+  //       </View>
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={[styles.container, {paddingTop: insets.top}]}>
@@ -333,34 +376,35 @@ const CartScreen = () => {
             />
 
             <View style={styles.footer}>
-              <View style={styles.totalContainer}>
-                <Text style={styles.totalLabel}>Total:</Text>
-                <Text style={styles.totalPrice}>${totalPrice.toFixed(2)}</Text>
-              </View>
-
-              <View style={styles.pointsContainer}>
-                <Icon name="star" size={16} color={colors.primary} />
-                <Text style={styles.pointsText}>
-                  Or redeem with {totalRedeemPoints || totalPrice * 10} points
-                </Text>
+              <View style={styles.totalsContainer}>
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalLabel}>Subtotal:</Text>
+                  <Text style={styles.totalValue}>{subtotal.toFixed(2)} ₺</Text>
+                </View>
+                {totalDiscount > 0 && (
+                  <View style={styles.totalRow}>
+                    <Text style={styles.totalLabel}>Discount:</Text>
+                    <Text style={[styles.totalValue, styles.discountValue]}>
+                      -{totalDiscount.toFixed(2)} ₺
+                    </Text>
+                  </View>
+                )}
+                <View style={[styles.totalRow, styles.finalTotalRow]}>
+                  <Text style={[styles.totalLabel, styles.finalTotalLabel]}>
+                    Total:
+                  </Text>
+                  <Text style={[styles.totalValue, styles.finalTotalValue]}>
+                    {totalPrice.toFixed(2)} ₺
+                  </Text>
+                </View>
               </View>
 
               <View style={styles.checkoutButtonsContainer}>
                 <TouchableOpacity
-                  style={[styles.checkoutButton, styles.redeemButton]}
-                  onPress={handleRedeemPoints}
-                  disabled={isRedeemingPoints}>
-                  {isRedeemingPoints ? (
-                    <ActivityIndicator color="#FFFFFF" size="small" />
-                  ) : (
-                    <Text style={styles.checkoutButtonText}>Redeem Points</Text>
-                  )}
-                </TouchableOpacity>
-
-                <TouchableOpacity
                   style={[styles.checkoutButton, styles.payButton]}
                   onPress={handlePayWithCardClick}>
-                  <Text style={styles.checkoutButtonText}>Pay with Card</Text>
+                  <Icon name="cart-check" size={24} color={colors.white} />
+                  <Text style={styles.checkoutButtonText}>Complete Order</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -482,8 +526,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   productImage: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: '100%',
     borderRadius: 8,
   },
   productInfo: {
@@ -502,6 +546,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.primary,
     marginBottom: 8,
+  },
+  itemTotal: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginBottom: 8,
+  },
+  campaignsContainer: {
+    marginBottom: 8,
+  },
+  campaignItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primaryLight,
+    padding: 4,
+    borderRadius: 4,
+    marginBottom: 4,
+  },
+  campaignText: {
+    fontSize: 12,
+    color: colors.primary,
+    marginLeft: 4,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -533,31 +599,42 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
-  totalContainer: {
+  totalsContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 8,
+    padding: 8,
+  },
+  totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
+  finalTotalRow: {
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
   totalLabel: {
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
+  finalTotalLabel: {
     fontSize: 18,
+    fontWeight: '600',
     color: colors.text,
   },
-  totalPrice: {
+  totalValue: {
+    fontSize: 16,
+    color: colors.text,
+  },
+  discountValue: {
+    color: colors.success,
+  },
+  finalTotalValue: {
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.primary,
-  },
-  pointsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginBottom: 16,
-    gap: 4,
-  },
-  pointsText: {
-    fontSize: 14,
-    color: colors.textSecondary,
   },
   checkoutButtonsContainer: {
     flexDirection: 'row',
@@ -571,11 +648,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  redeemButton: {
-    backgroundColor: colors.secondary || '#6B7280',
-  },
   payButton: {
     backgroundColor: colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   checkoutButtonText: {
     color: '#FFFFFF',
@@ -651,6 +728,35 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   doneButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: colors.error,
+    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 24,
+  },
+  retryButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',

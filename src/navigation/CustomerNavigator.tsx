@@ -20,11 +20,31 @@ import EmailVerificationScreen from '../screens/customer/EmailVerificationScreen
 import EmailVerificationCodeScreen from '../screens/customer/EmailVerificationCodeScreen';
 import PhoneVerificationScreen from '../screens/customer/PhoneVerificationScreen';
 import PhoneVerificationCodeScreen from '../screens/customer/PhoneVerificationCodeScreen';
+import PaymentConfirmationScreen from '../screens/customer/PaymentConfirmationScreen';
+import PaymentSuccessScreen from '../screens/customer/PaymentSuccessScreen';
 
 // Stack param lists
 export type CustomerHomeStackParamList = {
   Home: undefined;
   ProductDetail: {productId: string};
+  PaymentConfirmation: {
+    items: any[];
+    totalPrice: number;
+    defaultAddress: any;
+    defaultPaymentCard: any;
+  };
+  PaymentSuccess: {paymentId: string};
+};
+
+export type CustomerCartStackParamList = {
+  Cart: undefined;
+  PaymentConfirmation: {
+    items: any[];
+    totalPrice: number;
+    defaultAddress: any;
+    defaultPaymentCard: any;
+  };
+  PaymentSuccess: {paymentId: string};
 };
 
 export type CustomerProfileStackParamList = {
@@ -45,6 +65,7 @@ export type CustomerProfileStackParamList = {
 
 // Create the stack navigators
 const HomeStack = createStackNavigator<CustomerHomeStackParamList>();
+const CartStack = createStackNavigator<CustomerCartStackParamList>();
 const ProfileStack = createStackNavigator<CustomerProfileStackParamList>();
 
 // Home Stack Navigator
@@ -62,6 +83,29 @@ const HomeStackNavigator = () => {
         options={{title: 'Product Details'}}
       />
     </HomeStack.Navigator>
+  );
+};
+
+// Cart Stack Navigator
+const CartStackNavigator = () => {
+  return (
+    <CartStack.Navigator>
+      <CartStack.Screen
+        name="Cart"
+        component={CartScreen}
+        options={{headerShown: false}}
+      />
+      <CartStack.Screen
+        name="PaymentConfirmation"
+        component={PaymentConfirmationScreen}
+        options={{title: 'Payment Confirmation'}}
+      />
+      <CartStack.Screen
+        name="PaymentSuccess"
+        component={PaymentSuccessScreen}
+        options={{title: 'Payment Success'}}
+      />
+    </CartStack.Navigator>
   );
 };
 
@@ -179,8 +223,8 @@ const CustomerNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Cart"
-        component={CartScreen}
+        name="CartTab"
+        component={CartStackNavigator}
         options={{
           headerShown: false,
           tabBarLabel: 'Cart',

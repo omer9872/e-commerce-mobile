@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,19 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import QRCode from 'react-native-qrcode-svg';
 
+import {fetchUserInformation} from '../../services/userInformationService';
 import type {TransactionCodeResponse} from '../../types/transactionCode';
 import {useCart, type CartItem} from '../../contexts/CartContext';
+import type {PaymentCard} from '../../types/paymentCard';
+import type {UserInformation} from '../../types/address';
+import type {Address} from '../../types/address';
 import {api, API_URL} from '../../services/api';
 import {colors} from '../../theme/colors';
 
@@ -33,23 +37,59 @@ const CartScreen = () => {
     totalPrice,
     totalRedeemPoints,
   } = useCart();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
   const [token, setToken] = useState<string | null>(null);
   const [isRedeemingPoints, setIsRedeemingPoints] = useState(false);
-  const [isPayingWithCard, setIsPayingWithCard] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [transactionCode, setTransactionCode] = useState<string | null>(null);
-  const [paymentInitiated, setPaymentInitiated] = useState(false);
-  const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInformation | null>(null);
+  const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
+  const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
+  const [defaultPaymentCard, setDefaultPaymentCard] =
+    useState<PaymentCard | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchToken = async () => {
       const token = await AsyncStorage.getItem('@LoyaltyApp:token');
       setToken(token);
     };
     fetchToken();
+    fetchUserData();
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      setIsLoadingUserInfo(true);
+      const userInformation = await fetchUserInformation();
+      setUserInfo(userInformation);
+
+      // Find default address
+      if (userInformation.defaultAddress) {
+        const defaultAddr = userInformation.addresses.find(
+          addr => addr._id === userInformation.defaultAddress,
+        );
+        setDefaultAddress(defaultAddr || null);
+      }
+
+      // Find default payment card
+      if (userInformation.defaultPaymentCard) {
+        const defaultCard = userInformation.paymentCards.find(
+          card => card._id === userInformation.defaultPaymentCard,
+        );
+        setDefaultPaymentCard(defaultCard || null);
+      }
+    } catch (error) {
+      console.error('Error fetching user information:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to load your information. Please try again.',
+      });
+    } finally {
+      setIsLoadingUserInfo(false);
+    }
+  };
 
   const handleIncreaseQuantity = (
     productId: string,
@@ -150,7 +190,7 @@ const CartScreen = () => {
     }
   };
 
-  const handlePayWithCard = async () => {
+  const handlePayWithCardClick = () => {
     if (items.length === 0) {
       Alert.alert(
         'Empty Cart',
@@ -159,51 +199,55 @@ const CartScreen = () => {
       return;
     }
 
-    try {
-      setIsPayingWithCard(true);
-
-      // Send the payment init request
-      const response = await api.post('/payment/init', {
-        products: items.map(item => ({
-          product: item.product._id,
-          quantity: item.quantity,
-        })),
-      });
-
-      // Handle the payment response
-      if (response.data && response.data._id) {
-        setPaymentId(response.data._id);
-        setPaymentInitiated(true);
-        setModalVisible(true);
-
-        // Clear the cart after successful payment initiation
-        await clearCart();
-
-        Toast.show({
-          type: 'success',
-          text1: 'Payment Initiated',
-          text2: 'Your payment has been successfully initiated.',
-        });
-      } else {
-        throw new Error('Invalid payment response');
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Payment Failed',
-        text2: 'There was an error processing your payment. Please try again.',
-      });
-    } finally {
-      setIsPayingWithCard(false);
+    // Check if user has default address and payment card
+    if (!defaultAddress) {
+      Alert.alert(
+        'No Default Address',
+        'Please set a default address before proceeding with payment.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {
+            text: 'Add Address',
+            onPress: () =>
+              navigation.navigate('ProfileTab', {
+                screen: 'AddressList',
+              }),
+          },
+        ],
+      );
+      return;
     }
+
+    if (!defaultPaymentCard) {
+      Alert.alert(
+        'No Default Payment Card',
+        'Please set a default payment card before proceeding with payment.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {
+            text: 'Add Payment Card',
+            onPress: () =>
+              navigation.navigate('ProfileTab', {
+                screen: 'PaymentCardList',
+              }),
+          },
+        ],
+      );
+      return;
+    }
+
+    // Navigate to payment confirmation screen
+    navigation.navigate('PaymentConfirmation', {
+      items,
+      totalPrice,
+      defaultAddress,
+      defaultPaymentCard,
+    });
   };
 
   const closeModal = () => {
     setModalVisible(false);
     setTransactionCode(null);
-    setPaymentInitiated(false);
-    setPaymentId(null);
   };
 
   const renderCartItem = ({item}: {item: CartItem}) => (
@@ -305,7 +349,7 @@ const CartScreen = () => {
                 <TouchableOpacity
                   style={[styles.checkoutButton, styles.redeemButton]}
                   onPress={handleRedeemPoints}
-                  disabled={isRedeemingPoints || isPayingWithCard}>
+                  disabled={isRedeemingPoints}>
                   {isRedeemingPoints ? (
                     <ActivityIndicator color="#FFFFFF" size="small" />
                   ) : (
@@ -315,13 +359,8 @@ const CartScreen = () => {
 
                 <TouchableOpacity
                   style={[styles.checkoutButton, styles.payButton]}
-                  onPress={handlePayWithCard}
-                  disabled={isRedeemingPoints || isPayingWithCard}>
-                  {isPayingWithCard ? (
-                    <ActivityIndicator color="#FFFFFF" size="small" />
-                  ) : (
-                    <Text style={styles.checkoutButtonText}>Pay with Card</Text>
-                  )}
+                  onPress={handlePayWithCardClick}>
+                  <Text style={styles.checkoutButtonText}>Pay with Card</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -338,49 +377,27 @@ const CartScreen = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {paymentInitiated
-                  ? 'Payment Successful'
-                  : 'Transaction Complete'}
-              </Text>
+              <Text style={styles.modalTitle}>Transaction Complete</Text>
               <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                 <Icon name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
-            {paymentInitiated ? (
-              <View style={styles.paymentSuccessContainer}>
-                <View style={styles.iconContainer}>
-                  <Icon name="check-circle" size={80} color={colors.success} />
-                </View>
-                <Text style={styles.paymentSuccessText}>
-                  Your payment has been successfully processed.
-                </Text>
-                <Text style={styles.paymentIdText}>
-                  Payment ID: {paymentId}
-                </Text>
-                <Text style={styles.paymentInstructionsText}>
-                  You will receive a confirmation email shortly.
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.codeContainer}>
-                <Text style={styles.codeLabel}>Your Transaction Code:</Text>
-                {transactionCode && (
-                  <QRCode
-                    value={transactionCode}
-                    size={200}
-                    color={colors.text}
-                    backgroundColor={colors.card}
-                  />
-                )}
-                <Text style={styles.codeValue}>{transactionCode}</Text>
-                <Text style={styles.codeInstructions}>
-                  Please show this code to the merchant to complete your
-                  purchase.
-                </Text>
-              </View>
-            )}
+            <View style={styles.codeContainer}>
+              <Text style={styles.codeLabel}>Your Transaction Code:</Text>
+              {transactionCode && (
+                <QRCode
+                  value={transactionCode}
+                  size={200}
+                  color={colors.text}
+                  backgroundColor={colors.card}
+                />
+              )}
+              <Text style={styles.codeValue}>{transactionCode}</Text>
+              <Text style={styles.codeInstructions}>
+                Please show this code to the merchant to complete your purchase.
+              </Text>
+            </View>
 
             <TouchableOpacity style={styles.doneButton} onPress={closeModal}>
               <Text style={styles.doneButtonText}>Done</Text>
@@ -623,32 +640,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 10,
-  },
-  paymentSuccessContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  paymentSuccessText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    textAlign: 'center',
-    marginTop: 16,
-  },
-  paymentIdText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 8,
-  },
-  paymentInstructionsText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: 16,
-  },
-  iconContainer: {
-    marginBottom: 10,
   },
   doneButton: {
     backgroundColor: colors.primary,

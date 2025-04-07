@@ -1,6 +1,13 @@
 'use client';
 
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useCart} from '../contexts/CartContext';
@@ -8,15 +15,15 @@ import Toast from 'react-native-toast-message';
 
 import {Product} from '../types/product';
 import Image from '../components/Image';
-import {API_URL} from '../services/api';
 import {colors} from '../theme/colors';
 
 interface ProductCardProps {
   product: Product;
   onPress: () => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-const ProductCard = ({product, onPress}: ProductCardProps) => {
+const ProductCard = ({product, onPress, style}: ProductCardProps) => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const {addToCart, removeFromCart, items} = useCart();
 
@@ -62,7 +69,7 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
       <Image
         id={product.images[0]}
         style={styles.image}
@@ -103,7 +110,7 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: colors.card,
     borderRadius: 12,
     marginBottom: 16,
@@ -115,8 +122,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: 175,
   },
   content: {
     flex: 1,

@@ -11,4 +11,5 @@ export const colors = {
   success: '#388E3C',
   warning: '#FFA000',
   lightBackground: '#F5F5F5',
+  white: '#FFFFFF',
 };

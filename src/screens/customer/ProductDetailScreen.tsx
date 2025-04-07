@@ -5,7 +5,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
@@ -19,17 +18,18 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Carousel from 'react-native-reanimated-carousel';
 import Toast from 'react-native-toast-message';
 
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
 import {useCart} from '../../contexts/CartContext';
+import Image from '../../components/Image';
 import {useAuth} from '../../contexts/AuthContext';
 import {api, API_URL} from '../../services/api';
 import type {Product} from 'src/types/product';
 import {colors} from '../../theme/colors';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type ProductDetailScreenRouteProp = RouteProp<
   CustomerHomeStackParamList,
@@ -125,16 +125,7 @@ const ProductDetailScreen = () => {
   const renderCarouselItem = (item: string) => {
     return (
       <View style={styles.carouselItemContainer}>
-        <Image
-          source={{
-            uri: `${API_URL}/image/${item}`,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }}
-          style={styles.productImage}
-          defaultSource={require('../../assets/images/logo.jpg')}
-        />
+        <Image id={item} style={styles.productImage} />
       </View>
     );
   };
@@ -185,12 +176,6 @@ const ProductDetailScreen = () => {
             data={product.images}
             scrollAnimationDuration={1000}
             renderItem={({item}) => renderCarouselItem(item)}
-            mode={'horizontal-stack'}
-            modeConfig={{
-              snapDirection: 'left',
-              stackInterval: 18,
-              rotateZDeg: 1,
-            }}
             customConfig={() => ({type: 'positive', viewCount: 5})}
           />
         </View>

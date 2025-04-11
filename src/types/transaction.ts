@@ -1,15 +1,8 @@
 import {Product} from './product';
 import {IUser} from './user';
 
-export enum TransactionType {
-  EARN = 'earn',
-  REDEEM = 'redeem',
-  PURCHASE = 'purchase',
-}
-
 export enum PaymentMethod {
   CREDIT_CARD = 'credit_card',
-  POINTS = 'points',
   CASH = 'cash',
 }
 
@@ -20,24 +13,18 @@ export enum PaymentStatus {
 }
 
 export interface ITransactionProduct {
-  product: {
-    _id: string;
-    name: string;
-    price: number;
-  };
+  product: string;
   quantity: number;
 }
 
-export interface Transaction {
+export interface ITransaction {
   _id: string;
 
   user: string;
-  type: TransactionType;
   items: ITransactionProduct[];
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   totalAmount: number;
-  totalPoints: number;
   code?: string;
   payment?: string;
 
@@ -45,12 +32,13 @@ export interface Transaction {
   createdBy?: string;
   updatedAt?: Date;
   updatedBy?: string;
+  deletedAt?: Date;
+  deletedBy?: string;
 }
 
 export interface TransactionDetail {
   _id: string;
   user: IUser;
-  type: TransactionType;
   items: {
     product: Product;
     quantity: number;
@@ -66,7 +54,7 @@ export interface TransactionDetail {
 }
 
 export interface TransactionResponse {
-  data: Transaction[];
+  data: ITransaction[];
   total: number;
   page: number;
   limit: number;

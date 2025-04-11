@@ -27,7 +27,12 @@ interface ProductCardProps {
 const ProductCard = ({product, onPress, style}: ProductCardProps) => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const {addToCart, removeFromCart, items, isLoading: isCartLoading} = useCart();
+  const {
+    addToCart,
+    removeFromCart,
+    items,
+    isLoading: isCartLoading,
+  } = useCart();
 
   // Check if product is already in cart
   useEffect(() => {
@@ -97,11 +102,10 @@ const ProductCard = ({product, onPress, style}: ProductCardProps) => {
   };
 
   return (
-    <TouchableOpacity 
-      style={[styles.container, style]} 
+    <TouchableOpacity
+      style={[styles.container, style]}
       onPress={onPress}
-      disabled={isLoading || isCartLoading}
-    >
+      disabled={isLoading || isCartLoading}>
       <Image
         id={product.images[0]}
         style={styles.image}
@@ -111,35 +115,40 @@ const ProductCard = ({product, onPress, style}: ProductCardProps) => {
         <Text style={styles.name} numberOfLines={1}>
           {product.name}
         </Text>
-        <Text style={styles.description} numberOfLines={2}>
-          {product.description}
-        </Text>
-        <View style={styles.bottomContainer}>
-          <View style={styles.pointsContainer}>
-            <Text style={styles.pointsText}>
-              {product.price} <Text style={styles.pointsLabel}>₺</Text>
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={[
-              styles.addToCartButton,
-              isAddedToCart
-                ? {backgroundColor: colors.error}
-                : {backgroundColor: colors.primary},
-            ]}
-            onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
-            disabled={isLoading || isCartLoading}>
-            {isLoading || isCartLoading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
+        {product.description && (
+          <Text style={styles.description} numberOfLines={2}>
+            {product.description}
+          </Text>
+        )}
+        <View style={styles.amountContainer}>
+          <Text style={styles.amountText}>
+            {product.price} <Text style={styles.amountLabel}>₺</Text>
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={[
+            styles.addToCartButton,
+            isAddedToCart
+              ? {backgroundColor: colors.error}
+              : {backgroundColor: colors.primary},
+          ]}
+          onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
+          disabled={isLoading || isCartLoading}>
+          {isLoading || isCartLoading ? (
+            <ActivityIndicator color="#FFFFFF" size="small" />
+          ) : (
+            <View style={styles.addToCartButtonContent}>
               <Icon
                 name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
-                size={16}
+                size={20}
                 color="#FFFFFF"
               />
-            )}
-          </TouchableOpacity>
-        </View>
+              <Text style={styles.addToCartText}>
+                {isAddedToCart ? 'Remove' : 'Add'}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -159,19 +168,19 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   image: {
-    width: "100%",
+    width: '100%',
     height: 175,
   },
   content: {
     flex: 1,
     padding: 12,
+    gap: 10,
     justifyContent: 'space-between',
   },
   name: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 4,
   },
   description: {
     fontSize: 14,
@@ -183,24 +192,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  pointsContainer: {
+  amountContainer: {
     backgroundColor: colors.primaryLight,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  pointsText: {
+  amountText: {
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.primary,
   },
-  pointsLabel: {
+  amountLabel: {
     fontWeight: 'normal',
   },
   addToCartButton: {
-    borderRadius: 4,
     paddingVertical: 6,
     paddingHorizontal: 10,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addToCartButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

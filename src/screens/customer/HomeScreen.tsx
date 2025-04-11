@@ -19,12 +19,14 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
+import {IPaginatedResponsePayload} from '../../types/common';
+import type {IProductCategory} from '../../types/category';
 import LayoutHeader from '../../components/LayoutHeader';
 import ProductCard from '../../components/ProductCard';
-import Image from '../../components/Image';
 import {useAuth} from '../../contexts/AuthContext';
-import type {Product} from 'src/types/product';
-import type {ProductCategory, ProductSubcategory} from 'src/types/category';
+import type {Product} from '../../types/product';
+import Avatar from '../../components/Avatar';
+import Image from '../../components/Image';
 import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
 
@@ -45,9 +47,9 @@ const PRODUCT_CARD_WIDTH = (width - 60) / 2; // Adjust based on your ProductCard
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const {user, loyaltySummary, refreshLoyaltySummary} = useAuth();
+  const {user, refreshLoyaltySummary} = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [categories, setCategories] = useState<IProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
     null,
@@ -68,8 +70,10 @@ const HomeScreen = () => {
   const fetchCategories = useCallback(async () => {
     try {
       setIsCategoriesLoading(true);
-      const response = await api.get<ProductCategory[]>('/product-category');
-      setCategories(response.data);
+      const response = await api.get<
+        IPaginatedResponsePayload<IProductCategory>
+      >('/product-category');
+      setCategories(response.data.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     } finally {
@@ -179,7 +183,7 @@ const HomeScreen = () => {
     // The useEffect will trigger a new search
   };
 
-  const renderCategoryItem = (category: ProductCategory) => {
+  const renderCategoryItem = (category: IProductCategory) => {
     const isSelected = selectedCategory === category._id;
     return (
       <TouchableOpacity
@@ -205,7 +209,7 @@ const HomeScreen = () => {
     );
   };
 
-  const renderSubcategoryItem = (subcategory: ProductSubcategory) => {
+  const renderSubcategoryItem = (subcategory: IProductCategory) => {
     const isSelected = selectedSubcategory === subcategory._id;
     return (
       <TouchableOpacity
@@ -311,17 +315,13 @@ const HomeScreen = () => {
         <LayoutHeader
           title="Home"
           customComponent={
-            <View>
+            <View style={styles.header}>
               <Text style={styles.greeting}>
                 Hello, {user?.firstName || 'User'}
               </Text>
-              <Text style={styles.pointsText}>
-                You have{' '}
-                <Text style={styles.pointsValue}>
-                  {loyaltySummary?.currentBalance || 0}
-                </Text>{' '}
-                <Icon name="star" size={16} color={colors.card} />
-              </Text>
+              <View style={styles.avatarContainer}>
+                <Avatar size={40} id={user?.image} />
+              </View>
             </View>
           }
         />
@@ -396,13 +396,13 @@ const HomeScreen = () => {
 
           {/* Subcategories Section - Only show if a category is selected */}
           {selectedCategoryObject &&
-            selectedCategoryObject.subcategories.length > 0 && (
+            (selectedCategoryObject.subCategories ?? []).length > 0 && (
               <View style={styles.subcategoriesContainer}>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.subcategoriesScrollView}>
-                  {selectedCategoryObject.subcategories.map(
+                  {(selectedCategoryObject.subCategories ?? []).map(
                     renderSubcategoryItem,
                   )}
                 </ScrollView>
@@ -445,7 +445,7 @@ const HomeScreen = () => {
                   <View style={styles.filterChip}>
                     <Text style={styles.filterChipText}>
                       {
-                        selectedCategoryObject?.subcategories.find(
+                        selectedCategoryObject?.subCategories?.find(
                           sub => sub._id === selectedSubcategory,
                         )?.name
                       }
@@ -477,7 +477,7 @@ const HomeScreen = () => {
               ? `Search Results${
                   selectedSubcategory
                     ? ` in ${
-                        selectedCategoryObject?.subcategories.find(
+                        selectedCategoryObject?.subCategories?.find(
                           sub => sub._id === selectedSubcategory,
                         )?.name
                       }`
@@ -490,7 +490,7 @@ const HomeScreen = () => {
                 }`
               : selectedSubcategory
               ? `${
-                  selectedCategoryObject?.subcategories.find(
+                  selectedCategoryObject?.subCategories?.find(
                     sub => sub._id === selectedSubcategory,
                   )?.name
                 } Products`
@@ -528,25 +528,18 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: colors.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   greeting: {
     fontSize: 20,
     fontWeight: '600',
     color: '#FFFFFF',
-    marginBottom: 5,
   },
-  pointsText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-  },
-  pointsValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  avatarContainer: {
+    backgroundColor: colors.white,
+    borderRadius: 100,
   },
   content: {
     flex: 1,

@@ -18,7 +18,6 @@ import Toast from 'react-native-toast-message';
 import QRCode from 'react-native-qrcode-svg';
 
 import {fetchUserInformation} from '../../services/userInformationService';
-import type {TransactionCodeResponse} from '../../types/transactionCode';
 import type {PaymentCard} from '../../types/paymentCard';
 import type {UserInformation} from '../../types/address';
 import {useCart} from '../../contexts/CartContext';
@@ -26,7 +25,6 @@ import type {Address} from '../../types/address';
 import type {CartItem} from '../../types/cart';
 import Image from '../../components/Image';
 import {colors} from '../../theme/colors';
-import {api} from '../../services/api';
 
 const CartScreen = () => {
   const {
@@ -37,13 +35,10 @@ const CartScreen = () => {
     totalPrice,
     totalDiscount,
     subtotal,
-    totalRedeemPoints,
-    isLoading,
   } = useCart();
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
   const [token, setToken] = useState<string | null>(null);
-  const [isRedeemingPoints, setIsRedeemingPoints] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [transactionCode, setTransactionCode] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<UserInformation | null>(null);
@@ -145,52 +140,6 @@ const CartScreen = () => {
       {text: 'Cancel', style: 'cancel'},
       {text: 'Clear', style: 'destructive', onPress: () => clearCart()},
     ]);
-  };
-
-  const handleRedeemPoints = async () => {
-    if (items.length === 0) {
-      Alert.alert(
-        'Empty Cart',
-        'Your cart is empty. Add some items before checkout.',
-      );
-      return;
-    }
-
-    try {
-      setIsRedeemingPoints(true);
-
-      // Format the cart items into the required payload format
-      const products = items.map(item => ({
-        product: item.product._id,
-        quantity: item.quantity,
-      }));
-
-      // Send the checkout request
-      const response = await api.post<TransactionCodeResponse>(
-        '/transaction-code',
-        {
-          type: 'points_redeemed_for_purchase',
-          products,
-        },
-      );
-
-      // Set the transaction code and show the modal
-      setTransactionCode(response.data.code);
-      setModalVisible(true);
-
-      // Clear the cart after successful checkout
-      await clearCart();
-    } catch (error) {
-      console.error('Redeem points error:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Redemption Failed',
-        text2:
-          'There was an error processing your points redemption. Please try again.',
-      });
-    } finally {
-      setIsRedeemingPoints(false);
-    }
   };
 
   const handlePayWithCardClick = () => {

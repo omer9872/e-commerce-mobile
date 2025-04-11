@@ -17,7 +17,7 @@ import {
 } from '@react-navigation/native';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactionById} from '../../services/transactionService';
-import {TransactionType, type TransactionDetail} from '../../types/transaction';
+import {TransactionDetail} from '../../types/transaction';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
@@ -41,7 +41,6 @@ const TransactionDetailScreen = () => {
       try {
         setLoading(true);
         const data = await fetchTransactionById(transactionId);
-        console.log(data);
         setTransaction(data);
       } catch (error) {
         console.log(error);
@@ -80,9 +79,6 @@ const TransactionDetailScreen = () => {
     );
   }
 
-  const isEarn =
-    transaction.type === TransactionType.EARN ||
-    transaction.type === TransactionType.PURCHASE;
   const date = new Date(transaction.createdAt);
   const formattedDate = dayjs(date).format('MMMM dddd, YYYY');
   const formattedTime = dayjs(date).format('hh:mm');
@@ -93,36 +89,10 @@ const TransactionDetailScreen = () => {
 
       <View style={styles.card}>
         <View style={styles.transactionTypeContainer}>
-          <View
-            style={[
-              styles.iconContainer,
-              {backgroundColor: isEarn ? '#E8F5E9' : '#FFEBEE'},
-            ]}>
-            <Icon
-              name={isEarn ? 'arrow-down' : 'arrow-up'}
-              size={30}
-              color={isEarn ? '#4CAF50' : '#F44336'}
-            />
+          <View style={[styles.iconContainer, {backgroundColor: '#E8F5E9'}]}>
+            <Icon name={'check'} size={30} color={'#4CAF50'} />
           </View>
-          <Text style={styles.transactionType}>
-            {isEarn ? 'Points Earned' : 'Points Spent'}
-          </Text>
-        </View>
-
-        <View style={styles.amountContainer}>
-          <Text
-            style={[
-              styles.pointsAmount,
-              {color: isEarn ? '#4CAF50' : '#F44336'},
-            ]}>
-            {isEarn ? '+' : '-'}
-            {transaction.totalPoints} points
-          </Text>
-          {transaction.totalAmount > 0 && (
-            <Text style={styles.moneyAmount}>
-              ${(transaction?.totalAmount ?? 0).toFixed(2)}
-            </Text>
-          )}
+          <Text style={styles.transactionType}>Payment</Text>
         </View>
 
         <View style={styles.divider} />
@@ -188,13 +158,24 @@ const TransactionDetailScreen = () => {
           <View style={styles.itemsContainer}>
             <Text style={styles.itemsTitle}>Items</Text>
             {transaction.items.map((item, index) => (
-              <View key={index} style={styles.itemRow}>
+              <View
+                key={index}
+                style={{
+                  ...styles.itemRow,
+                  ...{borderBottomWidth: 1, borderBottomColor: '#EEEEEE'},
+                }}>
                 <Text style={styles.itemName}>{item.product.name}</Text>
                 <Text style={styles.itemPrice}>
                   ${(item?.product?.price ?? 0).toFixed(2)} x {item.quantity}
                 </Text>
               </View>
             ))}
+            <View style={styles.itemRow}>
+              <Text style={styles.totalName}>Total</Text>
+              <Text style={styles.moneyAmount}>
+                ${(transaction?.totalAmount ?? 0).toFixed(2)}
+              </Text>
+            </View>
           </View>
         )}
       </View>
@@ -267,18 +248,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#212121',
   },
-  amountContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  pointsAmount: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
   moneyAmount: {
     fontSize: 18,
     color: '#424242',
     marginTop: 4,
+    fontWeight: 'bold',
   },
   divider: {
     height: 1,
@@ -338,12 +312,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
   itemName: {
     fontSize: 16,
     color: '#212121',
+  },
+  totalName: {
+    fontSize: 16,
+    color: '#212121',
+    fontWeight: 'bold',
   },
   itemPrice: {
     fontSize: 16,

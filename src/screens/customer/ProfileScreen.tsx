@@ -136,13 +136,6 @@ const ProfileScreen = () => {
             )}
           </View>
 
-          <View style={styles.pointsContainer}>
-            <Icon name="star" size={24} color={colors.primary} />
-            <Text style={styles.pointsText}>
-              {loyaltySummary?.currentBalance ?? 0} Points
-            </Text>
-          </View>
-
           <View style={styles.actionsContainer}>
             <TouchableOpacity
               style={styles.actionButton}
@@ -267,24 +260,8 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
 
-  pointsContainer: {
-    width: 'auto',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
-    backgroundColor: colors.primaryLight,
-    padding: 15,
-    borderRadius: 10,
-  },
-  pointsText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.primary,
-    marginLeft: 8,
-  },
   actionsContainer: {
-    paddingBottom: 20,
+    marginVertical: 10,
   },
   actionButton: {
     flexDirection: 'row',

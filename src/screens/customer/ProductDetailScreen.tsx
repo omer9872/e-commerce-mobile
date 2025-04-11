@@ -44,7 +44,12 @@ const ProductDetailScreen = () => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const {user, loyaltySummary} = useAuth();
-  const {addToCart, removeFromCart, items, isLoading: isCartLoading} = useCart();
+  const {
+    addToCart,
+    removeFromCart,
+    items,
+    isLoading: isCartLoading,
+  } = useCart();
   const [token, setToken] = useState<string | null>(null);
   const navigation = useNavigation();
   const width = Dimensions.get('window').width;
@@ -216,20 +221,6 @@ const ProductDetailScreen = () => {
 
         <TouchableOpacity
           style={[
-            styles.redeemButton,
-            {opacity: currentBalance >= product.price ? 1 : 0.5},
-          ]}
-          onPress={handleRedeemProduct}
-          disabled={currentBalance < product.price}>
-          <Text style={styles.redeemButtonText}>
-            {currentBalance >= product.price
-              ? 'Redeem Now'
-              : 'Not Enough Points'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
             styles.addToCartButton,
             isAddedToCart ? styles.removeFromCartButton : null,
           ]}
@@ -238,9 +229,16 @@ const ProductDetailScreen = () => {
           {isAddingToCart || isCartLoading ? (
             <ActivityIndicator color="#FFFFFF" size="small" />
           ) : (
-            <Text style={styles.addToCartButtonText}>
-              {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
-            </Text>
+            <View style={styles.addToCartButtonContent}>
+              <Icon
+                name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
+                size={20}
+                color="#FFFFFF"
+              />
+              <Text style={styles.addToCartButtonText}>
+                {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
 
@@ -327,7 +325,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   addToCartButton: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -337,6 +335,11 @@ const styles = StyleSheet.create({
   },
   removeFromCartButton: {
     backgroundColor: colors.error,
+  },
+  addToCartButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addToCartButtonText: {
     color: '#FFFFFF',

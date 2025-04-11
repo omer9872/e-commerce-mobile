@@ -1,8 +1,10 @@
 import React, {createContext, useContext, useState, useEffect} from 'react';
+import Toast from 'react-native-toast-message';
+
 import {cartService} from '../services/cartService';
 import type {Cart, CartItem} from '../types/cart';
 import type {Product} from '../types/product';
-import Toast from 'react-native-toast-message';
+
 interface CartContextData {
   items: CartItem[];
   addToCart: (product: Product, quantity?: number) => Promise<void>;
@@ -13,8 +15,6 @@ interface CartContextData {
   totalPrice: number;
   subtotal: number;
   totalDiscount: number;
-  totalEarnPoints: number;
-  totalRedeemPoints: number;
   isLoading: boolean;
 }
 
@@ -116,18 +116,6 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
 
   const totalPrice = cart?.total || 0;
 
-  const totalRedeemPoints =
-    cart?.items.reduce(
-      (sum, item) => sum + (item.product.points?.redeem || 0) * item.quantity,
-      0,
-    ) || 0;
-
-  const totalEarnPoints =
-    cart?.items.reduce(
-      (sum, item) => sum + (item.product.points?.earn || 0) * item.quantity,
-      0,
-    ) || 0;
-
   const subtotal = cart?.subtotal || 0;
   const totalDiscount = cart?.totalDiscount || 0;
 
@@ -143,8 +131,6 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
         totalPrice,
         subtotal,
         totalDiscount,
-        totalEarnPoints,
-        totalRedeemPoints,
         isLoading,
       }}>
       {children}

@@ -13,12 +13,14 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchTransactions} from '../../services/transactionService';
-import {TransactionType, type Transaction} from '../../types/transaction';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
+
+import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {fetchTransactions} from '../../services/transactionService';
+import {ITransaction} from '../../types/transaction';
+import {colors} from '../../theme/colors';
 
 type TransactionHistoryScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -27,7 +29,7 @@ type TransactionHistoryScreenNavigationProp = StackNavigationProp<
 
 const TransactionHistoryScreen = () => {
   const navigation = useNavigation<TransactionHistoryScreenNavigationProp>();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
@@ -80,7 +82,7 @@ const TransactionHistoryScreen = () => {
     }
   }, [hasMore, loadingMore, loadTransactions, page]);
 
-  const navigateToTransactionDetail = (transaction: Transaction) => {
+  const navigateToTransactionDetail = (transaction: ITransaction) => {
     navigation.navigate('TransactionDetail', {transactionId: transaction._id});
   };
 
@@ -88,10 +90,7 @@ const TransactionHistoryScreen = () => {
     loadTransactions();
   }, [loadTransactions]);
 
-  const renderTransactionItem = ({item}: {item: Transaction}) => {
-    const isEarn =
-      item.type === TransactionType.EARN ||
-      item.type === TransactionType.PURCHASE;
+  const renderTransactionItem = ({item}: {item: ITransaction}) => {
     const date = new Date(item.createdAt);
     const formattedDate = dayjs(date).format('MMMM ddd, YYYY');
     const formattedTime = dayjs(date).format('hh:mm');
@@ -101,16 +100,10 @@ const TransactionHistoryScreen = () => {
         style={styles.transactionItem}
         onPress={() => navigateToTransactionDetail(item)}>
         <View style={styles.iconContainer}>
-          <Icon
-            name={isEarn ? 'arrow-down' : 'arrow-up'}
-            size={24}
-            color={isEarn ? '#4CAF50' : '#F44336'}
-          />
+          <Icon name={'receipt'} size={24} color={colors.primary} />
         </View>
         <View style={styles.transactionDetails}>
-          <Text style={styles.transactionType}>
-            {isEarn ? 'Points Earned' : 'Points Spent'}
-          </Text>
+          <Text style={styles.transactionType}>Payment</Text>
           <Text style={styles.transactionDate}>
             {formattedDate} at {formattedTime}
           </Text>
@@ -122,10 +115,11 @@ const TransactionHistoryScreen = () => {
           <Text
             style={[
               styles.transactionAmount,
-              {color: isEarn ? '#4CAF50' : '#F44336'},
+              {
+                color: colors.primary,
+              },
             ]}>
-            {isEarn ? '+' : '-'}
-            {item.totalPoints} pts
+            ${item.totalAmount.toFixed(2)}
           </Text>
           {item.totalAmount > 0 && (
             <Text style={styles.moneyAmount}>

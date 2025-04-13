@@ -12,4 +12,6 @@ export const colors = {
   warning: '#FFA000',
   lightBackground: '#F5F5F5',
   white: '#FFFFFF',
+  gray: '#9E9E9E',
+  black: '#000000',
 };

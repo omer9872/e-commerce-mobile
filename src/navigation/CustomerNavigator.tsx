@@ -3,25 +3,27 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {createStackNavigator} from '@react-navigation/stack';
 
 // Customer Screens
-import HomeScreen from '../screens/customer/HomeScreen';
-import ProductDetailScreen from '../screens/customer/ProductDetailScreen';
-import ProfileScreen from '../screens/customer/ProfileScreen';
-import EditProfileScreen from '../screens/customer/EditProfileScreen';
-import SettingsScreen from '../screens/customer/SettingsScreen';
-import QRCodeScreen from '../screens/customer/QRCodeScreen';
-import CartScreen from '../screens/customer/CartScreen';
-import AddressListScreen from '../screens/customer/AddressListScreen';
-import AddressFormScreen from '../screens/customer/AddressFormScreen';
-import PaymentCardListScreen from '../screens/customer/PaymentCardListScreen';
-import PaymentCardFormScreen from '../screens/customer/PaymentCardFormScreen';
+import PhoneVerificationCodeScreen from '../screens/customer/PhoneVerificationCodeScreen';
+import EmailVerificationCodeScreen from '../screens/customer/EmailVerificationCodeScreen';
+import PaymentConfirmationScreen from '../screens/customer/PaymentConfirmationScreen';
 import TransactionHistoryScreen from '../screens/customer/TransactionHistoryScreen';
 import TransactionDetailScreen from '../screens/customer/TransactionDetailScreen';
 import EmailVerificationScreen from '../screens/customer/EmailVerificationScreen';
-import EmailVerificationCodeScreen from '../screens/customer/EmailVerificationCodeScreen';
 import PhoneVerificationScreen from '../screens/customer/PhoneVerificationScreen';
-import PhoneVerificationCodeScreen from '../screens/customer/PhoneVerificationCodeScreen';
-import PaymentConfirmationScreen from '../screens/customer/PaymentConfirmationScreen';
+import PaymentCardListScreen from '../screens/customer/PaymentCardListScreen';
+import PaymentCardFormScreen from '../screens/customer/PaymentCardFormScreen';
 import PaymentSuccessScreen from '../screens/customer/PaymentSuccessScreen';
+import CampaignDetailScreen from '../screens/customer/CampaignDetailScreen';
+import ProductDetailScreen from '../screens/customer/ProductDetailScreen';
+import AddressListScreen from '../screens/customer/AddressListScreen';
+import AddressFormScreen from '../screens/customer/AddressFormScreen';
+import EditProfileScreen from '../screens/customer/EditProfileScreen';
+import FavoritesScreen from '../screens/customer/FavoritesScreen';
+import CampaignsScreen from '../screens/customer/CampaignsScreen';
+import SettingsScreen from '../screens/customer/SettingsScreen';
+import ProfileScreen from '../screens/customer/ProfileScreen';
+import CartScreen from '../screens/customer/CartScreen';
+import HomeScreen from '../screens/customer/HomeScreen';
 
 // Stack param lists
 export type CustomerHomeStackParamList = {
@@ -63,11 +65,22 @@ export type CustomerProfileStackParamList = {
   PhoneVerificationCode: {phone: string};
 };
 
+export type CustomerFavoritesStackParamList = {
+  Favorites: undefined;
+  ProductDetail: {productId: string};
+};
+
+export type CustomerCampaignsStackParamList = {
+  Campaigns: undefined;
+  CampaignDetail: {campaignId: string};
+};
+
 // Create the stack navigators
 const HomeStack = createStackNavigator<CustomerHomeStackParamList>();
 const CartStack = createStackNavigator<CustomerCartStackParamList>();
 const ProfileStack = createStackNavigator<CustomerProfileStackParamList>();
-
+const FavoritesStack = createStackNavigator<CustomerFavoritesStackParamList>();
+const CampaignsStack = createStackNavigator<CustomerCampaignsStackParamList>();
 // Home Stack Navigator
 const HomeStackNavigator = () => {
   return (
@@ -190,6 +203,41 @@ const ProfileStackNavigator = () => {
   );
 };
 
+// Favorites Stack Navigator
+const FavoritesStackNavigator = () => {
+  return (
+    <FavoritesStack.Navigator>
+      <FavoritesStack.Screen
+        name="Favorites"
+        component={FavoritesScreen}
+        options={{headerShown: false}}
+      />
+      <FavoritesStack.Screen
+        name="ProductDetail"
+        component={ProductDetailScreen}
+        options={{title: 'Product Details'}}
+      />
+    </FavoritesStack.Navigator>
+  );
+};
+
+const CampaignsStackNavigator = () => {
+  return (
+    <CampaignsStack.Navigator>
+      <CampaignsStack.Screen
+        name="Campaigns"
+        component={CampaignsScreen}
+        options={{headerShown: false}}
+      />
+      <CampaignsStack.Screen
+        name="CampaignDetail"
+        component={CampaignDetailScreen}
+        options={{title: 'Details'}}
+      />
+    </CampaignsStack.Navigator>
+  );
+};
+
 // Tab Navigator
 const Tab = createBottomTabNavigator();
 
@@ -212,13 +260,13 @@ const CustomerNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="QRCode"
-        component={QRCodeScreen}
+        name="CampaignsTab"
+        component={CampaignsStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'QR Code',
+          tabBarLabel: 'Campaigns',
           tabBarIcon: ({color, size}) => (
-            <Icon name="qrcode" color={color} size={size} />
+            <Icon name="ticket" color={color} size={size} />
           ),
         }}
       />
@@ -230,6 +278,17 @@ const CustomerNavigator = () => {
           tabBarLabel: 'Cart',
           tabBarIcon: ({color, size}) => (
             <Icon name="cart" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="FavoritesTab"
+        component={FavoritesStackNavigator}
+        options={{
+          headerShown: false,
+          tabBarLabel: 'Favorites',
+          tabBarIcon: ({color, size}) => (
+            <Icon name="heart-outline" color={color} size={size} />
           ),
         }}
       />

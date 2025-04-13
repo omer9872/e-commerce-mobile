@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message';
 import {StatusBar} from 'react-native';
 
 import MerchantEmployeeNavigator from './src/navigation/MerchantEmployeeNavigator';
+import {FavoritesProvider} from './src/contexts/FavoritesContext';
 import CustomerNavigator from './src/navigation/CustomerNavigator';
 import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import SplashScreen from './src/screens/common/SplashScreen';
@@ -43,11 +44,13 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
+        <FavoritesProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </FavoritesProvider>
       </AuthProvider>
-      <Toast />
+      <Toast position="top" />
     </SafeAreaProvider>
   );
 };

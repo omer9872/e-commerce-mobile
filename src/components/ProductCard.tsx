@@ -13,6 +13,7 @@ import {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useCart} from '../contexts/CartContext';
 import Toast from 'react-native-toast-message';
+import {useFavorites} from '../contexts/FavoritesContext';
 
 import {Product} from '../types/product';
 import Image from '../components/Image';
@@ -25,14 +26,16 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({product, onPress, style}: ProductCardProps) => {
-  const [isAddedToCart, setIsAddedToCart] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const {
     addToCart,
     removeFromCart,
     items,
     isLoading: isCartLoading,
   } = useCart();
+  const {addToFavorites, removeFromFavorites, isInFavorites} = useFavorites();
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
 
   // Check if product is already in cart
   useEffect(() => {
@@ -101,6 +104,32 @@ const ProductCard = ({product, onPress, style}: ProductCardProps) => {
     }
   };
 
+  const handleToggleFavorites = async () => {
+    try {
+      setIsFavoritesLoading(true);
+      console.log(product._id);
+      if (isInFavorites(product._id)) {
+        await removeFromFavorites(product._id);
+        Toast.show({
+          type: 'success',
+          text1: 'Removed from Favorites',
+          text2: `${product.name} has been removed from your favorites`,
+        });
+      } else {
+        await addToFavorites(product._id);
+        Toast.show({
+          type: 'success',
+          text1: 'Added to Favorites',
+          text2: `${product.name} has been added to your favorites`,
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling favorites:', error);
+    } finally {
+      setIsFavoritesLoading(false);
+    }
+  };
+
   return (
     <TouchableOpacity
       style={[styles.container, style]}
@@ -125,30 +154,51 @@ const ProductCard = ({product, onPress, style}: ProductCardProps) => {
             {product.price} <Text style={styles.amountLabel}>₺</Text>
           </Text>
         </View>
-        <TouchableOpacity
-          style={[
-            styles.addToCartButton,
-            isAddedToCart
-              ? {backgroundColor: colors.error}
-              : {backgroundColor: colors.primary},
-          ]}
-          onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
-          disabled={isLoading || isCartLoading}>
-          {isLoading || isCartLoading ? (
-            <ActivityIndicator color="#FFFFFF" size="small" />
-          ) : (
-            <View style={styles.addToCartButtonContent}>
-              <Icon
-                name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
-                size={20}
-                color="#FFFFFF"
-              />
-              <Text style={styles.addToCartText}>
-                {isAddedToCart ? 'Remove' : 'Add'}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity
+            style={[
+              styles.favoriteButton,
+              isInFavorites(product._id)
+                ? {backgroundColor: colors.error}
+                : {backgroundColor: colors.primary},
+            ]}
+            onPress={handleToggleFavorites}
+            disabled={isFavoritesLoading}>
+            {isFavoritesLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <View style={styles.favoriteButtonContent}>
+                <Icon
+                  name={isInFavorites(product._id) ? 'heart' : 'heart-outline'}
+                  size={20}
+                  color="#FFFFFF"
+                />
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.addToCartButton,
+              isAddedToCart
+                ? {backgroundColor: colors.error}
+                : {backgroundColor: colors.primary},
+            ]}
+            onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
+            disabled={isLoading || isCartLoading}>
+            {isLoading || isCartLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <View style={styles.addToCartButtonContent}>
+                <Icon
+                  name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
+                  size={20}
+                  color="#FFFFFF"
+                />
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -174,7 +224,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 12,
-    gap: 10,
+    gap: 6,
     justifyContent: 'space-between',
   },
   name: {
@@ -210,24 +260,47 @@ const styles = StyleSheet.create({
   amountLabel: {
     fontWeight: 'normal',
   },
-  addToCartButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 4,
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  favoriteButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 8,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  favoriteButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  favoriteText: {
+    color: '#FFFFFF',
+    marginLeft: 4,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  addToCartButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+    borderRadius: 8,
   },
   addToCartButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   addToCartText: {
     color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
     marginLeft: 4,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

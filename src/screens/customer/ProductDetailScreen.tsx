@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -12,24 +12,18 @@ import {
   Dimensions,
   StatusBar,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  type RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import {type RouteProp, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Carousel from 'react-native-reanimated-carousel';
 import Toast from 'react-native-toast-message';
 
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
+import {useFavorites} from '../../contexts/FavoritesContext';
 import {useCart} from '../../contexts/CartContext';
-import Image from '../../components/Image';
-import {useAuth} from '../../contexts/AuthContext';
-import {api, API_URL} from '../../services/api';
 import type {Product} from 'src/types/product';
+import Image from '../../components/Image';
 import {colors} from '../../theme/colors';
+import {api} from '../../services/api';
 
 type ProductDetailScreenRouteProp = RouteProp<
   CustomerHomeStackParamList,
@@ -43,17 +37,15 @@ const ProductDetailScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
-  const {user, loyaltySummary} = useAuth();
   const {
     addToCart,
     removeFromCart,
     items,
     isLoading: isCartLoading,
   } = useCart();
-  const [token, setToken] = useState<string | null>(null);
-  const navigation = useNavigation();
   const width = Dimensions.get('window').width;
-  const insets = useSafeAreaInsets();
+  const {addToFavorites, removeFromFavorites, isInFavorites} = useFavorites();
+  const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
 
   const fetchProductDetails = async () => {
     try {
@@ -75,27 +67,6 @@ const ProductDetailScreen = () => {
     }
   }, [items, product]);
 
-  const handleRedeemProduct = async () => {
-    if (!product) return;
-
-    try {
-      const response = await api.post('/redeem', {productId: product._id});
-      if (response.data.success) {
-        Alert.alert('Success', 'Product redeemed successfully!');
-        // You might want to update the user's points here or navigate back
-      } else {
-        Alert.alert(
-          'Error',
-          response.data.message ||
-            'Failed to redeem product. Please try again.',
-        );
-      }
-    } catch (error) {
-      console.error('Error redeeming product:', error);
-      Alert.alert('Error', 'Failed to redeem product. Please try again.');
-    }
-  };
-
   const handleAddToCart = async () => {
     if (!product || isAddedToCart || isAddingToCart) return;
 
@@ -109,8 +80,6 @@ const ProductDetailScreen = () => {
         type: 'success',
         text1: 'Added to Cart',
         text2: `${product.name} has been added to your cart`,
-        position: 'bottom',
-        visibilityTime: 2000,
       });
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -118,8 +87,6 @@ const ProductDetailScreen = () => {
         type: 'error',
         text1: 'Error',
         text2: 'Failed to add item to cart. Please try again.',
-        position: 'bottom',
-        visibilityTime: 2000,
       });
     } finally {
       setIsAddingToCart(false);
@@ -139,8 +106,6 @@ const ProductDetailScreen = () => {
         type: 'success',
         text1: 'Removed from Cart',
         text2: `${product.name} has been removed from your cart`,
-        position: 'bottom',
-        visibilityTime: 2000,
       });
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -148,11 +113,41 @@ const ProductDetailScreen = () => {
         type: 'error',
         text1: 'Error',
         text2: 'Failed to remove item from cart. Please try again.',
-        position: 'bottom',
-        visibilityTime: 2000,
       });
     } finally {
       setIsAddingToCart(false);
+    }
+  };
+
+  const handleToggleFavorites = async () => {
+    if (!product) return;
+
+    try {
+      setIsFavoritesLoading(true);
+      if (isInFavorites(product._id)) {
+        await removeFromFavorites(product._id);
+        Toast.show({
+          type: 'success',
+          text1: 'Removed from Favorites',
+          text2: `${product.name} has been removed from your favorites`,
+        });
+      } else {
+        await addToFavorites(product._id);
+        Toast.show({
+          type: 'success',
+          text1: 'Added to Favorites',
+          text2: `${product.name} has been added to your favorites`,
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling favorites:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update favorites. Please try again.',
+      });
+    } finally {
+      setIsFavoritesLoading(false);
     }
   };
 
@@ -163,19 +158,6 @@ const ProductDetailScreen = () => {
       </View>
     );
   };
-
-  const currentBalance = useMemo(
-    () => loyaltySummary?.currentBalance || 0,
-    [loyaltySummary],
-  );
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      const token = await AsyncStorage.getItem('@LoyaltyApp:token');
-      setToken(token);
-    };
-    fetchToken();
-  }, []);
 
   useEffect(() => {
     fetchProductDetails();
@@ -216,38 +198,60 @@ const ProductDetailScreen = () => {
       )}
       <View style={styles.contentContainer}>
         <Text style={styles.productName}>{product.name}</Text>
-        <Text style={styles.pointsRequired}>{product.price} ₺</Text>
+        <Text style={styles.price}>{product.price} ₺</Text>
         <Text style={styles.description}>{product.description}</Text>
 
-        <TouchableOpacity
-          style={[
-            styles.addToCartButton,
-            isAddedToCart ? styles.removeFromCartButton : null,
-          ]}
-          onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
-          disabled={isAddingToCart || isCartLoading}>
-          {isAddingToCart || isCartLoading ? (
-            <ActivityIndicator color="#FFFFFF" size="small" />
-          ) : (
-            <View style={styles.addToCartButtonContent}>
-              <Icon
-                name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
-                size={20}
-                color="#FFFFFF"
-              />
-              <Text style={styles.addToCartButtonText}>
-                {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity
+            style={[
+              styles.favoriteButton,
+              isInFavorites(product._id)
+                ? styles.removeFromFavoritesButton
+                : null,
+            ]}
+            onPress={handleToggleFavorites}
+            disabled={isFavoritesLoading}>
+            {isFavoritesLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <View style={styles.favoriteButtonContent}>
+                <Icon
+                  name={isInFavorites(product._id) ? 'heart' : 'heart-outline'}
+                  size={20}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.favoriteButtonText}>
+                  {isInFavorites(product._id)
+                    ? 'Remove from Favorites'
+                    : 'Add to Favorites'}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
 
-        {currentBalance < product.points.redeem && (
-          <Text style={styles.pointsNeeded}>
-            You need {product.points.redeem - currentBalance} more points to
-            redeem this product.
-          </Text>
-        )}
+          <TouchableOpacity
+            style={[
+              styles.addToCartButton,
+              isAddedToCart ? styles.removeFromCartButton : null,
+            ]}
+            onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
+            disabled={isAddingToCart || isCartLoading}>
+            {isAddingToCart || isCartLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <View style={styles.addToCartButtonContent}>
+                <Icon
+                  name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
+                  size={20}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.addToCartButtonText}>
+                  {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -294,11 +298,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 10,
   },
-  pointsRequired: {
+  price: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: colors.primary,
-    marginBottom: 15,
+    marginBottom: 10,
   },
   description: {
     fontSize: 16,
@@ -306,32 +310,42 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 24,
   },
-  redeemButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
+  actionsContainer: {
+    flexDirection: 'column',
+    gap: 12,
+    marginTop: 20,
   },
-  redeemButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  pointsNeeded: {
-    marginTop: 10,
-    fontSize: 14,
-    color: colors.error,
-    textAlign: 'center',
-  },
-  addToCartButton: {
+  favoriteButton: {
+    flex: 1,
     backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 15,
     borderRadius: 8,
-    marginTop: 10,
+  },
+  removeFromFavoritesButton: {
+    backgroundColor: colors.error,
+  },
+  favoriteButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoriteButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  addToCartButton: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    borderRadius: 8,
   },
   removeFromCartButton: {
     backgroundColor: colors.error,
@@ -343,7 +357,7 @@ const styles = StyleSheet.create({
   },
   addToCartButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },

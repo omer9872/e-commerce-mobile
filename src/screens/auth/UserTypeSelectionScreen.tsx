@@ -3,6 +3,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {colors} from '../../theme/colors';
 
 type UserTypeSelectionScreenNavigationProp = StackNavigationProp<
@@ -21,6 +22,10 @@ const UserTypeSelectionScreen = () => {
     navigation.navigate('Login', {userType: 'merchant'});
   };
 
+  const handleCarrierSelection = () => {
+    navigation.navigate('Login', {userType: 'carrier'});
+  };
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -33,11 +38,7 @@ const UserTypeSelectionScreen = () => {
               style={styles.option}
               onPress={handleCustomerSelection}>
               <View style={styles.iconContainer}>
-                <Image
-                  source={require('../../assets/images/logo.jpg')}
-                  style={styles.icon}
-                  defaultSource={require('../../assets/images/logo.jpg')}
-                />
+                <Icon name="account" size={50} color={colors.primary} />
               </View>
               <Text style={styles.optionTitle}>Customer</Text>
               <Text style={styles.optionDescription}>
@@ -47,15 +48,11 @@ const UserTypeSelectionScreen = () => {
 
             <TouchableOpacity
               style={styles.option}
-              onPress={handleMerchantSelection}>
+              onPress={handleCarrierSelection}>
               <View style={styles.iconContainer}>
-                <Image
-                  source={require('../../assets/images/logo.jpg')}
-                  style={styles.icon}
-                  defaultSource={require('../../assets/images/logo.jpg')}
-                />
+                <Icon name="moped" size={50} color={colors.primary} />
               </View>
-              <Text style={styles.optionTitle}>Merchant</Text>
+              <Text style={styles.optionTitle}>Carrier</Text>
               <Text style={styles.optionDescription}>
                 Scan customer codes and manage transactions
               </Text>

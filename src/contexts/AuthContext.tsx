@@ -4,18 +4,24 @@ import type React from 'react';
 import {createContext, useContext, useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {api} from '../services/api';
-import type {IUser} from '../types/user';
 import type {LoyaltySummary} from 'src/types/loyaltySummary';
 
-type UserType = 'customer' | 'merchant' | 'merchantEmployee' | null;
+import {IUser, UserType} from '../types/user';
+import {api} from '../services/api';
 
 type User = IUser & {verification: {email: boolean; phone: boolean}};
+
+type AuthResponse = {
+  accessToken: string;
+  refreshToken: string;
+  roles: string[];
+  permissions: string[];
+};
 
 interface AuthContextData {
   isAuthenticated: boolean;
   isLoading: boolean;
-  userType: UserType;
+  userType: UserType | null;
   user: User | null;
   loyaltySummary: LoyaltySummary | null;
   permissions: string[];
@@ -41,7 +47,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [userType, setUserType] = useState<UserType>(null);
+  const [userType, setUserType] = useState<UserType | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loyaltySummary, setLoyaltySummary] = useState<LoyaltySummary | null>(
     null,
@@ -120,30 +126,33 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
         '/auth/login-via-phone-number',
         credentials,
       );
-      const {
-        accessToken,
-        refreshToken,
-        roles,
-        permissions,
-        userType: responseUserType,
-      } = response.data;
+      const {accessToken, refreshToken, roles, permissions} =
+        response.data as AuthResponse;
+
+      let userResponseType: UserType | null = null;
+      if (roles.includes('MERCHANT')) {
+        userResponseType = UserType.MERCHANT;
+      } else if (roles.includes('CARRIER')) {
+        userResponseType = UserType.CARRIER;
+      } else if (roles.includes('CUSTOMER')) {
+        userResponseType = UserType.CUSTOMER;
+      }
 
       setPermissions(permissions);
       setRoles(roles);
-      setUserType('customer');
+      setUserType(userResponseType);
 
       await Promise.all([
         AsyncStorage.setItem('@LoyaltyApp:token', accessToken),
         AsyncStorage.setItem('@LoyaltyApp:refreshToken', refreshToken),
         AsyncStorage.setItem('@LoyaltyApp:roles', JSON.stringify(roles)),
         AsyncStorage.setItem(
-          '@LoyaltyApp:userType',
-          responseUserType || 'customer',
-        ),
-        AsyncStorage.setItem(
           '@LoyaltyApp:permissions',
           JSON.stringify(permissions),
         ),
+        ...(userResponseType
+          ? [AsyncStorage.setItem('@LoyaltyApp:userType', userResponseType)]
+          : []),
       ]);
 
       api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
@@ -163,30 +172,33 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   }): Promise<void> {
     try {
       const response = await api.post('/auth/login-via-email', credentials);
-      const {
-        accessToken,
-        refreshToken,
-        roles,
-        permissions,
-        userType: responseUserType,
-      } = response.data;
+      const {accessToken, refreshToken, roles, permissions} =
+        response.data as AuthResponse;
+
+      let userResponseType: UserType | null = null;
+      if (roles.includes('MERCHANT')) {
+        userResponseType = UserType.MERCHANT;
+      } else if (roles.includes('CARRIER')) {
+        userResponseType = UserType.CARRIER;
+      } else if (roles.includes('CUSTOMER')) {
+        userResponseType = UserType.CUSTOMER;
+      }
 
       setPermissions(permissions);
       setRoles(roles);
-      setUserType('merchant');
+      setUserType(userResponseType);
 
       await Promise.all([
         AsyncStorage.setItem('@LoyaltyApp:token', accessToken),
         AsyncStorage.setItem('@LoyaltyApp:refreshToken', refreshToken),
         AsyncStorage.setItem('@LoyaltyApp:roles', JSON.stringify(roles)),
         AsyncStorage.setItem(
-          '@LoyaltyApp:userType',
-          responseUserType || 'merchant',
-        ),
-        AsyncStorage.setItem(
           '@LoyaltyApp:permissions',
           JSON.stringify(permissions),
         ),
+        ...(userResponseType
+          ? [AsyncStorage.setItem('@LoyaltyApp:userType', userResponseType)]
+          : []),
       ]);
 
       api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;

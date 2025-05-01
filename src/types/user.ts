@@ -13,3 +13,9 @@ export interface IUser {
   updatedAt: Date;
   updatedBy: string;
 }
+
+export enum UserType {
+  CUSTOMER = 'customer',
+  MERCHANT = 'merchant',
+  CARRIER = 'carrier',
+}

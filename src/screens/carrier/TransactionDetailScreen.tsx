@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   StatusBar,
+  Modal,
+  Pressable,
 } from 'react-native';
 import {
   type RouteProp,
@@ -19,8 +21,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchTransactionById} from '../../services/transactionService';
 import {
   PaymentMethod,
   PaymentStatus,
@@ -28,6 +28,12 @@ import {
   ShippingType,
   TransactionDetail,
 } from '../../types/transaction';
+import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {
+  fetchCarrierTransactionById,
+  updateCarrierTransactionShippingStatus,
+} from '../../services/carrierTransactionService';
+import {colors} from '../../theme/colors';
 
 type TransactionDetailScreenRouteProp = RouteProp<
   CustomerProfileStackParamList,
@@ -80,12 +86,13 @@ const TransactionDetailScreen = () => {
     null,
   );
   const [loading, setLoading] = useState(true);
+  const [showStatusModal, setShowStatusModal] = useState(false);
 
   useEffect(() => {
     const loadTransaction = async () => {
       try {
         setLoading(true);
-        const data = await fetchTransactionById(transactionId);
+        const data = await fetchCarrierTransactionById(transactionId);
         setTransaction(data);
       } catch (error) {
         console.log(error);
@@ -101,6 +108,31 @@ const TransactionDetailScreen = () => {
 
     loadTransaction();
   }, [transactionId]);
+
+  const updateShippingStatus = async (newStatus: ShippingStatus) => {
+    try {
+      await updateCarrierTransactionShippingStatus(transactionId, newStatus);
+
+      // Update local state
+      setTransaction(prev =>
+        prev ? {...prev, shippingStatus: newStatus} : null,
+      );
+      setShowStatusModal(false);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Shipping status updated successfully',
+      });
+    } catch (error) {
+      setShowStatusModal(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update shipping status. Please try again.',
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -130,7 +162,7 @@ const TransactionDetailScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#5C6BC0" />
+      <StatusBar barStyle="dark-content" />
 
       <View style={styles.card}>
         <View style={styles.transactionTypeContainer}>
@@ -197,26 +229,58 @@ const TransactionDetailScreen = () => {
 
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Shipping Status</Text>
-          <View style={styles.statusContainer}>
-            <View
-              style={[
-                styles.statusDot,
-                {
-                  backgroundColor:
-                    ShippingStatusColors[transaction.shippingStatus],
-                },
-              ]}
-            />
-            <Text
-              style={[
-                styles.statusText,
-                {
-                  color: ShippingStatusColors[transaction.shippingStatus],
-                },
-              ]}>
-              {ShippingStatusText[transaction.shippingStatus]}
-            </Text>
-          </View>
+          {transaction.shippingStatus !== ShippingStatus.DELIVERED &&
+          transaction.shippingStatus !== ShippingStatus.CANCELLED ? (
+            <TouchableOpacity
+              style={styles.shippingStatusContainer}
+              onPress={() => setShowStatusModal(true)}>
+              <View
+                style={[
+                  styles.statusDot,
+                  {
+                    backgroundColor:
+                      ShippingStatusColors[transaction.shippingStatus],
+                  },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color: ShippingStatusColors[transaction.shippingStatus],
+                  },
+                ]}>
+                {ShippingStatusText[transaction.shippingStatus]}
+              </Text>
+              <Icon
+                name="chevron-down"
+                size={20}
+                color={colors.gray}
+                style={styles.statusIcon}
+              />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.statusContainer}>
+              <View
+                style={[
+                  styles.statusDot,
+                  {
+                    backgroundColor:
+                      ShippingStatusColors[transaction.shippingStatus],
+                  },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color: ShippingStatusColors[transaction.shippingStatus],
+                  },
+                ]}>
+                {ShippingStatusText[transaction.shippingStatus]}
+              </Text>
+            </View>
+          )}
         </View>
 
         {transaction.items && transaction.items.length > 0 && (
@@ -244,6 +308,47 @@ const TransactionDetailScreen = () => {
           </View>
         )}
       </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showStatusModal}
+        onRequestClose={() => setShowStatusModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Update Shipping Status</Text>
+            {Object.values(ShippingStatus).map(status => (
+              <TouchableOpacity
+                key={status}
+                style={styles.statusOption}
+                onPress={() => updateShippingStatus(status)}>
+                <View
+                  style={[
+                    styles.statusDot,
+                    {
+                      backgroundColor: ShippingStatusColors[status],
+                    },
+                  ]}
+                />
+                <Text
+                  style={[
+                    styles.statusOptionText,
+                    {
+                      color: ShippingStatusColors[status],
+                    },
+                  ]}>
+                  {ShippingStatusText[status]}
+                </Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setShowStatusModal(false)}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -332,6 +437,7 @@ const styles = StyleSheet.create({
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
   },
   detailLabel: {
@@ -349,6 +455,15 @@ const styles = StyleSheet.create({
     color: '#212121',
     fontWeight: '500',
     textAlign: 'right',
+  },
+  shippingStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+    borderRadius: 8,
+    padding: 10,
   },
   statusContainer: {
     flexDirection: 'row',
@@ -390,6 +505,54 @@ const styles = StyleSheet.create({
   itemPrice: {
     fontSize: 16,
     color: '#212121',
+    fontWeight: '500',
+  },
+  statusIcon: {
+    marginLeft: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 20,
+    width: '80%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#212121',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  statusOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+  },
+  statusOptionText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+  cancelButton: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#757575',
+    fontSize: 16,
     fontWeight: '500',
   },
 });

@@ -12,6 +12,19 @@ export enum PaymentStatus {
   FAILED = 'failed',
 }
 
+export enum ShippingType {
+  CARRIER = 'carrier',
+  SELF_PICKUP = 'self_pickup',
+}
+
+export enum ShippingStatus {
+  PENDING = 'pending',
+  SHIPPED = 'shipped',
+  ON_THE_WAY = 'on_the_way',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
+}
+
 export interface ITransactionProduct {
   product: string;
   quantity: number;
@@ -24,6 +37,8 @@ export interface ITransaction {
   items: ITransactionProduct[];
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
+  shippingType: ShippingType;
+  shippingStatus: ShippingStatus;
   totalAmount: number;
   code?: string;
   payment?: string;
@@ -45,6 +60,8 @@ export interface TransactionDetail {
   }[];
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
+  shippingType: ShippingType;
+  shippingStatus: ShippingStatus;
   totalAmount: number;
   totalPoints: number;
   code: null;

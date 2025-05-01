@@ -39,6 +39,24 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const screenParams = {
+    customer: {
+      title: 'Customer Login',
+      phone: true,
+      email: false,
+    },
+    merchant: {
+      title: 'Merchant Login',
+      phone: false,
+      email: true,
+    },
+    carrier: {
+      title: 'Carrier Login',
+      phone: false,
+      email: true,
+    },
+  };
+
   const handleLogin = async () => {
     if (userType === 'customer') {
       if (!phone || !password) {
@@ -92,12 +110,10 @@ const LoginScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>
-          {userType === 'customer' ? 'Customer Login' : 'Merchant Login'}
-        </Text>
+        <Text style={styles.title}>{screenParams[userType].title}</Text>
 
         <View style={styles.form}>
-          {userType === 'customer' ? (
+          {screenParams[userType].phone ? (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Phone</Text>
               <TextInput

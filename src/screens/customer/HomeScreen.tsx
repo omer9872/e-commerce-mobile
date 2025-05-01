@@ -70,10 +70,8 @@ const HomeScreen = () => {
   const fetchCategories = useCallback(async () => {
     try {
       setIsCategoriesLoading(true);
-      const response = await api.get<
-        IPaginatedResponsePayload<IProductCategory>
-      >('/product-category');
-      setCategories(response.data.data);
+      const response = await api.get<IProductCategory[]>('/product-category');
+      setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     } finally {

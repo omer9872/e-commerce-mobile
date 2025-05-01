@@ -18,11 +18,11 @@ import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchTransactions} from '../../services/transactionService';
+import {fetchCarrierTransactions} from '../../services/carrierTransactionService';
 import {ITransaction, ShippingStatus} from '../../types/transaction';
 import {colors} from '../../theme/colors';
 
-type TransactionHistoryScreenNavigationProp = StackNavigationProp<
+type TransactionsScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
   'TransactionHistory'
 >;
@@ -43,8 +43,8 @@ const ShippingStatusColors = {
   [ShippingStatus.CANCELLED]: '#F44336',
 };
 
-const TransactionHistoryScreen = () => {
-  const navigation = useNavigation<TransactionHistoryScreenNavigationProp>();
+const TransactionsScreen = () => {
+  const navigation = useNavigation<TransactionsScreenNavigationProp>();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,7 +62,7 @@ const TransactionHistoryScreen = () => {
           setLoadingMore(true);
         }
 
-        const response = await fetchTransactions(pageNum, limit);
+        const response = await fetchCarrierTransactions(pageNum, limit);
 
         if (shouldRefresh || pageNum === 0) {
           setTransactions(response.data);
@@ -178,7 +178,7 @@ const TransactionHistoryScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#5C6BC0" />
+      <StatusBar barStyle="dark-content" />
       {loading ? (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color="#5C6BC0" />
@@ -313,4 +313,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransactionHistoryScreen;
+export default TransactionsScreen;

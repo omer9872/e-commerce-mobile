@@ -1,7 +1,7 @@
-import {Product} from './product';
+import {IProduct} from './product';
 
 export interface IFavoritesItem {
-  product: Product;
+  product: IProduct;
 }
 
 export interface IFavorites {

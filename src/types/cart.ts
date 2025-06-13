@@ -1,49 +1,43 @@
-import {Product} from './product';
+import type {IProduct} from './product';
+import {Campaign} from './campaign';
 
-export interface CartItem {
-  product: Product;
+export interface ICartItem {
+  product: IProduct;
   quantity: number;
+  sku: string;
   price: number;
+  discount: number;
   total: number;
-  appliedCampaigns: Campaign[];
+  appliedCampaigns?: Campaign[];
 }
 
-export interface Campaign {
-  name: string;
-  description: string;
-  image: string;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-  targetType: string;
-  targets: any[];
-  conditions: {
-    minPurchaseAmount: number | null;
-    minQuantity: number | null;
-    maxUsagePerUser: number | null;
-    maxTotalUsage: number | null;
-    multiplePurchases: boolean;
-  };
-  reward: {
-    type: string;
-    value: number;
-    freeItem: any | null;
-    buyQuantity: number;
-    getFreeQuantity: number;
-  };
-  createdAt: string;
-  updatedAt: string;
-  updatedBy: string | null;
-  deletedAt: string | null;
-  deletedBy: string | null;
-  _id: string;
-}
-
-export interface Cart {
+export interface ICart {
   _id: string;
   user: string;
-  items: CartItem[];
+  items: ICartItem[];
   subtotal: number;
   totalDiscount: number;
   total: number;
-} 
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IAddToCartPayload {
+  product: IProduct;
+  quantity: number;
+  sku: string;
+}
+
+export interface IUpdateCartItemPayload {
+  quantity: number;
+  sku: string;
+}
+
+export interface ICartResponse {
+  _id: string;
+  user: string;
+  items: ICartItem[];
+  subtotal: number;
+  totalDiscount: number;
+  total: number;
+}

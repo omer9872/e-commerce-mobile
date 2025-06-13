@@ -13,7 +13,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import type {IFavoritesItem, Product} from '../../types/index';
+import type {IFavoritesItem, IProduct} from '../../types/index';
 import {useFavorites} from '../../contexts/FavoritesContext';
 import Image from '../../components/Image';
 import {colors} from '../../theme/colors';
@@ -23,7 +23,7 @@ const FavoritesScreen = () => {
   const insets = useSafeAreaInsets();
   const {isLoading, favorites, removeFromFavorites} = useFavorites();
 
-  const handleProductPress = (product: Product) => {
+  const handleProductPress = (product: IProduct) => {
     navigation.navigate('ProductDetail', {productId: product._id});
   };
 
@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
   },
   favoriteItem: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.white,
     borderRadius: 12,
     padding: 12,
@@ -157,7 +158,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.primary,
-    marginBottom: 8,
   },
   removeButton: {
     padding: 8,

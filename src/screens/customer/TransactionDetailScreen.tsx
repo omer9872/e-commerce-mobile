@@ -19,15 +19,17 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchTransactionById} from '../../services/transactionService';
 import {
+  ITransactionItem,
   PaymentMethod,
   PaymentStatus,
   ShippingStatus,
   ShippingType,
-  TransactionDetail,
+  ITransaction,
 } from '../../types/transaction';
+import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {fetchTransactionById} from '../../services/transactionService';
+import Image from '../../components/Image';
 
 type TransactionDetailScreenRouteProp = RouteProp<
   CustomerProfileStackParamList,
@@ -76,9 +78,7 @@ const TransactionDetailScreen = () => {
   const route = useRoute<TransactionDetailScreenRouteProp>();
   const navigation = useNavigation();
   const {transactionId} = route.params;
-  const [transaction, setTransaction] = useState<TransactionDetail | null>(
-    null,
-  );
+  const [transaction, setTransaction] = useState<ITransaction | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -160,7 +160,11 @@ const TransactionDetailScreen = () => {
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Payment Method</Text>
           <Text style={styles.detailValueRight}>
-            {PaymentMethodText[transaction.paymentMethod]}
+            {
+              PaymentMethodText[
+                transaction.paymentMethod as keyof typeof PaymentMethodText
+              ]
+            }
           </Text>
         </View>
 
@@ -172,7 +176,9 @@ const TransactionDetailScreen = () => {
                 styles.statusDot,
                 {
                   backgroundColor:
-                    PaymentStatusColors[transaction.paymentStatus],
+                    PaymentStatusColors[
+                      transaction.paymentStatus as keyof typeof PaymentStatusColors
+                    ],
                 },
               ]}
             />
@@ -180,10 +186,17 @@ const TransactionDetailScreen = () => {
               style={[
                 styles.statusText,
                 {
-                  color: PaymentStatusColors[transaction.paymentStatus],
+                  color:
+                    PaymentStatusColors[
+                      transaction.paymentStatus as keyof typeof PaymentStatusColors
+                    ],
                 },
               ]}>
-              {PaymentStatusText[transaction.paymentStatus]}
+              {
+                PaymentStatusText[
+                  transaction.paymentStatus as keyof typeof PaymentStatusText
+                ]
+              }
             </Text>
           </View>
         </View>
@@ -191,7 +204,11 @@ const TransactionDetailScreen = () => {
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Shipping Type</Text>
           <Text style={styles.detailValueRight}>
-            {ShippingTypeText[transaction.shippingType]}
+            {
+              ShippingTypeText[
+                transaction.shippingType as keyof typeof ShippingTypeText
+              ]
+            }
           </Text>
         </View>
 
@@ -203,7 +220,9 @@ const TransactionDetailScreen = () => {
                 styles.statusDot,
                 {
                   backgroundColor:
-                    ShippingStatusColors[transaction.shippingStatus],
+                    ShippingStatusColors[
+                      transaction.shippingStatus as keyof typeof ShippingStatusColors
+                    ],
                 },
               ]}
             />
@@ -211,10 +230,17 @@ const TransactionDetailScreen = () => {
               style={[
                 styles.statusText,
                 {
-                  color: ShippingStatusColors[transaction.shippingStatus],
+                  color:
+                    ShippingStatusColors[
+                      transaction.shippingStatus as keyof typeof ShippingStatusColors
+                    ],
                 },
               ]}>
-              {ShippingStatusText[transaction.shippingStatus]}
+              {
+                ShippingStatusText[
+                  transaction.shippingStatus as keyof typeof ShippingStatusText
+                ]
+              }
             </Text>
           </View>
         </View>
@@ -222,23 +248,29 @@ const TransactionDetailScreen = () => {
         {transaction.items && transaction.items.length > 0 && (
           <View style={styles.itemsContainer}>
             <Text style={styles.itemsTitle}>Items</Text>
-            {transaction.items.map((item, index) => (
+            {transaction.items.map((item: ITransactionItem, index: number) => (
               <View
                 key={index}
                 style={{
                   ...styles.itemRow,
                   ...{borderBottomWidth: 1, borderBottomColor: '#EEEEEE'},
                 }}>
-                <Text style={styles.itemName}>{item.product.name}</Text>
+                <View style={styles.itemImageContainer}>
+                  <Image id={item.product.images[0]} style={styles.itemImage} />
+                  <View>
+                    <Text style={styles.itemName}>{item.product.name}</Text>
+                    <Text style={styles.itemSKUName}>{item.sku}</Text>
+                  </View>
+                </View>
                 <Text style={styles.itemPrice}>
-                  ${(item?.product?.price ?? 0).toFixed(2)} x {item.quantity}
+                  {(item?.product?.price ?? 0).toFixed(2)}₺ x {item.quantity}
                 </Text>
               </View>
             ))}
             <View style={styles.itemRow}>
               <Text style={styles.totalName}>Total</Text>
               <Text style={styles.moneyAmount}>
-                ${(transaction?.totalAmount ?? 0).toFixed(2)}
+                {(transaction?.totalAmount ?? 0).toFixed(2)}₺
               </Text>
             </View>
           </View>
@@ -382,6 +414,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#212121',
   },
+  itemSKUName: {
+    fontSize: 14,
+    color: '#757575',
+  },
   totalName: {
     fontSize: 16,
     color: '#212121',
@@ -391,6 +427,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#212121',
     fontWeight: '500',
+  },
+  itemImageContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
   },
 });
 

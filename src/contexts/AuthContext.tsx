@@ -4,8 +4,6 @@ import type React from 'react';
 import {createContext, useContext, useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type {LoyaltySummary} from 'src/types/loyaltySummary';
-
 import {IUser, UserType} from '../types/user';
 import {api} from '../services/api';
 
@@ -23,7 +21,6 @@ interface AuthContextData {
   isLoading: boolean;
   userType: UserType | null;
   user: User | null;
-  loyaltySummary: LoyaltySummary | null;
   permissions: string[];
   roles: string[];
   fetchMe: () => Promise<void>;
@@ -37,7 +34,6 @@ interface AuthContextData {
   }) => Promise<void>;
   signOut: () => Promise<void>;
   updateUser: (data: Partial<User>) => Promise<void>;
-  refreshLoyaltySummary: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -49,9 +45,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [userType, setUserType] = useState<UserType | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [loyaltySummary, setLoyaltySummary] = useState<LoyaltySummary | null>(
-    null,
-  );
   const [permissions, setPermissions] = useState<string[]>([]);
   const [roles, setRoles] = useState<string[]>([]);
 
@@ -80,7 +73,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
           }
 
           setIsAuthenticated(true);
-          await refreshLoyaltySummary();
         } catch (error) {
           console.error('Token validation failed:', error);
           // Token is invalid or expired, clear storage and redirect to login
@@ -111,7 +103,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
     setIsAuthenticated(false);
     setUser(null);
     setUserType(null);
-    setLoyaltySummary(null);
     setPermissions([]);
     setRoles([]);
     delete api.defaults.headers.common.Authorization;
@@ -159,7 +150,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
       setIsAuthenticated(true);
 
       await fetchMe();
-      await refreshLoyaltySummary();
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -205,7 +195,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
       setIsAuthenticated(true);
 
       await fetchMe();
-      await refreshLoyaltySummary();
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -244,17 +233,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
     );
   }
 
-  async function refreshLoyaltySummary(): Promise<void> {
-    try {
-      if (userType === 'customer') {
-        const response = await api.get('/loyalty-summary/me');
-        setLoyaltySummary(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching loyalty summary:', error);
-    }
-  }
-
   return (
     <AuthContext.Provider
       value={{
@@ -262,7 +240,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
         isLoading,
         userType,
         user,
-        loyaltySummary,
         permissions,
         roles,
         fetchMe,
@@ -270,7 +247,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
         signInViaEmail,
         signOut,
         updateUser,
-        refreshLoyaltySummary,
       }}>
       {children}
     </AuthContext.Provider>

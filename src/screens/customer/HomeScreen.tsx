@@ -19,12 +19,11 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
-import {IPaginatedResponsePayload} from '../../types/common';
 import type {IProductCategory} from '../../types/category';
 import LayoutHeader from '../../components/LayoutHeader';
 import ProductCard from '../../components/ProductCard';
 import {useAuth} from '../../contexts/AuthContext';
-import type {Product} from '../../types/product';
+import type {IProduct} from '../../types/product';
 import Avatar from '../../components/Avatar';
 import Image from '../../components/Image';
 import {colors} from '../../theme/colors';
@@ -36,7 +35,7 @@ type HomeScreenNavigationProp = StackNavigationProp<
 >;
 
 interface ProductResponse {
-  data: Product[];
+  data: IProduct[];
   total: number;
   page: number;
   limit: number;
@@ -47,8 +46,8 @@ const PRODUCT_CARD_WIDTH = (width - 60) / 2; // Adjust based on your ProductCard
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const {user, refreshLoyaltySummary} = useAuth();
-  const [products, setProducts] = useState<Product[]>([]);
+  const {user} = useAuth();
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<IProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
@@ -135,7 +134,6 @@ const HomeScreen = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refreshLoyaltySummary();
     await fetchCategories();
     fetchProducts(0, true);
   };

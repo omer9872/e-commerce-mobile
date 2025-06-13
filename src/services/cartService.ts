@@ -1,42 +1,44 @@
 import {api} from './api';
 
-import type {Cart} from '../types/cart';
+import type {ICart} from '../types/cart';
 
 export const cartService = {
-  getCart: async (): Promise<Cart> => {
+  getCart: async (): Promise<ICart> => {
     const response = await api.get('/cart');
     return response.data;
   },
 
-  addToCart: async (productId: string, quantity: number): Promise<Cart> => {
+  addToCart: async (
+    productId: string,
+    sku: string,
+    quantity: number,
+  ): Promise<ICart> => {
     const response = await api.post('/cart/add', {
       productId,
       quantity,
+      sku,
     });
     return response.data;
   },
 
-  removeFromCart: async (
-    productId: string,
-    quantity: number,
-  ): Promise<Cart> => {
-    const response = await api.delete(`/cart/${productId}`, {
-      data: {quantity},
-    });
+  removeFromCart: async (sku: string): Promise<ICart> => {
+    const response = await api.delete(`/cart/${sku}`);
     return response.data;
   },
 
   updateQuantity: async (
     productId: string,
+    sku: string,
     quantity: number,
-  ): Promise<Cart> => {
+  ): Promise<ICart> => {
     const response = await api.put(`/cart/${productId}`, {
       quantity,
+      sku,
     });
     return response.data;
   },
 
-  clearCart: async (): Promise<Cart> => {
+  clearCart: async (): Promise<ICart> => {
     const response = await api.delete('/cart');
     return response.data;
   },

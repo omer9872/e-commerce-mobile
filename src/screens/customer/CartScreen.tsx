@@ -1,14 +1,15 @@
 'use client';
 
-import {useState, useEffect} from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Alert,
   Modal,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,11 +19,12 @@ import Toast from 'react-native-toast-message';
 import QRCode from 'react-native-qrcode-svg';
 
 import {fetchUserInformation} from '../../services/userInformationService';
+import type {IProductVariant} from '../../types/product';
 import type {PaymentCard} from '../../types/paymentCard';
 import type {UserInformation} from '../../types/address';
 import {useCart} from '../../contexts/CartContext';
 import type {Address} from '../../types/address';
-import type {CartItem} from '../../types/cart';
+import type {ICartItem} from '../../types/cart';
 import Image from '../../components/Image';
 import {colors} from '../../theme/colors';
 
@@ -32,22 +34,28 @@ const CartScreen = () => {
     removeFromCart,
     updateQuantity,
     clearCart,
+    totalItems,
     totalPrice,
-    totalDiscount,
     subtotal,
+    totalDiscount,
+    isLoading,
   } = useCart();
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
-  const [token, setToken] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [transactionCode, setTransactionCode] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInformation | null>(null);
-  const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
-  const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
+  const [token, setToken] = React.useState<string | null>(null);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [transactionCode, setTransactionCode] = React.useState<string | null>(
+    null,
+  );
+  const [userInfo, setUserInfo] = React.useState<UserInformation | null>(null);
+  const [isLoadingUserInfo, setIsLoadingUserInfo] = React.useState(false);
+  const [defaultAddress, setDefaultAddress] = React.useState<Address | null>(
+    null,
+  );
   const [defaultPaymentCard, setDefaultPaymentCard] =
-    useState<PaymentCard | null>(null);
+    React.useState<PaymentCard | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchToken = async () => {
       const token = await AsyncStorage.getItem('@LoyaltyApp:token');
       setToken(token);
@@ -89,48 +97,37 @@ const CartScreen = () => {
     }
   };
 
-  const handleIncreaseQuantity = (
-    productId: string,
-    currentQuantity: number,
-  ) => {
-    updateQuantity(productId, currentQuantity + 1);
-  };
-
-  const handleDecreaseQuantity = (
-    productId: string,
-    currentQuantity: number,
-  ) => {
-    if (currentQuantity > 1) {
-      updateQuantity(productId, currentQuantity - 1);
-    } else {
-      Alert.alert(
-        'Remove Item',
-        'Do you want to remove this item from your cart?',
-        [
-          {text: 'Cancel', style: 'cancel'},
-          {
-            text: 'Remove',
-            style: 'destructive',
-            onPress: () => removeFromCart(productId),
-          },
-        ],
-      );
+  const handleRemoveItem = async (sku: string) => {
+    try {
+      await removeFromCart(sku);
+      Toast.show({
+        type: 'success',
+        text1: 'Item removed',
+        text2: 'Item has been removed from your cart',
+      });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to remove item from cart',
+      });
     }
   };
 
-  const handleRemoveItem = (productId: string) => {
-    Alert.alert(
-      'Remove Item',
-      'Are you sure you want to remove this item from your cart?',
-      [
-        {text: 'Cancel', style: 'cancel'},
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => removeFromCart(productId),
-        },
-      ],
-    );
+  const handleUpdateQuantity = async (
+    productId: string,
+    sku: string,
+    quantity: number,
+  ) => {
+    try {
+      await updateQuantity(productId, sku, quantity);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update quantity',
+      });
+    }
   };
 
   const handleClearCart = () => {
@@ -202,95 +199,60 @@ const CartScreen = () => {
     setTransactionCode(null);
   };
 
-  const renderCartItem = ({item}: {item: CartItem}) => (
-    <View style={styles.cartItem}>
-      <Image id={item?.product?.images?.[0]} style={styles.productImage} />
+  const renderCartItem = (item: ICartItem) => {
+    const variant = item.product.variants?.find(
+      (v: IProductVariant) => v.sku === item.sku,
+    );
+    const variantOptions = variant
+      ? Object.entries(variant.options)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ')
+      : '';
 
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.product.name}</Text>
-        <Text style={styles.productPrice}>{item.price.toFixed(2)} ₺</Text>
-        <Text style={styles.itemTotal}>
-          Total: {(item.price * item.quantity).toFixed(2)} ₺
-        </Text>
-
-        {item.appliedCampaigns.length > 0 && (
-          <View style={styles.campaignsContainer}>
-            {item.appliedCampaigns.map(campaign => (
-              <View key={campaign._id} style={styles.campaignItem}>
-                <Icon name="gift" size={16} color={colors.primary} />
-                <Text style={styles.campaignText}>{campaign.name}</Text>
-              </View>
-            ))}
+    return (
+      <View key={`${item.product._id}-${item.sku}`} style={styles.cartItem}>
+        <Image id={item.product.images[0]} style={styles.productImage} />
+        <View style={styles.itemDetails}>
+          <Text style={styles.productName}>{item.product.name}</Text>
+          {variantOptions ? (
+            <Text style={styles.variantText}>{variantOptions}</Text>
+          ) : null}
+          <Text style={styles.price}>{item.price} ₺</Text>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() =>
+                handleUpdateQuantity(
+                  item.product._id,
+                  item.sku,
+                  item.quantity - 1,
+                )
+              }
+              disabled={item.quantity <= 1}>
+              <Text style={styles.quantityButtonText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.quantity}>{item.quantity}</Text>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() =>
+                handleUpdateQuantity(
+                  item.product._id,
+                  item.sku,
+                  item.quantity + 1,
+                )
+              }>
+              <Text style={styles.quantityButtonText}>+</Text>
+            </TouchableOpacity>
           </View>
-        )}
-
-        <View style={styles.quantityContainer}>
-          <TouchableOpacity
-            style={styles.quantityButton}
-            onPress={() =>
-              handleDecreaseQuantity(item.product._id, item.quantity)
-            }>
-            <Icon name="minus" size={16} color={colors.primary} />
-          </TouchableOpacity>
-
-          <Text style={styles.quantityText}>{item.quantity}</Text>
-
-          <TouchableOpacity
-            style={styles.quantityButton}
-            onPress={() =>
-              handleIncreaseQuantity(item.product._id, item.quantity)
-            }>
-            <Icon name="plus" size={16} color={colors.primary} />
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={() => handleRemoveItem(item.sku)}>
+          <Icon name="trash-can-outline" size={24} color={colors.error} />
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        style={styles.removeButton}
-        onPress={() => handleRemoveItem(item.product._id)}>
-        <Icon name="trash-can-outline" size={22} color={colors.error} />
-      </TouchableOpacity>
-    </View>
-  );
-
-  // if (isLoading) {
-  //   return (
-  //     <View style={[styles.container, {paddingTop: insets.top}]}>
-  //       <View style={styles.subContainer}>
-  //         <View style={styles.header}>
-  //           <Text style={styles.headerTitle}>Shopping Cart</Text>
-  //         </View>
-  //         <View style={styles.loadingContainer}>
-  //           <ActivityIndicator size="large" color={colors.primary} />
-  //         </View>
-  //       </View>
-  //     </View>
-  //   );
-  // }
-
-  // if (error) {
-  //   return (
-  //     <View style={[styles.container, {paddingTop: insets.top}]}>
-  //       <View style={styles.subContainer}>
-  //         <View style={styles.header}>
-  //           <Text style={styles.headerTitle}>Shopping Cart</Text>
-  //         </View>
-  //         <View style={styles.errorContainer}>
-  //           <Icon name="alert-circle" size={48} color={colors.error} />
-  //           <Text style={styles.errorText}>{error}</Text>
-  //           <TouchableOpacity
-  //             style={styles.retryButton}
-  //             onPress={() => {
-  //               // Reload cart
-  //               loadCart();
-  //             }}>
-  //             <Text style={styles.retryButtonText}>Retry</Text>
-  //           </TouchableOpacity>
-  //         </View>
-  //       </View>
-  //     </View>
-  //   );
-  // }
+    );
+  };
 
   return (
     <View style={[styles.container, {paddingTop: insets.top}]}>
@@ -305,7 +267,11 @@ const CartScreen = () => {
           </TouchableOpacity>
         )}
 
-        {items.length === 0 ? (
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : items.length === 0 ? (
           <View style={styles.emptyCartContainer}>
             <Icon name="cart-outline" size={80} color={colors.textSecondary} />
             <Text style={styles.emptyCartText}>Your cart is empty</Text>
@@ -317,12 +283,9 @@ const CartScreen = () => {
           </View>
         ) : (
           <>
-            <FlatList
-              data={items}
-              renderItem={renderCartItem}
-              keyExtractor={item => item.product._id}
-              contentContainerStyle={styles.cartList}
-            />
+            <ScrollView style={styles.cartList}>
+              {items.map(renderCartItem)}
+            </ScrollView>
 
             <View style={styles.footer}>
               <View style={styles.totalsContainer}>
@@ -479,7 +442,7 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 8,
   },
-  productInfo: {
+  itemDetails: {
     flex: 1,
     marginLeft: 12,
     justifyContent: 'space-between',
@@ -490,33 +453,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 4,
   },
-  productPrice: {
+  price: {
     fontSize: 15,
     fontWeight: '700',
     color: colors.primary,
     marginBottom: 8,
-  },
-  itemTotal: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
-  campaignsContainer: {
-    marginBottom: 8,
-  },
-  campaignItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primaryLight,
-    padding: 4,
-    borderRadius: 4,
-    marginBottom: 4,
-  },
-  campaignText: {
-    fontSize: 12,
-    color: colors.primary,
-    marginLeft: 4,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -530,7 +471,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  quantityText: {
+  quantityButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  quantity: {
     fontSize: 16,
     fontWeight: '600',
     color: colors.text,
@@ -686,29 +632,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.error,
-    textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  retryButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+  variantText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 4,
   },
 });
 

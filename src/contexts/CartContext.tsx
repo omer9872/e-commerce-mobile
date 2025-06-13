@@ -2,14 +2,21 @@ import React, {createContext, useContext, useState, useEffect} from 'react';
 import Toast from 'react-native-toast-message';
 
 import {cartService} from '../services/cartService';
-import type {Cart, CartItem} from '../types/cart';
-import type {Product} from '../types/product';
+import type {ICart, ICartItem} from '../types/cart';
 
 interface CartContextData {
-  items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
-  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  items: ICartItem[];
+  addToCart: (
+    productId: string,
+    sku: string,
+    quantity?: number,
+  ) => Promise<void>;
+  removeFromCart: (sku: string) => Promise<void>;
+  updateQuantity: (
+    productId: string,
+    sku: string,
+    quantity: number,
+  ) => Promise<void>;
   clearCart: () => Promise<void>;
   totalItems: number;
   totalPrice: number;
@@ -23,7 +30,7 @@ const CartContext = createContext<CartContextData>({} as CartContextData);
 export const CartProvider: React.FC<{children: React.ReactNode}> = ({
   children,
 }) => {
-  const [cart, setCart] = useState<Cart | null>(null);
+  const [cart, setCart] = useState<ICart | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load cart from API on mount
@@ -47,10 +54,10 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
     loadCart();
   }, []);
 
-  const addToCart = async (product: Product, quantity = 1) => {
+  const addToCart = async (productId: string, sku: string, quantity = 1) => {
     try {
       setIsLoading(true);
-      const updatedCart = await cartService.addToCart(product._id, quantity);
+      const updatedCart = await cartService.addToCart(productId, sku, quantity);
       setCart(updatedCart);
     } catch (error) {
       Toast.show({
@@ -63,10 +70,10 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
     }
   };
 
-  const removeFromCart = async (productId: string) => {
+  const removeFromCart = async (sku: string) => {
     try {
       setIsLoading(true);
-      const updatedCart = await cartService.removeFromCart(productId, 1);
+      const updatedCart = await cartService.removeFromCart(sku);
       setCart(updatedCart);
     } catch (error) {
       Toast.show({
@@ -79,10 +86,18 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
     }
   };
 
-  const updateQuantity = async (productId: string, quantity: number) => {
+  const updateQuantity = async (
+    productId: string,
+    sku: string,
+    quantity: number,
+  ) => {
     try {
       setIsLoading(true);
-      const updatedCart = await cartService.updateQuantity(productId, quantity);
+      const updatedCart = await cartService.updateQuantity(
+        productId,
+        sku,
+        quantity,
+      );
       setCart(updatedCart);
     } catch (error) {
       Toast.show({
@@ -115,7 +130,6 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
     (cart?.items ?? []).reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   const totalPrice = cart?.total || 0;
-
   const subtotal = cart?.subtotal || 0;
   const totalDiscount = cart?.totalDiscount || 0;
 

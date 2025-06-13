@@ -1,4 +1,3 @@
-import {Product} from './product';
 import {IUser} from './user';
 
 export enum PaymentMethod {
@@ -25,54 +24,31 @@ export enum ShippingStatus {
   CANCELLED = 'cancelled',
 }
 
-export interface ITransactionProduct {
-  product: string;
+export interface ITransactionItem {
+  product: {
+    _id: string;
+    name: string;
+    price: number;
+    images: string[];
+    isRefundable: boolean;
+  };
   quantity: number;
+  sku: string;
 }
 
 export interface ITransaction {
   _id: string;
-
-  user: string;
-  items: ITransactionProduct[];
+  user: string | IUser;
+  items: ITransactionItem[];
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
-  shippingType: ShippingType;
-  shippingStatus: ShippingStatus;
   totalAmount: number;
-  code?: string;
   payment?: string;
-
-  createdAt: Date;
-  createdBy?: string;
-  updatedAt?: Date;
-  updatedBy?: string;
-  deletedAt?: Date;
-  deletedBy?: string;
-}
-
-export interface TransactionDetail {
-  _id: string;
-  user: IUser;
-  items: {
-    product: Product;
-    quantity: number;
-  }[];
-  paymentMethod: PaymentMethod;
-  paymentStatus: PaymentStatus;
   shippingType: ShippingType;
   shippingStatus: ShippingStatus;
-  totalAmount: number;
-  totalPoints: number;
-  code: null;
-  payment: string;
-  createdBy: string;
+  carrier?: string;
   createdAt: string;
-}
-
-export interface TransactionResponse {
-  data: ITransaction[];
-  total: number;
-  page: number;
-  limit: number;
+  createdBy?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }

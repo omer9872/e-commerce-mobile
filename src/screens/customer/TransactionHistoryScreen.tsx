@@ -19,7 +19,11 @@ import dayjs from 'dayjs';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactions} from '../../services/transactionService';
-import {ITransaction, ShippingStatus} from '../../types/transaction';
+import {
+  ITransaction,
+  PaymentStatus,
+  ShippingStatus,
+} from '../../types/transaction';
 import {colors} from '../../theme/colors';
 
 type TransactionHistoryScreenNavigationProp = StackNavigationProp<
@@ -41,6 +45,18 @@ const ShippingStatusColors = {
   [ShippingStatus.ON_THE_WAY]: '#4CAF50',
   [ShippingStatus.DELIVERED]: '#4CAF50',
   [ShippingStatus.CANCELLED]: '#F44336',
+};
+
+const PaymentStatusText = {
+  [PaymentStatus.PENDING]: 'Pending',
+  [PaymentStatus.COMPLETED]: 'Completed',
+  [PaymentStatus.FAILED]: 'Failed',
+};
+
+const PaymentStatusColors = {
+  [PaymentStatus.PENDING]: '#FFC107',
+  [PaymentStatus.COMPLETED]: '#4CAF50',
+  [PaymentStatus.FAILED]: '#F44336',
 };
 
 const TransactionHistoryScreen = () => {
@@ -124,7 +140,17 @@ const TransactionHistoryScreen = () => {
             {formattedDate} at {formattedTime}
           </Text>
           <View style={styles.statusContainer}>
-            <Text style={styles.transactionStatus}>Status:</Text>
+            <Text style={styles.transactionStatus}>Payment Status:</Text>
+            <Text
+              style={{
+                ...styles.statusText,
+                color: PaymentStatusColors[item.paymentStatus],
+              }}>
+              {PaymentStatusText[item.paymentStatus]}
+            </Text>
+          </View>
+          <View style={styles.statusContainer}>
+            <Text style={styles.transactionStatus}>Shipping Status:</Text>
             <Text
               style={{
                 ...styles.statusText,
@@ -142,11 +168,11 @@ const TransactionHistoryScreen = () => {
                 color: colors.primary,
               },
             ]}>
-            ${item.totalAmount.toFixed(2)}
+            {item.totalAmount.toFixed(2)}₺
           </Text>
           {item.totalAmount > 0 && (
             <Text style={styles.moneyAmount}>
-              ${item.totalAmount.toFixed(2)}
+              {item.totalAmount.toFixed(2)}₺
             </Text>
           )}
         </View>

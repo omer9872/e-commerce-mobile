@@ -46,7 +46,7 @@ const ProductDetailScreen = () => {
 
   const [product, setProduct] = useState<IProduct | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isCartQuantityLoading, setIsCartQuantityLoading] = useState(false);
   const [selectedSKU, setSelectedSKU] = useState<string>('');
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -69,10 +69,10 @@ const ProductDetailScreen = () => {
   };
 
   const handleAddToCart = async () => {
-    if (!product || isAddedToCart || isAddingToCart) return;
+    if (!product || isAddedToCart || isCartQuantityLoading) return;
 
     try {
-      setIsAddingToCart(true);
+      setIsCartQuantityLoading(true);
       await addToCart(product._id, selectedSKU, quantity);
 
       Toast.show({
@@ -88,15 +88,15 @@ const ProductDetailScreen = () => {
         text2: 'Failed to add item to cart. Please try again.',
       });
     } finally {
-      setIsAddingToCart(false);
+      setIsCartQuantityLoading(false);
     }
   };
 
   const handleRemoveFromCart = async () => {
-    if (!product || !isAddedToCart || isAddingToCart) return;
+    if (!product || !isAddedToCart || isCartQuantityLoading) return;
 
     try {
-      setIsAddingToCart(true);
+      setIsCartQuantityLoading(true);
       await removeFromCart(selectedSKU);
 
       Toast.show({
@@ -112,7 +112,7 @@ const ProductDetailScreen = () => {
         text2: 'Failed to remove item from cart. Please try again.',
       });
     } finally {
-      setIsAddingToCart(false);
+      setIsCartQuantityLoading(false);
     }
   };
 
@@ -155,7 +155,7 @@ const ProductDetailScreen = () => {
     if (selectedVariant && newQuantity > selectedVariant.stock) return;
 
     try {
-      setIsAddingToCart(true);
+      setIsCartQuantityLoading(true);
       await updateQuantity(product._id, selectedSKU, newQuantity);
       setQuantity(newQuantity);
     } catch (error) {
@@ -166,7 +166,7 @@ const ProductDetailScreen = () => {
         text2: 'Failed to update quantity. Please try again.',
       });
     } finally {
-      setIsAddingToCart(false);
+      setIsCartQuantityLoading(false);
     }
   };
 
@@ -297,7 +297,11 @@ const ProductDetailScreen = () => {
                 ]}
                 onPress={() => handleQuantityChange(quantity - 1)}
                 disabled={quantity <= 1}>
-                <Icon name="minus" size={20} color={colors.text} />
+                {isCartQuantityLoading ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Icon name="minus" size={20} color={colors.text} />
+                )}
               </TouchableOpacity>
               <Text style={styles.quantityText}>{quantity}</Text>
               <TouchableOpacity
@@ -308,10 +312,14 @@ const ProductDetailScreen = () => {
                 ]}
                 onPress={() => handleQuantityChange(quantity + 1)}
                 disabled={
-                  product.variants?.find(v => v.sku === selectedSKU)?.stock ===
-                  quantity
+                  (product.variants?.find(v => v.sku === selectedSKU)?.stock ||
+                    0) <= quantity || isCartQuantityLoading
                 }>
-                <Icon name="plus" size={20} color={colors.text} />
+                {isCartQuantityLoading ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Icon name="plus" size={20} color={colors.text} />
+                )}
               </TouchableOpacity>
             </View>
             <Text style={styles.stockText}>
@@ -328,8 +336,8 @@ const ProductDetailScreen = () => {
               isAddedToCart ? styles.removeFromCartButton : null,
             ]}
             onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
-            disabled={isAddingToCart || isCartLoading || !selectedSKU}>
-            {isAddingToCart || isCartLoading ? (
+            disabled={isCartLoading || !selectedSKU}>
+            {isCartLoading ? (
               <ActivityIndicator color="#FFFFFF" size="small" />
             ) : (
               <View style={styles.addToCartButtonContent}>

@@ -2,6 +2,7 @@ import {createContext, useContext, useState, useEffect, ReactNode} from 'react';
 
 import {api} from '../services/api';
 import type {IFavoritesItem} from '../types';
+import {useAuth} from './AuthContext';
 
 interface FavoritesContextType {
   favorites: IFavoritesItem[];
@@ -28,6 +29,7 @@ interface FavoritesProviderProps {
 }
 
 export const FavoritesProvider = ({children}: FavoritesProviderProps) => {
+  const {isAuthenticated} = useAuth();
   const [favorites, setFavorites] = useState<IFavoritesItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,8 +46,10 @@ export const FavoritesProvider = ({children}: FavoritesProviderProps) => {
   };
 
   useEffect(() => {
-    fetchFavorites();
-  }, []);
+    if (isAuthenticated) {
+      fetchFavorites();
+    }
+  }, [isAuthenticated]);
 
   const addToFavorites = async (productId: string) => {
     try {

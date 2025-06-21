@@ -3,6 +3,7 @@ import Toast from 'react-native-toast-message';
 
 import {cartService} from '../services/cartService';
 import type {ICart, ICartItem} from '../types/cart';
+import {useAuth} from './AuthContext';
 
 interface CartContextData {
   items: ICartItem[];
@@ -32,27 +33,29 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
 }) => {
   const [cart, setCart] = useState<ICart | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const {isAuthenticated} = useAuth();
   // Load cart from API on mount
   useEffect(() => {
-    const loadCart = async () => {
-      try {
-        setIsLoading(true);
-        const cartData = await cartService.getCart();
-        setCart(cartData);
-      } catch (error) {
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to load cart. Please try again.',
-          text2: 'Please try again.',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (isAuthenticated) {
+      const loadCart = async () => {
+        try {
+          setIsLoading(true);
+          const cartData = await cartService.getCart();
+          setCart(cartData);
+        } catch (error) {
+          Toast.show({
+            type: 'error',
+            text1: 'Failed to load cart. Please try again.',
+            text2: 'Please try again.',
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-    loadCart();
-  }, []);
+      loadCart();
+    }
+  }, [isAuthenticated]);
 
   const addToCart = async (productId: string, sku: string, quantity = 1) => {
     try {

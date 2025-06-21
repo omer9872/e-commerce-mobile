@@ -10,6 +10,7 @@ import {FavoritesProvider} from './src/contexts/FavoritesContext';
 import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import CarrierNavigator from './src/navigation/CarrierNavigator';
 import SplashScreen from './src/screens/common/SplashScreen';
+import {LocaleProvider} from './src/contexts/LocaleContext';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import {CartProvider} from './src/contexts/CartContext';
 
@@ -64,15 +65,17 @@ const AppContent = () => {
 const App = () => {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <FavoritesProvider>
-            <CartProvider>
-              <AppContent />
-            </CartProvider>
-          </FavoritesProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <LocaleProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <AppContent />
+              </CartProvider>
+            </FavoritesProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </LocaleProvider>
       <Toast position="top" />
     </SafeAreaProvider>
   );

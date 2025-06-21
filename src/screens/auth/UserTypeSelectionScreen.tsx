@@ -5,6 +5,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 
 type UserTypeSelectionScreenNavigationProp = StackNavigationProp<
@@ -15,6 +16,7 @@ type UserTypeSelectionScreenNavigationProp = StackNavigationProp<
 const UserTypeSelectionScreen = () => {
   const navigation = useNavigation<UserTypeSelectionScreenNavigationProp>();
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const handleCustomerSelection = () => {
     navigation.navigate('Login', {userType: 'customer'});
@@ -34,8 +36,8 @@ const UserTypeSelectionScreen = () => {
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
-          <Text style={styles.title}>Welcome to Loyalty App</Text>
-          <Text style={styles.subtitle}>Please select your account type</Text>
+          <Text style={styles.title}>{t('userTypeSelection.title')}</Text>
+          <Text style={styles.subtitle}>{t('userTypeSelection.subtitle')}</Text>
 
           <View style={styles.optionsContainer}>
             <TouchableOpacity
@@ -44,9 +46,11 @@ const UserTypeSelectionScreen = () => {
               <View style={styles.iconContainer}>
                 <Icon name="account" size={50} color={colors.primary} />
               </View>
-              <Text style={styles.optionTitle}>Customer</Text>
+              <Text style={styles.optionTitle}>
+                {t('userTypeSelection.customer')}
+              </Text>
               <Text style={styles.optionDescription}>
-                Earn points, view rewards, and redeem offers
+                {t('userTypeSelection.customerDescription')}
               </Text>
             </TouchableOpacity>
 
@@ -56,9 +60,11 @@ const UserTypeSelectionScreen = () => {
               <View style={styles.iconContainer}>
                 <Icon name="moped" size={50} color={colors.primary} />
               </View>
-              <Text style={styles.optionTitle}>Carrier</Text>
+              <Text style={styles.optionTitle}>
+                {t('userTypeSelection.carrier')}
+              </Text>
               <Text style={styles.optionDescription}>
-                Scan customer codes and manage transactions
+                {t('userTypeSelection.carrierDescription')}
               </Text>
             </TouchableOpacity>
           </View>

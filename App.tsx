@@ -4,8 +4,9 @@ import Toast from 'react-native-toast-message';
 import {StatusBar, Text} from 'react-native';
 
 import MerchantEmployeeNavigator from './src/navigation/MerchantEmployeeNavigator';
-import {FavoritesProvider} from './src/contexts/FavoritesContext';
+import {ThemeProvider, useTheme} from './src/contexts/ThemeContext';
 import CustomerNavigator from './src/navigation/CustomerNavigator';
+import {FavoritesProvider} from './src/contexts/FavoritesContext';
 import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import CarrierNavigator from './src/navigation/CarrierNavigator';
 import SplashScreen from './src/screens/common/SplashScreen';
@@ -14,6 +15,7 @@ import {CartProvider} from './src/contexts/CartContext';
 
 const AppContent = () => {
   const {isLoading, isAuthenticated, userType} = useAuth();
+  const {isDark, colors} = useTheme();
 
   const screenParams = {
     customer: {
@@ -39,12 +41,18 @@ const AppContent = () => {
       {!isAuthenticated ? (
         <>
           <AuthNavigator />
-          <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+          <StatusBar
+            barStyle={isDark ? 'light-content' : 'dark-content'}
+            backgroundColor={colors.background}
+          />
         </>
       ) : userType ? (
         <>
           {screenParams[userType].navigator()}
-          <StatusBar barStyle="light-content" backgroundColor="#FFFFFF" />
+          <StatusBar
+            barStyle={isDark ? 'light-content' : 'dark-content'}
+            backgroundColor={colors.background}
+          />
         </>
       ) : (
         <Text>Please Wait...</Text>
@@ -56,13 +64,15 @@ const AppContent = () => {
 const App = () => {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <FavoritesProvider>
-          <CartProvider>
-            <AppContent />
-          </CartProvider>
-        </FavoritesProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            <CartProvider>
+              <AppContent />
+            </CartProvider>
+          </FavoritesProvider>
+        </AuthProvider>
+      </ThemeProvider>
       <Toast position="top" />
     </SafeAreaProvider>
   );

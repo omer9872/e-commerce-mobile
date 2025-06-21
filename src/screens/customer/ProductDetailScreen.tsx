@@ -20,9 +20,9 @@ import Toast from 'react-native-toast-message';
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
 import type {IProduct, IProductVariant} from 'src/types/product';
 import {useFavorites} from '../../contexts/FavoritesContext';
+import {useTheme} from '../../contexts/ThemeContext';
 import {useCart} from '../../contexts/CartContext';
 import Image from '../../components/Image';
-import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
 
 type ProductDetailScreenRouteProp = RouteProp<
@@ -40,6 +40,7 @@ const ProductDetailScreen = () => {
     isLoading: isCartLoading,
   } = useCart();
   const {addToFavorites, removeFromFavorites, isInFavorites} = useFavorites();
+  const {colors} = useTheme();
 
   const {productId} = route.params;
   const width = Dimensions.get('window').width;
@@ -179,6 +180,8 @@ const ProductDetailScreen = () => {
       setQuantity(1);
     }
   }, [selectedSKU, cartItems]);
+
+  const styles = getStyles(colors);
 
   const renderCarouselItem = (item: string) => {
     return (
@@ -385,222 +388,223 @@ const ProductDetailScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  carouselContainer: {
-    marginTop: 20,
-  },
-  carouselItemContainer: {
-    flex: 1,
-    paddingHorizontal: 10,
-  },
-  productImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-    borderRadius: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 18,
-    color: colors.error,
-  },
-  contentContainer: {
-    padding: 20,
-  },
-  productName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
-  },
-  price: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 20,
-    lineHeight: 24,
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 20,
-  },
-  favoriteButton: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 15,
-    borderRadius: 8,
-  },
-  removeFromFavoritesButton: {
-    backgroundColor: colors.error,
-  },
-  favoriteButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  favoriteButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  addToCartButton: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 15,
-    borderRadius: 8,
-  },
-  removeFromCartButton: {
-    backgroundColor: colors.error,
-  },
-  addToCartButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addToCartButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  variantsContainer: {
-    marginTop: 20,
-  },
-  variantsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  variantItem: {
-    backgroundColor: colors.background,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-    borderWidth: 2,
-    borderColor: colors.border,
-  },
-  selectedVariant: {
-    borderColor: colors.primary,
-    borderWidth: 2,
-  },
-  outOfStockVariant: {
-    opacity: 0.5,
-  },
-  variantContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  variantOption: {
-    fontSize: 14,
-    color: colors.text,
-    marginBottom: 4,
-  },
-  variantSku: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  variantInfo: {
-    alignItems: 'flex-end',
-  },
-  variantPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  variantStock: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  outOfStockText: {
-    color: colors.error,
-  },
-  inCartBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: colors.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  inCartText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  quantityContainer: {
-    marginTop: 20,
-    backgroundColor: colors.background,
-    borderRadius: 8,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  quantityTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  quantityControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  quantityButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  quantityButtonDisabled: {
-    opacity: 0.5,
-  },
-  quantityText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginHorizontal: 20,
-    minWidth: 30,
-    textAlign: 'center',
-  },
-  stockText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    carouselContainer: {
+      marginTop: 20,
+    },
+    carouselItemContainer: {
+      flex: 1,
+      paddingHorizontal: 10,
+    },
+    productImage: {
+      width: '100%',
+      height: '100%',
+      resizeMode: 'cover',
+      borderRadius: 10,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    errorText: {
+      fontSize: 18,
+      color: colors.error,
+    },
+    contentContainer: {
+      padding: 20,
+    },
+    productName: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 10,
+    },
+    price: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.primary,
+      marginBottom: 10,
+    },
+    description: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 20,
+      lineHeight: 24,
+    },
+    actionsContainer: {
+      flexDirection: 'row',
+      gap: 12,
+      marginTop: 20,
+    },
+    favoriteButton: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 15,
+      borderRadius: 8,
+    },
+    removeFromFavoritesButton: {
+      backgroundColor: colors.error,
+    },
+    favoriteButtonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    favoriteButtonText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    addToCartButton: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 15,
+      borderRadius: 8,
+    },
+    removeFromCartButton: {
+      backgroundColor: colors.error,
+    },
+    addToCartButtonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    addToCartButtonText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    variantsContainer: {
+      marginTop: 20,
+    },
+    variantsTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    variantItem: {
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      padding: 12,
+      marginBottom: 8,
+      borderWidth: 2,
+      borderColor: colors.border,
+    },
+    selectedVariant: {
+      borderColor: colors.primary,
+      borderWidth: 2,
+    },
+    outOfStockVariant: {
+      opacity: 0.5,
+    },
+    variantContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    variantOption: {
+      fontSize: 14,
+      color: colors.text,
+      marginBottom: 4,
+    },
+    variantSku: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    variantInfo: {
+      alignItems: 'flex-end',
+    },
+    variantPrice: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.primary,
+      marginBottom: 4,
+    },
+    variantStock: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    outOfStockText: {
+      color: colors.error,
+    },
+    inCartBadge: {
+      position: 'absolute',
+      top: 8,
+      right: 8,
+      backgroundColor: colors.primary,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+    },
+    inCartText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    quantityContainer: {
+      marginTop: 20,
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    quantityTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    quantityControls: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 8,
+    },
+    quantityButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    quantityButtonDisabled: {
+      opacity: 0.5,
+    },
+    quantityText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginHorizontal: 20,
+      minWidth: 30,
+      textAlign: 'center',
+    },
+    stockText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
 
 export default ProductDetailScreen;

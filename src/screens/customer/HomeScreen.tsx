@@ -11,7 +11,6 @@ import {
   ScrollView,
   TextInput,
   Keyboard,
-  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type {StackNavigationProp} from '@react-navigation/stack';
@@ -22,11 +21,11 @@ import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigato
 import type {IProductCategory} from '../../types/category';
 import LayoutHeader from '../../components/LayoutHeader';
 import ProductCard from '../../components/ProductCard';
+import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
 import type {IProduct} from '../../types/product';
 import Avatar from '../../components/Avatar';
 import Image from '../../components/Image';
-import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
 
 type HomeScreenNavigationProp = StackNavigationProp<
@@ -41,11 +40,9 @@ interface ProductResponse {
   limit: number;
 }
 
-const {width} = Dimensions.get('window');
-const PRODUCT_CARD_WIDTH = (width - 60) / 2; // Adjust based on your ProductCard width
-
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const {colors} = useTheme();
   const {user} = useAuth();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<IProductCategory[]>([]);
@@ -305,6 +302,8 @@ const HomeScreen = () => {
   const hasActiveFilters =
     !!searchQuery || !!selectedCategory || !!selectedSubcategory;
 
+  const styles = getStyles(colors);
+
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
@@ -510,234 +509,235 @@ const HomeScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
-  subContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollViewContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  greeting: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  avatarContainer: {
-    backgroundColor: colors.white,
-    borderRadius: 100,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: colors.background,
-  },
-  searchContainer: {
-    marginTop: 15,
-    marginBottom: 5,
-  },
-  searchInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 44,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: '100%',
-    color: colors.text,
-    fontSize: 16,
-    padding: 0,
-  },
-  clearButton: {
-    padding: 4,
-  },
-  searchingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    height: 200,
-  },
-  searchingText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
-  loadingContainer: {
-    padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 200,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginVertical: 15,
-  },
-  productsContainer: {
-    width: '100%',
-  },
-  productRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  productCard: {
-    width: '48%',
-  },
-  emptyContainer: {
-    padding: 20,
-    alignItems: 'center',
-    height: 200,
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 10,
-  },
-  clearSearchButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-  },
-  clearSearchText: {
-    color: colors.white,
-    fontWeight: '500',
-  },
-  footerLoader: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  loadMoreButton: {
-    alignItems: 'center',
-    paddingVertical: 12,
-    marginVertical: 10,
-    backgroundColor: colors.card,
-    borderRadius: 8,
-  },
-  loadMoreText: {
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  categoriesContainer: {
-    marginBottom: 10,
-  },
-  categoriesScrollView: {
-    paddingRight: 20,
-  },
-  categoryItem: {
-    marginRight: 12,
-    alignItems: 'center',
-    width: 80,
-  },
-  selectedCategoryItem: {
-    opacity: 1,
-  },
-  categoryImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 8,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  categoryImagePlaceholder: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.card,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  categoryName: {
-    fontSize: 12,
-    textAlign: 'center',
-    color: colors.text,
-  },
-  selectedCategoryName: {
-    color: colors.primary,
-    fontWeight: 'bold',
-  },
-  subcategoriesContainer: {
-    marginBottom: 10,
-  },
-  subcategoriesScrollView: {
-    paddingRight: 20,
-  },
-  subcategoryItem: {
-    marginRight: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-  },
-  selectedSubcategoryItem: {
-    backgroundColor: colors.primary,
-  },
-  subcategoryName: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  selectedSubcategoryName: {
-    color: colors.white,
-  },
-  activeFiltersContainer: {
-    marginBottom: 10,
-  },
-  activeFiltersLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 5,
-  },
-  filtersRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
-  filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  filterChipText: {
-    fontSize: 14,
-    color: colors.text,
-    marginRight: 6,
-  },
-  clearAllButton: {
-    marginLeft: 4,
-    paddingVertical: 6,
-  },
-  clearAllText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.primary,
+    },
+    subContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollViewContent: {
+      paddingHorizontal: 20,
+      paddingBottom: 30,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    greeting: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: '#FFFFFF',
+    },
+    avatarContainer: {
+      backgroundColor: colors.white,
+      borderRadius: 100,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 20,
+      backgroundColor: colors.background,
+    },
+    searchContainer: {
+      marginTop: 15,
+      marginBottom: 5,
+    },
+    searchInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      height: 44,
+    },
+    searchIcon: {
+      marginRight: 8,
+    },
+    searchInput: {
+      flex: 1,
+      height: '100%',
+      color: colors.text,
+      fontSize: 16,
+      padding: 0,
+    },
+    clearButton: {
+      padding: 4,
+    },
+    searchingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      height: 200,
+    },
+    searchingText: {
+      marginLeft: 10,
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
+    loadingContainer: {
+      padding: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 200,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginVertical: 15,
+    },
+    productsContainer: {
+      width: '100%',
+    },
+    productRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    productCard: {
+      width: '48%',
+    },
+    emptyContainer: {
+      padding: 20,
+      alignItems: 'center',
+      height: 200,
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 10,
+    },
+    clearSearchButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      backgroundColor: colors.primary,
+      borderRadius: 20,
+    },
+    clearSearchText: {
+      color: colors.white,
+      fontWeight: '500',
+    },
+    footerLoader: {
+      paddingVertical: 20,
+      alignItems: 'center',
+    },
+    loadMoreButton: {
+      alignItems: 'center',
+      paddingVertical: 12,
+      marginVertical: 10,
+      backgroundColor: colors.card,
+      borderRadius: 8,
+    },
+    loadMoreText: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    categoriesContainer: {
+      marginBottom: 10,
+    },
+    categoriesScrollView: {
+      paddingRight: 20,
+    },
+    categoryItem: {
+      marginRight: 12,
+      alignItems: 'center',
+      width: 80,
+    },
+    selectedCategoryItem: {
+      opacity: 1,
+    },
+    categoryImage: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      marginBottom: 8,
+      borderWidth: 2,
+      borderColor: 'transparent',
+    },
+    categoryImagePlaceholder: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: colors.card,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    categoryName: {
+      fontSize: 12,
+      textAlign: 'center',
+      color: colors.text,
+    },
+    selectedCategoryName: {
+      color: colors.primary,
+      fontWeight: 'bold',
+    },
+    subcategoriesContainer: {
+      marginBottom: 10,
+    },
+    subcategoriesScrollView: {
+      paddingRight: 20,
+    },
+    subcategoryItem: {
+      marginRight: 10,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.card,
+    },
+    selectedSubcategoryItem: {
+      backgroundColor: colors.primary,
+    },
+    subcategoryName: {
+      fontSize: 14,
+      color: colors.text,
+    },
+    selectedSubcategoryName: {
+      color: colors.white,
+    },
+    activeFiltersContainer: {
+      marginBottom: 10,
+    },
+    activeFiltersLabel: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 5,
+    },
+    filtersRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+    },
+    filterChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.card,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 16,
+      marginRight: 8,
+      marginBottom: 8,
+    },
+    filterChipText: {
+      fontSize: 14,
+      color: colors.text,
+      marginRight: 6,
+    },
+    clearAllButton: {
+      marginLeft: 4,
+      paddingVertical: 6,
+    },
+    clearAllText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+  });
 
 export default HomeScreen;

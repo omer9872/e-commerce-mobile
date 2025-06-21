@@ -17,14 +17,14 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchTransactions} from '../../services/transactionService';
 import {
   ITransaction,
   PaymentStatus,
   ShippingStatus,
 } from '../../types/transaction';
-import {colors} from '../../theme/colors';
+import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {fetchTransactions} from '../../services/transactionService';
+import {useTheme} from '../../contexts/ThemeContext';
 
 type TransactionHistoryScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -61,6 +61,8 @@ const PaymentStatusColors = {
 
 const TransactionHistoryScreen = () => {
   const navigation = useNavigation<TransactionHistoryScreenNavigationProp>();
+  const {colors} = useTheme();
+
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -121,6 +123,8 @@ const TransactionHistoryScreen = () => {
   useEffect(() => {
     loadTransactions();
   }, [loadTransactions]);
+
+  const styles = getStyles(colors);
 
   const renderTransactionItem = ({item}: {item: ITransaction}) => {
     const date = new Date(item.createdAt);
@@ -237,106 +241,107 @@ const TransactionHistoryScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  listContent: {
-    padding: 16,
-  },
-  listContentEmpty: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  transactionItem: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  transactionDetails: {
-    flex: 1,
-  },
-  transactionType: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#212121',
-  },
-  transactionDate: {
-    fontSize: 14,
-    color: '#757575',
-    marginTop: 2,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  transactionStatus: {
-    fontSize: 14,
-    color: '#757575',
-    marginRight: 4,
-  },
-  statusText: {
-    textTransform: 'capitalize',
-    fontWeight: '600',
-  },
-  amountContainer: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  transactionAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  moneyAmount: {
-    fontSize: 14,
-    color: '#757575',
-    marginTop: 4,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerLoader: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#424242',
-    marginTop: 16,
-  },
-  emptySubText: {
-    fontSize: 14,
-    color: '#757575',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#F5F5F5',
+    },
+    listContent: {
+      padding: 16,
+    },
+    listContentEmpty: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+    },
+    transactionItem: {
+      flexDirection: 'row',
+      backgroundColor: 'white',
+      borderRadius: 8,
+      padding: 16,
+      marginBottom: 12,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.2,
+      shadowRadius: 1.41,
+    },
+    iconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: '#F5F5F5',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    transactionDetails: {
+      flex: 1,
+    },
+    transactionType: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#212121',
+    },
+    transactionDate: {
+      fontSize: 14,
+      color: '#757575',
+      marginTop: 2,
+    },
+    statusContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 4,
+    },
+    transactionStatus: {
+      fontSize: 14,
+      color: '#757575',
+      marginRight: 4,
+    },
+    statusText: {
+      textTransform: 'capitalize',
+      fontWeight: '600',
+    },
+    amountContainer: {
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+    },
+    transactionAmount: {
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    moneyAmount: {
+      fontSize: 14,
+      color: '#757575',
+      marginTop: 4,
+    },
+    loaderContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    footerLoader: {
+      paddingVertical: 20,
+      alignItems: 'center',
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#424242',
+      marginTop: 16,
+    },
+    emptySubText: {
+      fontSize: 14,
+      color: '#757575',
+      marginTop: 8,
+      textAlign: 'center',
+    },
+  });
 
 export default TransactionHistoryScreen;

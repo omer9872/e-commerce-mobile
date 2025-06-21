@@ -15,14 +15,13 @@ import {
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 
 import type {CustomerCartStackParamList} from '../../navigation/CustomerNavigator';
-import type {CartItem} from '../../contexts/CartContext';
+import {useTheme} from '../../contexts/ThemeContext';
 import {useCart} from '../../contexts/CartContext';
-import {colors} from '../../theme/colors';
+import type {ICartItem} from '../../types/cart';
 import {api} from '../../services/api';
 
 type PaymentConfirmationScreenRouteProp = RouteProp<
@@ -35,6 +34,7 @@ const PaymentConfirmationScreen = () => {
   const route = useRoute<PaymentConfirmationScreenRouteProp>();
   const [isProcessing, setIsProcessing] = useState(false);
   const {clearCart} = useCart();
+  const {colors} = useTheme();
 
   const {items, totalPrice, defaultAddress, defaultPaymentCard} = route.params;
 
@@ -99,7 +99,9 @@ const PaymentConfirmationScreen = () => {
     );
   };
 
-  const renderConfirmationItem = (item: CartItem) => (
+  const styles = getStyles(colors);
+
+  const renderConfirmationItem = (item: ICartItem) => (
     <View key={item.product._id} style={styles.confirmationItem}>
       <Text style={styles.confirmationItemName}>{item.product.name}</Text>
       <View style={styles.confirmationItemDetails}>
@@ -212,149 +214,150 @@ const PaymentConfirmationScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  section: {
-    backgroundColor: colors.card,
-    marginHorizontal: 16,
-    marginTop: 16,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginLeft: 8,
-    flex: 1,
-  },
-  changeText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  addressContainer: {
-    backgroundColor: colors.background,
-    borderRadius: 8,
-    padding: 12,
-  },
-  addressName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  addressLine: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  cardContainer: {
-    backgroundColor: colors.background,
-    borderRadius: 8,
-    padding: 12,
-  },
-  cardInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardDetails: {
-    marginLeft: 12,
-  },
-  cardName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  cardNumber: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  orderSummaryContainer: {
-    backgroundColor: colors.background,
-    borderRadius: 8,
-    padding: 12,
-  },
-  confirmationItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  confirmationItemName: {
-    fontSize: 14,
-    color: colors.text,
-    flex: 1,
-  },
-  confirmationItemDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  confirmationItemQuantity: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginRight: 8,
-    width: 30,
-    textAlign: 'right',
-  },
-  confirmationItemPrice: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    width: 60,
-    textAlign: 'right',
-  },
-  totalItem: {
-    borderBottomWidth: 0,
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  totalItemLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  totalItemPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  footer: {
-    backgroundColor: colors.card,
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  confirmButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-  },
-  confirmButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    section: {
+      backgroundColor: colors.card,
+      marginHorizontal: 16,
+      marginTop: 16,
+      borderRadius: 12,
+      padding: 16,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginLeft: 8,
+      flex: 1,
+    },
+    changeText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    addressContainer: {
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      padding: 12,
+    },
+    addressName: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    addressLine: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 2,
+    },
+    cardContainer: {
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      padding: 12,
+    },
+    cardInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    cardDetails: {
+      marginLeft: 12,
+    },
+    cardName: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    cardNumber: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    orderSummaryContainer: {
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      padding: 12,
+    },
+    confirmationItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    confirmationItemName: {
+      fontSize: 14,
+      color: colors.text,
+      flex: 1,
+    },
+    confirmationItemDetails: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    confirmationItemQuantity: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginRight: 8,
+      width: 30,
+      textAlign: 'right',
+    },
+    confirmationItemPrice: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      width: 60,
+      textAlign: 'right',
+    },
+    totalItem: {
+      borderBottomWidth: 0,
+      marginTop: 8,
+      paddingTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    totalItemLabel: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text,
+    },
+    totalItemPrice: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.primary,
+    },
+    footer: {
+      backgroundColor: colors.card,
+      padding: 16,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    confirmButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      padding: 16,
+      alignItems: 'center',
+    },
+    confirmButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
 
 export default PaymentConfirmationScreen;

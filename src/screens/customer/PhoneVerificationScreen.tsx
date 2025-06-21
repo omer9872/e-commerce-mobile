@@ -16,9 +16,9 @@ import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {colors} from '../../theme/colors';
-import {useAuth} from '../../contexts/AuthContext';
 import {userService} from '../../services/userService';
+import {useTheme} from '../../contexts/ThemeContext';
+import {useAuth} from '../../contexts/AuthContext';
 import TextInput from '../../components/TextInput';
 
 type PhoneVerificationScreenNavigationProp = StackNavigationProp<
@@ -29,6 +29,8 @@ type PhoneVerificationScreenNavigationProp = StackNavigationProp<
 const PhoneVerificationScreen = () => {
   const navigation = useNavigation<PhoneVerificationScreenNavigationProp>();
   const {user, fetchMe} = useAuth();
+  const {colors} = useTheme();
+
   const [phone, setPhone] = useState(user?.phone || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -65,6 +67,8 @@ const PhoneVerificationScreen = () => {
       setLoading(false);
     }
   };
+
+  const styles = getStyles(colors);
 
   return (
     <KeyboardAvoidingView
@@ -119,73 +123,74 @@ const PhoneVerificationScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  formContainer: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonDisabled: {
-    backgroundColor: colors.primaryLight,
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.primaryLight,
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  infoText: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      padding: 20,
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+    },
+    iconContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 10,
+      textAlign: 'center',
+    },
+    description: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 30,
+      textAlign: 'center',
+    },
+    formContainer: {
+      width: '100%',
+      marginBottom: 20,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: 15,
+      borderRadius: 10,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    buttonDisabled: {
+      backgroundColor: colors.primaryLight,
+      opacity: 0.7,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    infoContainer: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.primaryLight,
+      padding: 15,
+      borderRadius: 10,
+      marginTop: 20,
+    },
+    infoText: {
+      flex: 1,
+      marginLeft: 10,
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+  });
 
 export default PhoneVerificationScreen;

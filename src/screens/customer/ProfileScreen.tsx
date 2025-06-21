@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import LayoutHeader from '../../components/LayoutHeader';
+import {useTheme} from '../../contexts/ThemeContext';
 import {adjustColor} from '../../utils/colorUtils';
 import {useAuth} from '../../contexts/AuthContext';
 import Avatar from '../../components/Avatar';
@@ -26,7 +27,8 @@ type ProfileScreenNavigationProp = StackNavigationProp<
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const {user, loyaltySummary, signOut} = useAuth();
+  const {user, signOut} = useAuth();
+  const {colors} = useTheme();
   const insets = useSafeAreaInsets();
 
   const navigateToEditProfile = () => {
@@ -66,6 +68,8 @@ const ProfileScreen = () => {
     }
   };
 
+  const styles = getStyles(colors);
+
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
@@ -95,20 +99,14 @@ const ProfileScreen = () => {
             {user?.verification?.email ? (
               <TouchableOpacity
                 onPress={navigateToEmailVerification}
-                style={[
-                  styles.validationItem,
-                  {backgroundColor: adjustColor(colors.success, 250)},
-                ]}>
+                style={[styles.validationItem]}>
                 <Icon name="check-circle" size={20} color={colors.primary} />
                 <Text style={styles.validationText}>Email Verified</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 onPress={navigateToEmailVerification}
-                style={[
-                  styles.validationItem,
-                  {backgroundColor: adjustColor(colors.error, 325)},
-                ]}>
+                style={[styles.validationItem]}>
                 <Icon name="close-circle" size={20} color={colors.error} />
                 <Text style={styles.validationText}>Email Not Verified</Text>
               </TouchableOpacity>
@@ -116,20 +114,14 @@ const ProfileScreen = () => {
             {user?.verification?.phone ? (
               <TouchableOpacity
                 onPress={navigateToPhoneVerification}
-                style={[
-                  styles.validationItem,
-                  {backgroundColor: adjustColor(colors.success, 250)},
-                ]}>
+                style={[styles.validationItem]}>
                 <Icon name="check-circle" size={20} color={colors.primary} />
                 <Text style={styles.validationText}>Phone Verified</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 onPress={navigateToPhoneVerification}
-                style={[
-                  styles.validationItem,
-                  {backgroundColor: adjustColor(colors.error, 325)},
-                ]}>
+                style={[styles.validationItem]}>
                 <Icon name="close-circle" size={20} color={colors.error} />
                 <Text style={styles.validationText}>Phone Not Verified</Text>
               </TouchableOpacity>
@@ -187,96 +179,98 @@ const ProfileScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
-  subContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollView: {
-    flex: 1,
-    padding: 10,
-  },
-  userSection: {
-    borderRadius: 10,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-    marginVertical: 10,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-  },
-  image: {
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-  },
-  userInfoSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-  },
-  userInfoRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 4,
-  },
-  userName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  userEmail: {
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
-  validationSection: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-  },
-  validationItem: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 4,
-    padding: 10,
-    borderRadius: 10,
-  },
-  validationText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.primary,
+    },
+    subContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollView: {
+      flex: 1,
+      padding: 10,
+    },
+    userSection: {
+      borderRadius: 10,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 6,
+      marginVertical: 10,
+      paddingBottom: 20,
+      paddingHorizontal: 20,
+    },
+    image: {
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+    },
+    userInfoSection: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 6,
+    },
+    userInfoRow: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 4,
+    },
+    userName: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: colors.text,
+    },
+    userEmail: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
+    validationSection: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 6,
+    },
+    validationItem: {
+      backgroundColor: colors.card,
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 4,
+      padding: 10,
+      borderRadius: 10,
+    },
+    validationText: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
 
-  actionsContainer: {
-    marginVertical: 10,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  actionText: {
-    fontSize: 16,
-    marginLeft: 15,
-    color: colors.text,
-  },
-});
+    actionsContainer: {
+      marginVertical: 10,
+    },
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.card,
+      paddingVertical: 15,
+      paddingHorizontal: 20,
+      borderRadius: 10,
+      marginBottom: 10,
+    },
+    actionText: {
+      fontSize: 16,
+      marginLeft: 15,
+      color: colors.text,
+    },
+  });
 
 export default ProfileScreen;

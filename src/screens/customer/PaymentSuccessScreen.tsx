@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import type {CustomerCartStackParamList} from '../../navigation/CustomerNavigator';
-import {colors} from '../../theme/colors';
+import {useTheme} from '../../contexts/ThemeContext';
 
 type PaymentSuccessScreenRouteProp = RouteProp<
   CustomerCartStackParamList,
@@ -25,6 +25,7 @@ type PaymentSuccessScreenRouteProp = RouteProp<
 const PaymentSuccessScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const route = useRoute<PaymentSuccessScreenRouteProp>();
+  const {colors} = useTheme();
   const insets = useSafeAreaInsets();
   const {paymentId} = route.params;
 
@@ -40,6 +41,8 @@ const PaymentSuccessScreen = () => {
       } as never,
     );
   };
+
+  const styles = getStyles(colors);
 
   return (
     <View style={[styles.container, {paddingTop: insets.top}]}>
@@ -78,73 +81,74 @@ const PaymentSuccessScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  contentContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  iconContainer: {
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  message: {
-    fontSize: 16,
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  paymentIdText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 16,
-  },
-  instructionsText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  buttonsContainer: {
-    width: '100%',
-    flexDirection: 'column',
-    gap: 12,
-  },
-  button: {
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    width: '100%',
-  },
-  primaryButton: {
-    backgroundColor: colors.primary,
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  secondaryButtonText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    contentContainer: {
+      flexGrow: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+    },
+    iconContainer: {
+      marginBottom: 24,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    message: {
+      fontSize: 16,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    paymentIdText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 16,
+    },
+    instructionsText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 32,
+    },
+    buttonsContainer: {
+      width: '100%',
+      flexDirection: 'column',
+      gap: 12,
+    },
+    button: {
+      borderRadius: 8,
+      padding: 16,
+      alignItems: 'center',
+      width: '100%',
+    },
+    primaryButton: {
+      backgroundColor: colors.primary,
+    },
+    primaryButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    secondaryButton: {
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+    secondaryButtonText: {
+      color: colors.primary,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
 
 export default PaymentSuccessScreen;

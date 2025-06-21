@@ -12,15 +12,16 @@ import {useRoute} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
+import {useTheme} from '../../contexts/ThemeContext';
 import {Campaign} from '../../types/campaign';
 import Image from '../../components/Image';
-import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
 
 const CampaignDetailScreen = () => {
   const route = useRoute();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
+  const {colors} = useTheme();
 
   const {campaignId} = route.params as {campaignId: string};
 
@@ -43,6 +44,8 @@ const CampaignDetailScreen = () => {
       setLoading(false);
     }
   };
+
+  const styles = getStyles(colors);
 
   if (loading) {
     return (
@@ -97,75 +100,76 @@ const CampaignDetailScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-  },
-  campaignImage: {
-    width: '100%',
-    height: 250,
-  },
-  detailsContainer: {
-    padding: 16,
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    margin: 16,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  campaignName: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  campaignDescription: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 24,
-    lineHeight: 24,
-  },
-  section: {},
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  durationContainer: {
-    backgroundColor: colors.lightBackground,
-    padding: 12,
-    borderRadius: 8,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dateText: {
-    fontSize: 16,
-    color: colors.text,
-    marginLeft: 12,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.error,
-  },
-});
+    centerContent: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    content: {
+      flex: 1,
+    },
+    campaignImage: {
+      width: '100%',
+      height: 250,
+    },
+    detailsContainer: {
+      padding: 16,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      margin: 16,
+      shadowColor: colors.black,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    campaignName: {
+      fontSize: 24,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    campaignDescription: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 24,
+      lineHeight: 24,
+    },
+    section: {},
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    durationContainer: {
+      backgroundColor: colors.lightBackground,
+      padding: 12,
+      borderRadius: 8,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 12,
+    },
+    dateContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    dateText: {
+      fontSize: 16,
+      color: colors.text,
+      marginLeft: 12,
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.error,
+    },
+  });
 
 export default CampaignDetailScreen;

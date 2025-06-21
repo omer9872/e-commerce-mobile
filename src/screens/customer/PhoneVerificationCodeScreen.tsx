@@ -21,9 +21,9 @@ import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {colors} from '../../theme/colors';
-import {useAuth} from '../../contexts/AuthContext';
 import {userService} from '../../services/userService';
+import {useTheme} from '../../contexts/ThemeContext';
+import {useAuth} from '../../contexts/AuthContext';
 
 type PhoneVerificationCodeScreenRouteProp = RouteProp<
   CustomerProfileStackParamList,
@@ -43,6 +43,7 @@ const PhoneVerificationCodeScreen = () => {
   const route = useRoute<PhoneVerificationCodeScreenRouteProp>();
   const {phone} = route.params;
   const {fetchMe} = useAuth();
+  const {colors} = useTheme();
 
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -145,6 +146,8 @@ const PhoneVerificationCodeScreen = () => {
     }
   };
 
+  const styles = getStyles(colors);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -227,118 +230,119 @@ const PhoneVerificationCodeScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  codeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    width: '100%',
-  },
-  codeInput: {
-    width: 40,
-    height: 50,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    textAlign: 'center',
-    fontSize: 20,
-    marginHorizontal: 4,
-    backgroundColor: colors.card,
-    color: colors.text,
-  },
-  errorText: {
-    color: colors.error,
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-    width: '100%',
-  },
-  buttonDisabled: {
-    backgroundColor: colors.primaryLight,
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  resendContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  resendText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-  },
-  resendButtonText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  cooldownText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-  },
-  successContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  successMessage: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      padding: 20,
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+    },
+    iconContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 10,
+      textAlign: 'center',
+    },
+    description: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 30,
+      textAlign: 'center',
+    },
+    codeContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20,
+      width: '100%',
+    },
+    codeInput: {
+      width: 40,
+      height: 50,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      textAlign: 'center',
+      fontSize: 20,
+      marginHorizontal: 4,
+      backgroundColor: colors.card,
+      color: colors.text,
+    },
+    errorText: {
+      color: colors.error,
+      marginBottom: 15,
+      textAlign: 'center',
+    },
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: 15,
+      paddingHorizontal: 30,
+      borderRadius: 10,
+      alignItems: 'center',
+      marginTop: 10,
+      width: '100%',
+    },
+    buttonDisabled: {
+      backgroundColor: colors.primaryLight,
+      opacity: 0.7,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    resendContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 20,
+    },
+    resendText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+    resendButtonText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    cooldownText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+    successContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    successTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginTop: 20,
+      marginBottom: 10,
+    },
+    successMessage: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
 
 export default PhoneVerificationCodeScreen;

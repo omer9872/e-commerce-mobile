@@ -24,6 +24,7 @@ import SettingsScreen from '../screens/customer/SettingsScreen';
 import ProfileScreen from '../screens/customer/ProfileScreen';
 import CartScreen from '../screens/customer/CartScreen';
 import HomeScreen from '../screens/customer/HomeScreen';
+import {useTheme} from '../contexts/ThemeContext';
 
 // Stack param lists
 export type CustomerHomeStackParamList = {
@@ -83,8 +84,19 @@ const FavoritesStack = createStackNavigator<CustomerFavoritesStackParamList>();
 const CampaignsStack = createStackNavigator<CustomerCampaignsStackParamList>();
 // Home Stack Navigator
 const HomeStackNavigator = () => {
+  const {colors} = useTheme();
+
   return (
-    <HomeStack.Navigator>
+    <HomeStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          color: colors.text,
+        },
+      }}>
       <HomeStack.Screen
         name="Home"
         component={HomeScreen}
@@ -101,8 +113,18 @@ const HomeStackNavigator = () => {
 
 // Cart Stack Navigator
 const CartStackNavigator = () => {
+  const {colors} = useTheme();
   return (
-    <CartStack.Navigator>
+    <CartStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          color: colors.text,
+        },
+      }}>
       <CartStack.Screen
         name="Cart"
         component={CartScreen}
@@ -124,8 +146,18 @@ const CartStackNavigator = () => {
 
 // Profile Stack Navigator
 const ProfileStackNavigator = () => {
+  const {colors} = useTheme();
   return (
-    <ProfileStack.Navigator>
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          color: colors.text,
+        },
+      }}>
       <ProfileStack.Screen
         name="Profile"
         component={ProfileScreen}
@@ -205,8 +237,18 @@ const ProfileStackNavigator = () => {
 
 // Favorites Stack Navigator
 const FavoritesStackNavigator = () => {
+  const {colors} = useTheme();
   return (
-    <FavoritesStack.Navigator>
+    <FavoritesStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          color: colors.text,
+        },
+      }}>
       <FavoritesStack.Screen
         name="Favorites"
         component={FavoritesScreen}
@@ -222,8 +264,18 @@ const FavoritesStackNavigator = () => {
 };
 
 const CampaignsStackNavigator = () => {
+  const {colors} = useTheme();
   return (
-    <CampaignsStack.Navigator>
+    <CampaignsStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          color: colors.text,
+        },
+      }}>
       <CampaignsStack.Screen
         name="Campaigns"
         component={CampaignsScreen}
@@ -242,11 +294,17 @@ const CampaignsStackNavigator = () => {
 const Tab = createBottomTabNavigator();
 
 const CustomerNavigator = () => {
+  const {colors} = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: '#5C6BC0',
         tabBarInactiveTintColor: '#9E9E9E',
+        tabBarStyle: {
+          backgroundColor: colors.background,
+          borderTopColor: colors.outline,
+          borderTopWidth: 1,
+        },
       }}>
       <Tab.Screen
         name="HomeTab"

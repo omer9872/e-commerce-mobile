@@ -18,9 +18,9 @@ import {
 import type {StackNavigationProp} from '@react-navigation/stack';
 
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
-import {colors} from '../../theme/colors';
 
 type LoginScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -33,6 +33,7 @@ const LoginScreen = () => {
   const route = useRoute<LoginScreenRouteProp>();
   const {userType} = route.params;
   const {signInViaPhoneNumber, signInViaEmail} = useAuth();
+  const {colors} = useTheme();
 
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -107,6 +108,8 @@ const LoginScreen = () => {
     navigation.navigate('ForgotPassword');
   };
 
+  const styles = getStyles(colors);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -172,73 +175,74 @@ const LoginScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 40,
-    textAlign: 'center',
-  },
-  form: {
-    gap: 20,
-  },
-  inputContainer: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text,
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    padding: 15,
-    fontSize: 16,
-    color: colors.text,
-  },
-  forgotPassword: {
-    color: colors.primary,
-    textAlign: 'right',
-    fontSize: 14,
-  },
-  loginButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 40,
-    gap: 5,
-  },
-  footerText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-  },
-  registerText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      flex: 1,
+      padding: 20,
+      justifyContent: 'center',
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.primary,
+      marginBottom: 40,
+      textAlign: 'center',
+    },
+    form: {
+      gap: 20,
+    },
+    inputContainer: {
+      gap: 8,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      padding: 15,
+      fontSize: 16,
+      color: colors.text,
+    },
+    forgotPassword: {
+      color: colors.primary,
+      textAlign: 'right',
+      fontSize: 14,
+    },
+    loginButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      padding: 15,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    loginButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 40,
+      gap: 5,
+    },
+    footerText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+    registerText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+  });
 
 export default LoginScreen;

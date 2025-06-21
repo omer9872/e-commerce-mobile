@@ -27,8 +27,8 @@ import {
 } from '../../services/userInformationService';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import type {AddressFormData} from '../../types/address';
+import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
-import {colors} from '../../theme/colors';
 
 type AddressFormScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -45,6 +45,7 @@ const AddressFormScreen = () => {
   const route = useRoute<AddressFormScreenRouteProp>();
   const {addressId} = route.params || {};
   const isEditing = !!addressId;
+  const {colors} = useTheme();
 
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
@@ -168,6 +169,8 @@ const AddressFormScreen = () => {
       setSubmitting(false);
     }
   };
+
+  const styles = getStyles(colors);
 
   if (loading) {
     return (
@@ -310,57 +313,56 @@ const AddressFormScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  formContainer: {
-    padding: 16,
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: colors.text,
-    borderWidth: 1,
-    borderColor: '#E1E1E1',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  disabledButton: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    formContainer: {
+      padding: 16,
+    },
+    inputGroup: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 16,
+      color: colors.text,
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    submitButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginTop: 8,
+    },
+    disabledButton: {
+      opacity: 0.7,
+    },
+    submitButtonText: {
+      color: '#FFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
 
 export default AddressFormScreen;

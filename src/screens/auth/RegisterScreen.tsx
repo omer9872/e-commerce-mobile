@@ -19,6 +19,7 @@ import {
 import type {StackNavigationProp} from '@react-navigation/stack';
 
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
@@ -33,6 +34,7 @@ const RegisterScreen = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const route = useRoute<RegisterScreenRouteProp>();
   const {userType} = route.params;
+  const {colors} = useTheme();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -102,6 +104,8 @@ const RegisterScreen = () => {
   const navigateToLogin = () => {
     navigation.navigate('Login', {userType});
   };
+
+  const styles = getStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -191,71 +195,72 @@ const RegisterScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  form: {
-    gap: 16,
-  },
-  inputContainer: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text,
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    padding: 15,
-    fontSize: 16,
-    color: colors.text,
-  },
-  registerButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  registerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 30,
-    gap: 5,
-  },
-  footerText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-  },
-  loginText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    content: {
+      flex: 1,
+      padding: 20,
+      justifyContent: 'center',
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.primary,
+      marginBottom: 30,
+      textAlign: 'center',
+    },
+    form: {
+      gap: 16,
+    },
+    inputContainer: {
+      gap: 8,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      padding: 15,
+      fontSize: 16,
+      color: colors.text,
+    },
+    registerButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      padding: 15,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    registerButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 30,
+      gap: 5,
+    },
+    footerText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+    loginText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+  });
 
 export default RegisterScreen;

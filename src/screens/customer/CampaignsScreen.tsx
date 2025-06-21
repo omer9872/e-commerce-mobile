@@ -16,8 +16,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import {IPaginatedResponsePayload} from '../../types';
+import {useTheme} from '../../contexts/ThemeContext';
 import Image from '../../components/Image';
-import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
 
 interface CampaignCondition {
@@ -47,6 +47,8 @@ interface Campaign {
 const CampaignsScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
+  const {colors} = useTheme();
+
   const [campaigns, setCampaigns] = useState<
     IPaginatedResponsePayload<Campaign>
   >({
@@ -75,6 +77,8 @@ const CampaignsScreen = () => {
   const handleCampaignPress = (campaign: Campaign) => {
     navigation.navigate('CampaignDetail', {campaignId: campaign._id});
   };
+
+  const styles = getStyles(colors);
 
   const renderCondition = (condition: CampaignCondition, index: number) => (
     <View key={index} style={styles.conditionContainer}>
@@ -137,113 +141,114 @@ const CampaignsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
-  subContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
-    backgroundColor: colors.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 5,
-    textAlign: 'center',
-  },
-  flex: {
-    flex: 1,
-  },
-  list: {
-    flex: 1,
-    padding: 16,
-  },
-
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  campaignCard: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 8,
-    marginBottom: 12,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.primary,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  campaignImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  campaignContent: {
-    marginTop: 6,
-  },
-  campaignName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  campaignDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 6,
-    lineHeight: 20,
-  },
-  conditionsContainer: {
-    marginBottom: 12,
-  },
-  conditionContainer: {
-    backgroundColor: colors.lightBackground,
-    padding: 8,
-    borderRadius: 4,
-    marginBottom: 4,
-  },
-  conditionText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  rewardContainer: {
-    backgroundColor: colors.lightBackground,
-    padding: 8,
-    borderRadius: 4,
-  },
-  rewardText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: colors.gray,
-    textAlign: 'center',
-    paddingHorizontal: 32,
-  },
-});
+    subContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 20,
+      paddingTop: 10,
+      paddingBottom: 20,
+      backgroundColor: colors.primary,
+      borderBottomLeftRadius: 30,
+      borderBottomRightRadius: 30,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: '#FFFFFF',
+      marginBottom: 5,
+      textAlign: 'center',
+    },
+    flex: {
+      flex: 1,
+    },
+    list: {
+      flex: 1,
+      padding: 16,
+    },
+
+    centerContent: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    campaignCard: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 8,
+      marginBottom: 12,
+      shadowColor: colors.black,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    campaignImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: 8,
+      marginBottom: 12,
+    },
+    campaignContent: {
+      marginTop: 6,
+    },
+    campaignName: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    campaignDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 6,
+      lineHeight: 20,
+    },
+    conditionsContainer: {
+      marginBottom: 12,
+    },
+    conditionContainer: {
+      backgroundColor: colors.lightBackground,
+      padding: 8,
+      borderRadius: 4,
+      marginBottom: 4,
+    },
+    conditionText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    rewardContainer: {
+      backgroundColor: colors.lightBackground,
+      padding: 8,
+      borderRadius: 4,
+    },
+    rewardText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: colors.gray,
+      textAlign: 'center',
+      paddingHorizontal: 32,
+    },
+  });
 
 export default CampaignsScreen;

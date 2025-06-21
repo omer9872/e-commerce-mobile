@@ -10,13 +10,15 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import type {StackNavigationProp} from '@react-navigation/stack';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
+
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
-import {api} from '../../services/api';
+import {useTheme} from '../../contexts/ThemeContext';
 import {colors} from '../../theme/colors';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {api} from '../../services/api';
 
 type ForgotPasswordScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -28,6 +30,7 @@ const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const {colors} = useTheme();
 
   const validateEmail = () => {
     if (!email) {
@@ -70,6 +73,8 @@ const ForgotPasswordScreen = () => {
   const handleBackToLogin = () => {
     navigation.goBack();
   };
+
+  const styles = getStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -136,100 +141,101 @@ const ForgotPasswordScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 40,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  form: {
-    gap: 20,
-  },
-  inputContainer: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text,
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    padding: 15,
-    fontSize: 16,
-    color: colors.text,
-  },
-  resetButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  resetButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  successContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  successIcon: {
-    marginBottom: 20,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  successMessage: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 30,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  backToLoginButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    alignItems: 'center',
-  },
-  backToLoginText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      flex: 1,
+      padding: 20,
+      justifyContent: 'center',
+    },
+    backButton: {
+      position: 'absolute',
+      top: 20,
+      left: 20,
+      zIndex: 10,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.primary,
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 40,
+      textAlign: 'center',
+      paddingHorizontal: 20,
+    },
+    form: {
+      gap: 20,
+    },
+    inputContainer: {
+      gap: 8,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      padding: 15,
+      fontSize: 16,
+      color: colors.text,
+    },
+    resetButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      padding: 15,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    resetButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    successContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 20,
+    },
+    successIcon: {
+      marginBottom: 20,
+    },
+    successTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    successMessage: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 30,
+      textAlign: 'center',
+      lineHeight: 24,
+    },
+    backToLoginButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingVertical: 15,
+      paddingHorizontal: 30,
+      alignItems: 'center',
+    },
+    backToLoginText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
 
 export default ForgotPasswordScreen;

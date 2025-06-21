@@ -1,10 +1,11 @@
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import type {StackNavigationProp} from '@react-navigation/stack';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
+
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {colors} from '../../theme/colors';
+import {useTheme} from '../../contexts/ThemeContext';
 
 type UserTypeSelectionScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -13,6 +14,7 @@ type UserTypeSelectionScreenNavigationProp = StackNavigationProp<
 
 const UserTypeSelectionScreen = () => {
   const navigation = useNavigation<UserTypeSelectionScreenNavigationProp>();
+  const {colors} = useTheme();
 
   const handleCustomerSelection = () => {
     navigation.navigate('Login', {userType: 'customer'});
@@ -25,6 +27,8 @@ const UserTypeSelectionScreen = () => {
   const handleCarrierSelection = () => {
     navigation.navigate('Login', {userType: 'carrier'});
   };
+
+  const styles = getStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -64,70 +68,71 @@ const UserTypeSelectionScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.primary,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  optionsContainer: {
-    gap: 20,
-  },
-  option: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.lightBackground,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  icon: {
-    width: 50,
-    height: 50,
-  },
-  optionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 8,
-  },
-  optionDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    content: {
+      flex: 1,
+      padding: 20,
+      justifyContent: 'center',
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.primary,
+      textAlign: 'center',
+      marginBottom: 10,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 40,
+    },
+    optionsContainer: {
+      gap: 20,
+    },
+    option: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 20,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    iconContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.lightBackground,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    icon: {
+      width: 50,
+      height: 50,
+    },
+    optionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.primary,
+      marginBottom: 8,
+    },
+    optionDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
 
 export default UserTypeSelectionScreen;

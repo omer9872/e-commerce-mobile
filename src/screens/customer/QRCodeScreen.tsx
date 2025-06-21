@@ -14,8 +14,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import QRCode from 'react-native-qrcode-svg';
 
 import LayoutHeader from '../../components/LayoutHeader';
+import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
-import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
 
 interface TransactionCodeResponse {
@@ -28,6 +28,8 @@ interface TransactionCodeResponse {
 
 const QRCodeScreen = () => {
   const {user} = useAuth();
+  const {colors} = useTheme();
+
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +79,8 @@ const QRCodeScreen = () => {
       console.error('Error sharing QR code:', error);
     }
   };
+
+  const styles = getStyles(colors);
 
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
@@ -141,99 +145,100 @@ const QRCodeScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
-  subContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 40,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pointsText: {
-    fontSize: 14,
-    color: '#FFFFFF',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 40,
-    textAlign: 'center',
-  },
-  qrContainer: {
-    backgroundColor: colors.card,
-    padding: 15,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    minHeight: 250,
-    minWidth: 250,
-  },
-  codeText: {
-    marginTop: 10,
-    fontSize: 19,
-    fontWeight: '800',
-    color: colors.primary,
-    letterSpacing: 4,
-  },
-  showCodeButton: {
-    marginTop: 10,
-  },
-  showCodeButtonText: {
-    color: colors.primary,
-    fontSize: 16,
-  },
-  errorContainer: {
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    color: colors.error,
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  refreshButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  refreshButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    marginTop: 40,
-    justifyContent: 'center',
-    gap: 30,
-  },
-  actionButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionText: {
-    color: colors.primary,
-    marginTop: 5,
-    fontSize: 14,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.primary,
+    },
+    subContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 40,
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    pointsText: {
+      fontSize: 14,
+      color: '#FFFFFF',
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 10,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginBottom: 40,
+      textAlign: 'center',
+    },
+    qrContainer: {
+      backgroundColor: colors.card,
+      padding: 15,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      minHeight: 250,
+      minWidth: 250,
+    },
+    codeText: {
+      marginTop: 10,
+      fontSize: 19,
+      fontWeight: '800',
+      color: colors.primary,
+      letterSpacing: 4,
+    },
+    showCodeButton: {
+      marginTop: 10,
+    },
+    showCodeButtonText: {
+      color: colors.primary,
+      fontSize: 16,
+    },
+    errorContainer: {
+      alignItems: 'center',
+      padding: 20,
+    },
+    errorText: {
+      color: colors.error,
+      marginBottom: 15,
+      textAlign: 'center',
+    },
+    refreshButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    refreshButtonText: {
+      color: '#FFFFFF',
+      fontWeight: '600',
+    },
+    actionsContainer: {
+      flexDirection: 'row',
+      marginTop: 40,
+      justifyContent: 'center',
+      gap: 30,
+    },
+    actionButton: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    actionText: {
+      color: colors.primary,
+      marginTop: 5,
+      fontSize: 14,
+    },
+  });
 
 export default QRCodeScreen;

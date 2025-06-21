@@ -12,19 +12,19 @@ import {
   StatusBar,
 } from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {colors} from '../../theme/colors';
-import type {PaymentCard} from '../../types/paymentCard';
-import type {UserInformation} from '../../types/address';
+import type {StackNavigationProp} from '@react-navigation/stack';
 import Toast from 'react-native-toast-message';
-import {fetchUserInformation} from '../../services/userInformationService';
+
 import {
   deletePaymentCard,
   setDefaultPaymentCard,
 } from '../../services/paymentCardService';
+import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {fetchUserInformation} from '../../services/userInformationService';
+import type {PaymentCard} from '../../types/paymentCard';
+import type {UserInformation} from '../../types/address';
+import {useTheme} from '../../contexts/ThemeContext';
 
 type PaymentCardListScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -48,6 +48,8 @@ const getCardIcon = (cardAssociation: string) => {
 
 const PaymentCardListScreen = () => {
   const navigation = useNavigation<PaymentCardListScreenNavigationProp>();
+  const {colors} = useTheme();
+
   const [userInfo, setUserInfo] = useState<UserInformation | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -141,6 +143,8 @@ const PaymentCardListScreen = () => {
     fetchData(false);
   };
 
+  const styles = getStyles(colors);
+
   const renderPaymentCardItem = ({item}: {item: PaymentCard}) => {
     const isDefault = userInfo?.defaultPaymentCard === item._id;
 
@@ -231,135 +235,136 @@ const PaymentCardListScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listContainer: {
-    paddingBottom: 80, // Space for the add button
-  },
-  cardContainer: {
-    backgroundColor: colors.card,
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  cardTypeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardType: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginLeft: 8,
-  },
-  defaultBadge: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginLeft: 8,
-  },
-  defaultText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-  },
-  iconButton: {
-    padding: 5,
-    marginLeft: 10,
-  },
-  cardDetails: {
-    marginBottom: 10,
-  },
-  cardNumber: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  cardholderName: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  setDefaultButton: {
-    alignSelf: 'flex-start',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    marginTop: 5,
-  },
-  setDefaultText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  addButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  addButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 80,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginTop: 16,
-  },
-  emptySubText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    listContainer: {
+      paddingBottom: 80, // Space for the add button
+    },
+    cardContainer: {
+      backgroundColor: colors.card,
+      borderRadius: 10,
+      padding: 16,
+      marginBottom: 16,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    cardTypeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    cardType: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginLeft: 8,
+    },
+    defaultBadge: {
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 4,
+      marginLeft: 8,
+    },
+    defaultText: {
+      color: colors.primary,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    actionButtons: {
+      flexDirection: 'row',
+    },
+    iconButton: {
+      padding: 5,
+      marginLeft: 10,
+    },
+    cardDetails: {
+      marginBottom: 10,
+    },
+    cardNumber: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    cardholderName: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 2,
+    },
+    setDefaultButton: {
+      alignSelf: 'flex-start',
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      marginTop: 5,
+    },
+    setDefaultText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    addButton: {
+      position: 'absolute',
+      bottom: 20,
+      left: 20,
+      right: 20,
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+    },
+    addButtonText: {
+      color: '#FFF',
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingBottom: 80,
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginTop: 16,
+    },
+    emptySubText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginTop: 8,
+      textAlign: 'center',
+    },
+  });
 
 export default PaymentCardListScreen;

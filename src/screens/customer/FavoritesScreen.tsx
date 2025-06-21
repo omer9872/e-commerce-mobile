@@ -15,17 +15,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {IFavoritesItem, IProduct} from '../../types/index';
 import {useFavorites} from '../../contexts/FavoritesContext';
+import {useTheme} from '../../contexts/ThemeContext';
 import Image from '../../components/Image';
-import {colors} from '../../theme/colors';
 
 const FavoritesScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
   const {isLoading, favorites, removeFromFavorites} = useFavorites();
+  const {colors} = useTheme();
 
   const handleProductPress = (product: IProduct) => {
     navigation.navigate('ProductDetail', {productId: product._id});
   };
+
+  const styles = getStyles(colors);
 
   const renderFavoriteItem = ({item}: {item: IFavoritesItem}) => (
     <TouchableOpacity
@@ -86,96 +89,97 @@ const FavoritesScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
-  subContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
-    backgroundColor: colors.primary,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 5,
-    textAlign: 'center',
-  },
-  flex: {
-    flex: 1,
-  },
-  list: {
-    flex: 1,
-    padding: 16,
-  },
-
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  favoriteItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.primary,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  productInfo: {
-    flex: 1,
-    justifyContent: 'flex-start',
-  },
-  productName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  productPrice: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  removeButton: {
-    padding: 8,
-    marginLeft: 8,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: colors.gray,
-    textAlign: 'center',
-    paddingHorizontal: 32,
-  },
-});
+    subContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 20,
+      paddingTop: 10,
+      paddingBottom: 20,
+      backgroundColor: colors.primary,
+      borderBottomLeftRadius: 30,
+      borderBottomRightRadius: 30,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: '#FFFFFF',
+      marginBottom: 5,
+      textAlign: 'center',
+    },
+    flex: {
+      flex: 1,
+    },
+    list: {
+      flex: 1,
+      padding: 16,
+    },
+
+    centerContent: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    favoriteItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 12,
+      shadowColor: colors.black,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    productImage: {
+      width: 80,
+      height: 80,
+      borderRadius: 8,
+      marginRight: 12,
+    },
+    productInfo: {
+      flex: 1,
+      justifyContent: 'flex-start',
+    },
+    productName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    productPrice: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+    removeButton: {
+      padding: 8,
+      marginLeft: 8,
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: colors.gray,
+      textAlign: 'center',
+      paddingHorizontal: 32,
+    },
+  });
 
 export default FavoritesScreen;

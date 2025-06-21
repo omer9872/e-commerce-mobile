@@ -20,8 +20,8 @@ import Toast from 'react-native-toast-message';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import type {PaymentCardFormData} from '../../types/paymentCard';
 import {addPaymentCard} from '../../services/paymentCardService';
+import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
-import {colors} from '../../theme/colors';
 
 type PaymentCardFormScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -30,6 +30,8 @@ type PaymentCardFormScreenNavigationProp = StackNavigationProp<
 
 const PaymentCardFormScreen = () => {
   const navigation = useNavigation<PaymentCardFormScreenNavigationProp>();
+  const {colors} = useTheme();
+
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<PaymentCardFormData>({
     cardAlias: '',
@@ -194,6 +196,8 @@ const PaymentCardFormScreen = () => {
     }
   };
 
+  const styles = getStyles(colors);
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
@@ -307,68 +311,69 @@ const PaymentCardFormScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  formContainer: {
-    padding: 16,
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: colors.text,
-    borderWidth: 1,
-    borderColor: '#E1E1E1',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  securityNote: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primaryLight,
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 24,
-  },
-  securityIcon: {
-    marginRight: 8,
-  },
-  securityText: {
-    fontSize: 14,
-    color: colors.text,
-    flex: 1,
-  },
-  submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  disabledButton: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    formContainer: {
+      padding: 16,
+    },
+    inputGroup: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 16,
+      color: colors.text,
+      borderWidth: 1,
+      borderColor: '#E1E1E1',
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    securityNote: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primaryLight,
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 24,
+    },
+    securityIcon: {
+      marginRight: 8,
+    },
+    securityText: {
+      fontSize: 14,
+      color: colors.text,
+      flex: 1,
+    },
+    submitButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginTop: 8,
+    },
+    disabledButton: {
+      opacity: 0.7,
+    },
+    submitButtonText: {
+      color: '#FFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
 
 export default PaymentCardFormScreen;

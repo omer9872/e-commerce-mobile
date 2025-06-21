@@ -16,9 +16,9 @@ import {useCart} from '../contexts/CartContext';
 import Toast from 'react-native-toast-message';
 import {useEffect, useState} from 'react';
 
+import {useTheme} from '../contexts/ThemeContext';
 import {IProduct} from '../types/product';
 import Image from '../components/Image';
-import {colors} from '../theme/colors';
 
 interface ProductCardProps {
   product: IProduct;
@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
-
+  const {colors} = useTheme();
   // Check if product is already in cart
   useEffect(() => {
     const isInCart = items.some(item => item.product._id === product._id);
@@ -85,6 +85,8 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
     }
   };
 
+  const styles = getStyles(colors);
+
   return (
     <TouchableOpacity
       style={[styles.container, style]}
@@ -126,88 +128,89 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'column',
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    marginBottom: 16,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  image: {
-    width: '100%',
-    height: 175,
-  },
-  content: {
-    flex: 1,
-    padding: 12,
-    gap: 6,
-    justifyContent: 'space-between',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  description: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
-  bottomContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  amountContainer: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  amountText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  amountLabel: {
-    fontWeight: 'normal',
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  favoriteButton: {
-    padding: 8,
-    borderRadius: 8,
-  },
-  addToCartButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-    borderRadius: 8,
-  },
-  addToCartButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'column',
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      marginBottom: 16,
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    image: {
+      width: '100%',
+      height: 175,
+    },
+    content: {
+      flex: 1,
+      padding: 12,
+      gap: 6,
+      justifyContent: 'space-between',
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    name: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text,
+    },
+    description: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 8,
+    },
+    bottomContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    amountContainer: {
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    amountText: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: colors.primary,
+    },
+    amountLabel: {
+      fontWeight: 'normal',
+    },
+    actionsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 8,
+    },
+    favoriteButton: {
+      padding: 8,
+      borderRadius: 8,
+    },
+    addToCartButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 8,
+      borderRadius: 8,
+    },
+    addToCartButtonText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+  });
 
 export default ProductCard;

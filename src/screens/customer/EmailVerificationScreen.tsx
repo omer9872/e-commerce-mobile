@@ -17,9 +17,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {userService} from '../../services/userService';
+import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
-import {colors} from '../../theme/colors';
 
 type EmailVerificationScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -28,6 +28,7 @@ type EmailVerificationScreenNavigationProp = StackNavigationProp<
 
 const EmailVerificationScreen = () => {
   const {user, fetchMe} = useAuth();
+  const {colors} = useTheme();
   const navigation = useNavigation<EmailVerificationScreenNavigationProp>();
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState(user?.email || '');
@@ -65,6 +66,8 @@ const EmailVerificationScreen = () => {
       setIsLoading(false);
     }
   };
+
+  const styles = getStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -117,72 +120,73 @@ const EmailVerificationScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 30,
-  },
-  formContainer: {
-    marginTop: 10,
-    width: '100%',
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonDisabled: {
-    backgroundColor: colors.primaryLight,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.primaryLight,
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  infoText: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      padding: 20,
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+    },
+    iconContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 10,
+    },
+    description: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 30,
+    },
+    formContainer: {
+      marginTop: 10,
+      width: '100%',
+    },
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: 15,
+      borderRadius: 10,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    buttonDisabled: {
+      backgroundColor: colors.primaryLight,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    infoContainer: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.primaryLight,
+      padding: 15,
+      borderRadius: 10,
+      marginTop: 20,
+    },
+    infoText: {
+      flex: 1,
+      marginLeft: 10,
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+  });
 
 export default EmailVerificationScreen;

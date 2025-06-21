@@ -22,8 +22,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {userService} from '../../services/userService';
+import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
-import {colors} from '../../theme/colors';
 
 type EmailVerificationCodeScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -43,6 +43,7 @@ const EmailVerificationCodeScreen = () => {
   const route = useRoute<EmailVerificationCodeScreenRouteProp>();
   const insets = useSafeAreaInsets();
   const {email} = route.params;
+  const {colors} = useTheme();
 
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -143,6 +144,8 @@ const EmailVerificationCodeScreen = () => {
     }
   };
 
+  const styles = getStyles(colors);
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -224,110 +227,111 @@ const EmailVerificationCodeScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 30,
-  },
-  codeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 20,
-    width: '100%',
-  },
-  codeInput: {
-    width: 40,
-    height: 50,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    textAlign: 'center',
-    fontSize: 20,
-    marginHorizontal: 5,
-    backgroundColor: colors.card,
-  },
-  errorText: {
-    color: colors.error,
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-    width: '100%',
-  },
-  buttonDisabled: {
-    backgroundColor: colors.primaryLight,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  resendContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  resendButton: {
-    padding: 10,
-  },
-  resendText: {
-    color: colors.primary,
-    fontSize: 16,
-  },
-  countdownText: {
-    color: colors.textSecondary,
-    fontSize: 16,
-  },
-  successContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  successMessage: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      padding: 20,
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+    },
+    iconContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 10,
+    },
+    description: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 30,
+    },
+    codeContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginVertical: 20,
+      width: '100%',
+    },
+    codeInput: {
+      width: 40,
+      height: 50,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      textAlign: 'center',
+      fontSize: 20,
+      marginHorizontal: 5,
+      backgroundColor: colors.card,
+    },
+    errorText: {
+      color: colors.error,
+      textAlign: 'center',
+      marginVertical: 10,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: 15,
+      borderRadius: 10,
+      alignItems: 'center',
+      marginTop: 20,
+      width: '100%',
+    },
+    buttonDisabled: {
+      backgroundColor: colors.primaryLight,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    resendContainer: {
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    resendButton: {
+      padding: 10,
+    },
+    resendText: {
+      color: colors.primary,
+      fontSize: 16,
+    },
+    countdownText: {
+      color: colors.textSecondary,
+      fontSize: 16,
+    },
+    successContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    successTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginTop: 20,
+      marginBottom: 10,
+    },
+    successMessage: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
 
 export default EmailVerificationCodeScreen;

@@ -11,30 +11,20 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
-import {colors} from '../../theme/colors';
 
 const SettingsScreen = () => {
+  const {colors, isDark, toggleTheme} = useTheme();
   const {signOut} = useAuth();
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const insets = useSafeAreaInsets();
 
   const togglePushNotifications = () =>
     setPushNotifications(previousState => !previousState);
   const toggleEmailNotifications = () =>
     setEmailNotifications(previousState => !previousState);
-  const toggleDarkMode = () => {
-    setDarkMode(previousState => !previousState);
-    // Here you would implement the logic to actually change the app's theme
-    Alert.alert(
-      'Feature Not Implemented',
-      'Dark mode switching is not yet implemented.',
-    );
-  };
 
   const handleSignOut = async () => {
     try {
@@ -66,6 +56,8 @@ const SettingsScreen = () => {
       ],
     );
   };
+
+  const styles = getStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -100,10 +92,10 @@ const SettingsScreen = () => {
             <View style={styles.settingItem}>
               <Text style={styles.settingLabel}>Dark Mode</Text>
               <Switch
-                value={darkMode}
-                onValueChange={toggleDarkMode}
+                value={isDark}
+                onValueChange={toggleTheme}
                 trackColor={{false: colors.border, true: colors.primary}}
-                thumbColor={darkMode ? colors.card : colors.background}
+                thumbColor={isDark ? colors.card : colors.background}
               />
             </View>
           </View>
@@ -131,47 +123,50 @@ const SettingsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-  },
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    content: {
+      padding: 20,
+    },
 
-  section: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 15,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  settingLabel: {
-    fontSize: 16,
-    color: colors.text,
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-  },
-  buttonText: {
-    fontSize: 16,
-    marginLeft: 10,
-  },
-});
+    section: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      paddingBottom: 20,
+      marginBottom: 20,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 15,
+    },
+    settingItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 10,
+    },
+    settingLabel: {
+      fontSize: 16,
+      color: colors.text,
+    },
+    button: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 15,
+    },
+    buttonText: {
+      fontSize: 16,
+      marginLeft: 10,
+    },
+  });
 
 export default SettingsScreen;

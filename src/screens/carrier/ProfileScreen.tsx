@@ -6,13 +6,12 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 
 import type {MerchantEmployeeProfileStackParamList} from '../../navigation/MerchantEmployeeNavigator';
+import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
-import {colors} from '../../theme/colors';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   MerchantEmployeeProfileStackParamList,
@@ -20,9 +19,9 @@ type ProfileScreenNavigationProp = StackNavigationProp<
 >;
 
 const ProfileScreen = () => {
+  const {colors} = useTheme();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const {user, signOut} = useAuth();
-  const insets = useSafeAreaInsets();
 
   const navigateToEditProfile = () => {
     navigation.navigate('EditProfile');
@@ -40,6 +39,8 @@ const ProfileScreen = () => {
       console.error('Error signing out:', error);
     }
   };
+
+  const styles = getStyles(colors);
 
   return (
     <View style={styles.content}>
@@ -83,64 +84,65 @@ const ProfileScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  userInfoSection: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  userName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginTop: 10,
-  },
-  userEmail: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginTop: 5,
-  },
-  roleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  roleText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.primary,
-    marginLeft: 8,
-  },
-  actionsContainer: {
-    paddingHorizontal: 16,
-    marginTop: 20,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  actionText: {
-    fontSize: 16,
-    marginLeft: 15,
-    color: colors.text,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    content: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    userInfoSection: {
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    userName: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginTop: 10,
+    },
+    userEmail: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginTop: 5,
+    },
+    roleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 10,
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: 15,
+      paddingVertical: 8,
+      borderRadius: 20,
+    },
+    roleText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.primary,
+      marginLeft: 8,
+    },
+    actionsContainer: {
+      paddingHorizontal: 16,
+      marginTop: 20,
+    },
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.card,
+      paddingVertical: 15,
+      paddingHorizontal: 20,
+      borderRadius: 10,
+      marginBottom: 10,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    actionText: {
+      fontSize: 16,
+      marginLeft: 15,
+      color: colors.text,
+    },
+  });
 
 export default ProfileScreen;

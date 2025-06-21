@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchCarrierTransactions} from '../../services/carrierTransactionService';
 import {ITransaction, ShippingStatus} from '../../types/transaction';
-import {colors} from '../../theme/colors';
+import {useTheme} from '../../contexts/ThemeContext';
 
 type TransactionsScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -44,6 +44,7 @@ const ShippingStatusColors = {
 };
 
 const TransactionsScreen = () => {
+  const {colors} = useTheme();
   const navigation = useNavigation<TransactionsScreenNavigationProp>();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +53,8 @@ const TransactionsScreen = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const limit = 10;
+
+  const styles = getStyles(colors);
 
   const loadTransactions = useCallback(
     async (pageNum = 0, shouldRefresh = false) => {
@@ -211,106 +214,107 @@ const TransactionsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  listContent: {
-    padding: 16,
-  },
-  listContentEmpty: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  transactionItem: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  transactionDetails: {
-    flex: 1,
-  },
-  transactionType: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#212121',
-  },
-  transactionDate: {
-    fontSize: 14,
-    color: '#757575',
-    marginTop: 2,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  transactionStatus: {
-    fontSize: 14,
-    color: '#757575',
-    marginRight: 4,
-  },
-  statusText: {
-    textTransform: 'capitalize',
-    fontWeight: '600',
-  },
-  amountContainer: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  transactionAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  moneyAmount: {
-    fontSize: 14,
-    color: '#757575',
-    marginTop: 4,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerLoader: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#424242',
-    marginTop: 16,
-  },
-  emptySubText: {
-    fontSize: 14,
-    color: '#757575',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    listContent: {
+      padding: 16,
+    },
+    listContentEmpty: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+    },
+    transactionItem: {
+      flexDirection: 'row',
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      padding: 16,
+      marginBottom: 12,
+      elevation: 2,
+      shadowColor: colors.text,
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.2,
+      shadowRadius: 1.41,
+    },
+    iconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.card,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    transactionDetails: {
+      flex: 1,
+    },
+    transactionType: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#212121',
+    },
+    transactionDate: {
+      fontSize: 14,
+      color: '#757575',
+      marginTop: 2,
+    },
+    statusContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 4,
+    },
+    transactionStatus: {
+      fontSize: 14,
+      color: '#757575',
+      marginRight: 4,
+    },
+    statusText: {
+      textTransform: 'capitalize',
+      fontWeight: '600',
+    },
+    amountContainer: {
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+    },
+    transactionAmount: {
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    moneyAmount: {
+      fontSize: 14,
+      color: '#757575',
+      marginTop: 4,
+    },
+    loaderContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    footerLoader: {
+      paddingVertical: 20,
+      alignItems: 'center',
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#424242',
+      marginTop: 16,
+    },
+    emptySubText: {
+      fontSize: 14,
+      color: '#757575',
+      marginTop: 8,
+      textAlign: 'center',
+    },
+  });
 
 export default TransactionsScreen;

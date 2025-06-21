@@ -185,7 +185,7 @@ const getStyles = (colors: any) =>
     amountText: {
       fontSize: 14,
       fontWeight: 'bold',
-      color: colors.primary,
+      color: colors.text,
     },
     amountLabel: {
       fontWeight: 'normal',

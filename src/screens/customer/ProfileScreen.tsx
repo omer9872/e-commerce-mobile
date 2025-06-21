@@ -15,10 +15,8 @@ import {useNavigation} from '@react-navigation/native';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import LayoutHeader from '../../components/LayoutHeader';
 import {useTheme} from '../../contexts/ThemeContext';
-import {adjustColor} from '../../utils/colorUtils';
 import {useAuth} from '../../contexts/AuthContext';
 import Avatar from '../../components/Avatar';
-import {colors} from '../../theme/colors';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,

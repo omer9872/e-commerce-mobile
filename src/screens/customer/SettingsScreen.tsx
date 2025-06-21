@@ -135,7 +135,6 @@ const getStyles = (colors: any) =>
     content: {
       padding: 20,
     },
-
     section: {
       borderBottomWidth: 1,
       borderBottomColor: colors.border,

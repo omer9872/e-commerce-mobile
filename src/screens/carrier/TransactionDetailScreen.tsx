@@ -26,14 +26,14 @@ import {
   PaymentStatus,
   ShippingStatus,
   ShippingType,
-  TransactionDetail,
+  ITransaction,
 } from '../../types/transaction';
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {
   fetchCarrierTransactionById,
   updateCarrierTransactionShippingStatus,
 } from '../../services/carrierTransactionService';
-import {colors} from '../../theme/colors';
+import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {useTheme} from '../../contexts/ThemeContext';
 
 type TransactionDetailScreenRouteProp = RouteProp<
   CustomerProfileStackParamList,
@@ -80,11 +80,11 @@ const PaymentStatusText = {
 
 const TransactionDetailScreen = () => {
   const route = useRoute<TransactionDetailScreenRouteProp>();
+  const {colors} = useTheme();
+
   const navigation = useNavigation();
   const {transactionId} = route.params;
-  const [transaction, setTransaction] = useState<TransactionDetail | null>(
-    null,
-  );
+  const [transaction, setTransaction] = useState<ITransaction | null>(null);
   const [loading, setLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
 
@@ -133,6 +133,8 @@ const TransactionDetailScreen = () => {
       });
     }
   };
+
+  const styles = getStyles(colors);
 
   if (loading) {
     return (
@@ -353,208 +355,209 @@ const TransactionDetailScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#424242',
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  backButton: {
-    backgroundColor: '#5C6BC0',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  backButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    margin: 16,
-    padding: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-  },
-  transactionTypeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  transactionType: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#212121',
-  },
-  moneyAmount: {
-    fontSize: 18,
-    color: '#424242',
-    marginTop: 4,
-    fontWeight: 'bold',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E0E0E0',
-    marginBottom: 20,
-  },
-  detailColumn: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    marginBottom: 25,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  detailLabel: {
-    fontSize: 16,
-    color: '#757575',
-  },
-  detailValueLeft: {
-    fontSize: 16,
-    color: '#212121',
-    fontWeight: '500',
-    textAlign: 'left',
-  },
-  detailValueRight: {
-    fontSize: 16,
-    color: '#212121',
-    fontWeight: '500',
-    textAlign: 'right',
-  },
-  shippingStatusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
-    borderRadius: 8,
-    padding: 10,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 6,
-  },
-  statusText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  itemsContainer: {
-    marginTop: 8,
-  },
-  itemsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#212121',
-    marginBottom: 12,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-  },
-  itemName: {
-    fontSize: 16,
-    color: '#212121',
-  },
-  totalName: {
-    fontSize: 16,
-    color: '#212121',
-    fontWeight: 'bold',
-  },
-  itemPrice: {
-    fontSize: 16,
-    color: '#212121',
-    fontWeight: '500',
-  },
-  statusIcon: {
-    marginLeft: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 20,
-    width: '80%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#212121',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  statusOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
-  },
-  statusOptionText: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 8,
-  },
-  cancelButton: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#757575',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#F5F5F5',
+    },
+    loaderContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#F5F5F5',
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#F5F5F5',
+      padding: 20,
+    },
+    errorText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#424242',
+      marginTop: 16,
+      marginBottom: 24,
+    },
+    backButton: {
+      backgroundColor: '#5C6BC0',
+      paddingVertical: 12,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+    },
+    backButtonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    card: {
+      backgroundColor: 'white',
+      borderRadius: 8,
+      margin: 16,
+      padding: 20,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.2,
+      shadowRadius: 1.41,
+    },
+    transactionTypeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    iconContainer: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    transactionType: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#212121',
+    },
+    moneyAmount: {
+      fontSize: 18,
+      color: '#424242',
+      marginTop: 4,
+      fontWeight: 'bold',
+    },
+    divider: {
+      height: 1,
+      backgroundColor: '#E0E0E0',
+      marginBottom: 20,
+    },
+    detailColumn: {
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      marginBottom: 25,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    detailLabel: {
+      fontSize: 16,
+      color: '#757575',
+    },
+    detailValueLeft: {
+      fontSize: 16,
+      color: '#212121',
+      fontWeight: '500',
+      textAlign: 'left',
+    },
+    detailValueRight: {
+      fontSize: 16,
+      color: '#212121',
+      fontWeight: '500',
+      textAlign: 'right',
+    },
+    shippingStatusContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderWidth: 1,
+      borderColor: '#EEEEEE',
+      borderRadius: 8,
+      padding: 10,
+    },
+    statusContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    statusDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginRight: 6,
+    },
+    statusText: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    itemsContainer: {
+      marginTop: 8,
+    },
+    itemsTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#212121',
+      marginBottom: 12,
+    },
+    itemRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 8,
+    },
+    itemName: {
+      fontSize: 16,
+      color: '#212121',
+    },
+    totalName: {
+      fontSize: 16,
+      color: '#212121',
+      fontWeight: 'bold',
+    },
+    itemPrice: {
+      fontSize: 16,
+      color: '#212121',
+      fontWeight: '500',
+    },
+    statusIcon: {
+      marginLeft: 8,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      backgroundColor: 'white',
+      borderRadius: 8,
+      padding: 20,
+      width: '80%',
+      maxWidth: 400,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#212121',
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    statusOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: '#EEEEEE',
+    },
+    statusOptionText: {
+      fontSize: 16,
+      fontWeight: '500',
+      marginLeft: 8,
+    },
+    cancelButton: {
+      marginTop: 16,
+      padding: 12,
+      backgroundColor: '#F5F5F5',
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    cancelButtonText: {
+      color: '#757575',
+      fontSize: 16,
+      fontWeight: '500',
+    },
+  });
 
 export default TransactionDetailScreen;

@@ -5,8 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {StyleSheet, Image as RNImage, View} from 'react-native';
 import {useEffect, useState} from 'react';
 
+import {useTheme} from '../contexts/ThemeContext';
 import {API_URL} from '../services/api';
-import {colors} from '../theme/colors';
 
 interface IAvatarProps {
   id?: string;
@@ -15,6 +15,9 @@ interface IAvatarProps {
 
 const Avatar: React.FC<IAvatarProps> = ({id, size}) => {
   const [token, setToken] = useState<string | null>(null);
+  const {colors} = useTheme();
+
+  const styles = getStyles(colors);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -41,10 +44,11 @@ const Avatar: React.FC<IAvatarProps> = ({id, size}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  image: {
-    borderRadius: '100%',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    image: {
+      borderRadius: '100%',
+    },
+  });
 
 export default Avatar;

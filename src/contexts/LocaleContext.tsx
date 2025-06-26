@@ -21,30 +21,31 @@ const LOCALE_STORAGE_KEY = '@LoyaltyApp:locale';
 // Simple translation function
 const getTranslation = (locale: Locale, key: string, params?: any): string => {
   const translations: Record<string, any> = locale === 'en' ? en : tr;
-  
+
   // Handle nested keys with dot notation (e.g., "common.welcome")
   const keys = key.split('.');
   let translation = keys.reduce((obj, k) => obj?.[k], translations);
-  
+
   // If translation not found, return the key
   if (!translation || typeof translation !== 'string') {
     return key;
   }
-  
+
   // Simple parameter replacement
   if (params) {
     Object.keys(params).forEach(paramKey => {
       translation = translation.replace(`{${paramKey}}`, params[paramKey]);
     });
   }
-  
+
   return translation;
 };
 
+const DEFAULT_LOCALE = 'tr';
 export const LocaleProvider: React.FC<{children: React.ReactNode}> = ({
   children,
 }) => {
-  const [locale, setLocaleState] = useState<Locale>('tr');
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
   const [isRtl, setIsRtl] = useState(false);
 
   useEffect(() => {
@@ -58,11 +59,11 @@ export const LocaleProvider: React.FC<{children: React.ReactNode}> = ({
         setLocaleState(storedLocale as Locale);
       } else {
         // Default to Turkish for now, we'll add device locale detection later
-        setLocaleState('tr');
+        setLocaleState(DEFAULT_LOCALE);
       }
     } catch (error) {
       console.error('Error loading locale from storage:', error);
-      setLocaleState('tr');
+      setLocaleState(DEFAULT_LOCALE);
     }
   };
 

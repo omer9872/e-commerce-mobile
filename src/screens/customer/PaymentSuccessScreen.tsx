@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import type {CustomerCartStackParamList} from '../../navigation/CustomerNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 
 type PaymentSuccessScreenRouteProp = RouteProp<
@@ -25,6 +26,7 @@ type PaymentSuccessScreenRouteProp = RouteProp<
 const PaymentSuccessScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const route = useRoute<PaymentSuccessScreenRouteProp>();
+  const {t} = useLocale();
   const {colors} = useTheme();
   const insets = useSafeAreaInsets();
   const {paymentId} = route.params;
@@ -51,29 +53,39 @@ const PaymentSuccessScreen = () => {
           <Icon name="check-circle" size={100} color={colors.success} />
         </View>
 
-        <Text style={styles.title}>Payment Successful!</Text>
-
-        <Text style={styles.message}>
-          Your payment has been successfully processed.
+        <Text style={styles.title}>
+          {t('paymentSuccess.paymentSuccessful')}
         </Text>
 
-        <Text style={styles.paymentIdText}>Payment ID: {paymentId}</Text>
+        <Text style={styles.message}>
+          {t('paymentSuccess.yourPaymentHasBeenSuccessfullyProcessed')}
+        </Text>
+
+        <Text style={styles.paymentIdText}>
+          {t('paymentSuccess.paymentId')}: {paymentId}
+        </Text>
 
         <Text style={styles.instructionsText}>
-          You will receive a confirmation email shortly with your order details.
+          {t(
+            'paymentSuccess.youWillReceiveAConfirmationEmailShortlyWithYourOrderDetails',
+          )}
         </Text>
 
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={[styles.button, styles.secondaryButton]}
             onPress={handleViewOrders}>
-            <Text style={styles.secondaryButtonText}>View Orders</Text>
+            <Text style={styles.secondaryButtonText}>
+              {t('paymentSuccess.viewOrders')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.primaryButton]}
             onPress={handleContinueShopping}>
-            <Text style={styles.primaryButtonText}>Continue Shopping</Text>
+            <Text style={styles.primaryButtonText}>
+              {t('paymentSuccess.continueShopping')}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

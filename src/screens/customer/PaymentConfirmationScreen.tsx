@@ -19,6 +19,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 
 import type {CustomerCartStackParamList} from '../../navigation/CustomerNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useCart} from '../../contexts/CartContext';
 import type {ICartItem} from '../../types/cart';
@@ -31,6 +32,7 @@ type PaymentConfirmationScreenRouteProp = RouteProp<
 
 const PaymentConfirmationScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const {t} = useLocale();
   const route = useRoute<PaymentConfirmationScreenRouteProp>();
   const [isProcessing, setIsProcessing] = useState(false);
   const {clearCart} = useCart();
@@ -62,8 +64,10 @@ const PaymentConfirmationScreen = () => {
 
         Toast.show({
           type: 'success',
-          text1: 'Payment Initiated',
-          text2: 'Your payment has been successfully initiated.',
+          text1: t('paymentConfirmation.paymentInitiated'),
+          text2: t(
+            'paymentConfirmation.yourPaymentHasBeenSuccessfullyInitiated',
+          ),
         });
       } else {
         throw new Error('Invalid payment response');
@@ -72,8 +76,10 @@ const PaymentConfirmationScreen = () => {
       console.error('Payment error:', error);
       Toast.show({
         type: 'error',
-        text1: 'Payment Failed',
-        text2: 'There was an error processing your payment. Please try again.',
+        text1: t('paymentConfirmation.paymentFailed'),
+        text2: t(
+          'paymentConfirmation.thereWasAnErrorProcessingYourPaymentPleaseTryAgain',
+        ),
       });
       navigation.goBack();
     } finally {
@@ -120,9 +126,13 @@ const PaymentConfirmationScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Icon name="map-marker" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Shipping Address</Text>
+            <Text style={styles.sectionTitle}>
+              {t('paymentConfirmation.shippingAddress')}
+            </Text>
             <TouchableOpacity onPress={navigateToAddressList}>
-              <Text style={styles.changeText}>Change</Text>
+              <Text style={styles.changeText}>
+                {t('paymentConfirmation.change')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -144,9 +154,13 @@ const PaymentConfirmationScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Icon name="credit-card" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Payment Method</Text>
+            <Text style={styles.sectionTitle}>
+              {t('paymentConfirmation.paymentMethod')}
+            </Text>
             <TouchableOpacity onPress={navigateToPaymentCardList}>
-              <Text style={styles.changeText}>Change</Text>
+              <Text style={styles.changeText}>
+                {t('paymentConfirmation.change')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -177,7 +191,9 @@ const PaymentConfirmationScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Icon name="basket" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Order Summary</Text>
+            <Text style={styles.sectionTitle}>
+              {t('paymentConfirmation.orderSummary')}
+            </Text>
           </View>
 
           <View style={styles.orderSummaryContainer}>
@@ -189,7 +205,9 @@ const PaymentConfirmationScreen = () => {
                 styles.totalItem,
                 {borderTopWidth: 0},
               ]}>
-              <Text style={styles.totalItemLabel}>Total</Text>
+              <Text style={styles.totalItemLabel}>
+                {t('paymentConfirmation.total')}
+              </Text>
               <Text style={styles.totalItemPrice}>
                 ${totalPrice.toFixed(2)}
               </Text>
@@ -206,7 +224,9 @@ const PaymentConfirmationScreen = () => {
           {isProcessing ? (
             <ActivityIndicator color="#FFFFFF" size="small" />
           ) : (
-            <Text style={styles.confirmButtonText}>Confirm Payment</Text>
+            <Text style={styles.confirmButtonText}>
+              {t('paymentConfirmation.confirmPayment')}
+            </Text>
           )}
         </TouchableOpacity>
       </View>

@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {userService} from '../../services/userService';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
@@ -28,6 +29,7 @@ type EmailVerificationScreenNavigationProp = StackNavigationProp<
 
 const EmailVerificationScreen = () => {
   const {user, fetchMe} = useAuth();
+  const {t} = useLocale();
   const {colors} = useTheme();
   const navigation = useNavigation<EmailVerificationScreenNavigationProp>();
   const insets = useSafeAreaInsets();
@@ -37,12 +39,12 @@ const EmailVerificationScreen = () => {
 
   const handleSendVerificationCode = async () => {
     if (!email || !email.trim()) {
-      setError('Please enter a valid email address');
+      setError(t('emailVerification.pleaseEnterAValidEmailAddress'));
       return;
     }
 
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address');
+      setError(t('emailVerification.pleaseEnterAValidEmailAddress'));
       return;
     }
 
@@ -60,7 +62,7 @@ const EmailVerificationScreen = () => {
       console.error('Error sending verification code:', error);
       setError(
         error.response?.data?.message ||
-          'Failed to send verification code. Please try again.',
+          t('emailVerification.failedToSendVerificationCode'),
       );
     } finally {
       setIsLoading(false);
@@ -79,16 +81,20 @@ const EmailVerificationScreen = () => {
           <Icon name="email-outline" size={60} color={colors.primary} />
         </View>
 
-        <Text style={styles.title}>Update Your Email Address</Text>
+        <Text style={styles.title}>
+          {t('emailVerification.updateYourEmailAddress')}
+        </Text>
         <Text style={styles.description}>
-          Enter your email address to receive a verification code via email.
+          {t(
+            'emailVerification.enterYourEmailAddressToReceiveAVerificationCodeViaEmail',
+          )}
         </Text>
 
         <View style={styles.formContainer}>
           <TextInput
             value={email}
             onChangeText={setEmail}
-            placeholder="Enter your email address"
+            placeholder={t('emailVerification.enterYourEmailAddress')}
             keyboardType="email-address"
             autoCapitalize="none"
             maxLength={255}
@@ -104,7 +110,9 @@ const EmailVerificationScreen = () => {
             {isLoading ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text style={styles.buttonText}>Send Verification Code</Text>
+              <Text style={styles.buttonText}>
+                {t('emailVerification.sendVerificationCode')}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
@@ -112,7 +120,9 @@ const EmailVerificationScreen = () => {
         <View style={styles.infoContainer}>
           <Icon name="information-outline" size={20} color={colors.primary} />
           <Text style={styles.infoText}>
-            We'll send a verification code to this email address.
+            {t(
+              'emailVerification.weWillSendAVerificationCodeToThisEmailAddress',
+            )}
           </Text>
         </View>
       </ScrollView>

@@ -27,6 +27,7 @@ import {
 } from '../../services/userInformationService';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import type {AddressFormData} from '../../types/address';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 
@@ -46,6 +47,7 @@ const AddressFormScreen = () => {
   const {addressId} = route.params || {};
   const isEditing = !!addressId;
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
@@ -86,8 +88,8 @@ const AddressFormScreen = () => {
           console.error('Error fetching address:', error);
           Toast.show({
             type: 'error',
-            text1: 'Error',
-            text2: 'Failed to load address details. Please try again.',
+            text1: t('errors.error'),
+            text2: t('addressForm.failedToLoadAddressDetails'),
           });
         } finally {
           setLoading(false);
@@ -127,8 +129,8 @@ const AddressFormScreen = () => {
 
         Toast.show({
           type: 'error',
-          text1: 'Error',
-          text2: `${fieldName} is required`,
+          text1: t('errors.error'),
+          text2: `${fieldName} ${t('errors.isRequired')}`,
         });
         return false;
       }
@@ -146,15 +148,15 @@ const AddressFormScreen = () => {
         await updateAddress(addressId, formData);
         Toast.show({
           type: 'success',
-          text1: 'Success',
-          text2: 'Address updated successfully',
+          text1: t('success'),
+          text2: t('addressForm.addressUpdatedSuccessfully'),
         });
       } else {
         await addAddress(formData);
         Toast.show({
           type: 'success',
-          text1: 'Success',
-          text2: 'Address added successfully',
+          text1: t('success'),
+          text2: t('addressForm.addressAddedSuccessfully'),
         });
       }
       navigation.goBack();
@@ -162,8 +164,8 @@ const AddressFormScreen = () => {
       console.error('Error saving address:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to save address. Please try again.',
+        text1: t('errors.error'),
+        text2: t('addressForm.failedToSaveAddress'),
       });
     } finally {
       setSubmitting(false);
@@ -189,30 +191,30 @@ const AddressFormScreen = () => {
       <ScrollView style={styles.container}>
         <View style={styles.formContainer}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Address Name</Text>
+            <Text style={styles.label}>{t('addressForm.addressName')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g., Home, Work"
+              placeholder={t('addressForm.addressNamePlaceholder')}
               value={formData.name}
               onChangeText={text => handleChange('name', text)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Address Line</Text>
+            <Text style={styles.label}>{t('addressForm.addressLine')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Full address"
+              placeholder={t('addressForm.addressLinePlaceholder')}
               value={formData.addressLine1}
               onChangeText={text => handleChange('addressLine1', text)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Country</Text>
+            <Text style={styles.label}>{t('addressForm.country')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Country"
+              placeholder={t('addressForm.countryPlaceholder')}
               value={formData.country}
               onChangeText={text => handleChange('country', text)}
             />
@@ -220,20 +222,20 @@ const AddressFormScreen = () => {
 
           <View style={styles.row}>
             <View style={[styles.inputGroup, {flex: 1, marginRight: 8}]}>
-              <Text style={styles.label}>City</Text>
+              <Text style={styles.label}>{t('addressForm.city')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="City"
+                placeholder={t('addressForm.cityPlaceholder')}
                 value={formData.city}
                 onChangeText={text => handleChange('city', text)}
               />
             </View>
 
             <View style={[styles.inputGroup, {flex: 1}]}>
-              <Text style={styles.label}>County</Text>
+              <Text style={styles.label}>{t('addressForm.county')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="County"
+                placeholder={t('addressForm.countyPlaceholder')}
                 value={formData.county}
                 onChangeText={text => handleChange('county', text)}
               />
@@ -241,20 +243,20 @@ const AddressFormScreen = () => {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Neighborhood</Text>
+            <Text style={styles.label}>{t('addressForm.neighborhood')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Neighborhood"
+              placeholder={t('addressForm.neighborhoodPlaceholder')}
               value={formData.neighborhood}
               onChangeText={text => handleChange('neighborhood', text)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Street</Text>
+            <Text style={styles.label}>{t('addressForm.street')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Street"
+              placeholder={t('addressForm.streetPlaceholder')}
               value={formData.street}
               onChangeText={text => handleChange('street', text)}
             />
@@ -262,10 +264,10 @@ const AddressFormScreen = () => {
 
           <View style={styles.row}>
             <View style={[styles.inputGroup, {flex: 1, marginRight: 8}]}>
-              <Text style={styles.label}>No</Text>
+              <Text style={styles.label}>{t('addressForm.no')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="No"
+                placeholder={t('addressForm.noPlaceholder')}
                 value={formData.no}
                 onChangeText={text => handleChange('no', text)}
                 keyboardType="number-pad"
@@ -273,10 +275,10 @@ const AddressFormScreen = () => {
             </View>
 
             <View style={[styles.inputGroup, {flex: 1}]}>
-              <Text style={styles.label}>Flat</Text>
+              <Text style={styles.label}>{t('addressForm.flat')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Flat"
+                placeholder={t('addressForm.flatPlaceholder')}
                 value={formData.flat}
                 onChangeText={text => handleChange('flat', text)}
                 keyboardType="number-pad"
@@ -285,10 +287,10 @@ const AddressFormScreen = () => {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Postal Code</Text>
+            <Text style={styles.label}>{t('addressForm.postalCode')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Postal Code"
+              placeholder={t('addressForm.postalCodePlaceholder')}
               value={formData.postalCode}
               onChangeText={text => handleChange('postalCode', text)}
               keyboardType="number-pad"
@@ -303,7 +305,9 @@ const AddressFormScreen = () => {
               <ActivityIndicator size="small" color="#FFF" />
             ) : (
               <Text style={styles.submitButtonText}>
-                {isEditing ? 'Update Address' : 'Save Address'}
+                {isEditing
+                  ? t('addressForm.updateAddress')
+                  : t('addressForm.saveAddress')}
               </Text>
             )}
           </TouchableOpacity>

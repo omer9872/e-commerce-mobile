@@ -16,6 +16,7 @@ import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import {userService} from '../../services/userService';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
@@ -30,7 +31,7 @@ const PhoneVerificationScreen = () => {
   const navigation = useNavigation<PhoneVerificationScreenNavigationProp>();
   const {user, fetchMe} = useAuth();
   const {colors} = useTheme();
-
+  const {t} = useLocale();
   const [phone, setPhone] = useState(user?.phone || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,7 +49,7 @@ const PhoneVerificationScreen = () => {
     const cleanPhone = phone.replace(/\D/g, '');
 
     if (!validatePhone(cleanPhone)) {
-      setError('Please enter a valid phone number');
+      setError(t('phoneVerification.pleaseEnterAValidPhoneNumber'));
       return;
     }
 
@@ -61,7 +62,7 @@ const PhoneVerificationScreen = () => {
       console.error('Error sending phone verification:', err);
       setError(
         err.response?.data?.message ||
-          'Failed to send verification code. Please try again.',
+          t('phoneVerification.failedToSendVerificationCodePleaseTryAgain'),
       );
     } finally {
       setLoading(false);
@@ -81,16 +82,20 @@ const PhoneVerificationScreen = () => {
           <Icon name="cellphone" size={60} color={colors.primary} />
         </View>
 
-        <Text style={styles.title}>Update Your Phone Number</Text>
+        <Text style={styles.title}>
+          {t('phoneVerification.updateYourPhoneNumber')}
+        </Text>
         <Text style={styles.description}>
-          Enter your phone number to receive a verification code via SMS.
+          {t(
+            'phoneVerification.enterYourPhoneNumberToReceiveAVerificationCodeViaSMS',
+          )}
         </Text>
 
         <View style={styles.formContainer}>
           <TextInput
             value={phone}
             onChangeText={setPhone}
-            placeholder="Enter your phone number"
+            placeholder={t('phoneVerification.enterYourPhoneNumber')}
             keyboardType="phone-pad"
             autoCapitalize="none"
             maxLength={11}
@@ -106,7 +111,9 @@ const PhoneVerificationScreen = () => {
             {loading ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text style={styles.buttonText}>Send Verification Code</Text>
+              <Text style={styles.buttonText}>
+                {t('phoneVerification.sendVerificationCode')}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
@@ -114,8 +121,9 @@ const PhoneVerificationScreen = () => {
         <View style={styles.infoContainer}>
           <Icon name="information-outline" size={20} color={colors.primary} />
           <Text style={styles.infoText}>
-            We'll send a verification code to this phone number. Standard SMS
-            rates may apply.
+            {t(
+              'phoneVerification.weWillSendAVerificationCodeToThisPhoneNumber',
+            )}
           </Text>
         </View>
       </ScrollView>

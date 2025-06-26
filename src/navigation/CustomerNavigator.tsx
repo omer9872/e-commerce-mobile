@@ -24,6 +24,7 @@ import SettingsScreen from '../screens/customer/SettingsScreen';
 import ProfileScreen from '../screens/customer/ProfileScreen';
 import CartScreen from '../screens/customer/CartScreen';
 import HomeScreen from '../screens/customer/HomeScreen';
+import {useLocale} from '../contexts/LocaleContext';
 import {useTheme} from '../contexts/ThemeContext';
 
 // Stack param lists
@@ -85,6 +86,7 @@ const CampaignsStack = createStackNavigator<CustomerCampaignsStackParamList>();
 // Home Stack Navigator
 const HomeStackNavigator = () => {
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   return (
     <HomeStack.Navigator
@@ -105,7 +107,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen
         name="ProductDetail"
         component={ProductDetailScreen}
-        options={{title: 'Product Details'}}
+        options={{title: t('productDetails.title')}}
       />
     </HomeStack.Navigator>
   );
@@ -114,6 +116,8 @@ const HomeStackNavigator = () => {
 // Cart Stack Navigator
 const CartStackNavigator = () => {
   const {colors} = useTheme();
+  const {t} = useLocale();
+
   return (
     <CartStack.Navigator
       screenOptions={{
@@ -133,12 +137,12 @@ const CartStackNavigator = () => {
       <CartStack.Screen
         name="PaymentConfirmation"
         component={PaymentConfirmationScreen}
-        options={{title: 'Payment Confirmation'}}
+        options={{title: t('paymentConfirmation.title')}}
       />
       <CartStack.Screen
         name="PaymentSuccess"
         component={PaymentSuccessScreen}
-        options={{title: 'Payment Success'}}
+        options={{title: t('paymentSuccess.title')}}
       />
     </CartStack.Navigator>
   );
@@ -147,6 +151,7 @@ const CartStackNavigator = () => {
 // Profile Stack Navigator
 const ProfileStackNavigator = () => {
   const {colors} = useTheme();
+  const {t} = useLocale();
   return (
     <ProfileStack.Navigator
       screenOptions={{
@@ -166,70 +171,72 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen
         name="EditProfile"
         component={EditProfileScreen}
-        options={{title: 'Edit Profile'}}
+        options={{title: t('profile.editProfile')}}
       />
       <ProfileStack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{title: 'Settings'}}
+        options={{title: t('settings.title')}}
       />
       <ProfileStack.Screen
         name="AddressList"
         component={AddressListScreen}
-        options={{title: 'My Addresses'}}
+        options={{title: t('profile.myAddresses')}}
       />
       <ProfileStack.Screen
         name="AddressForm"
         component={AddressFormScreen}
         options={({route}) => ({
-          title: route.params?.addressId ? 'Edit Address' : 'Add New Address',
-          headerBackTitle: 'Back',
+          title: route.params?.addressId
+            ? t('profile.editAddress')
+            : t('profile.addNewAddress'),
+          headerBackTitle: t('profile.back'),
         })}
       />
       <ProfileStack.Screen
         name="PaymentCardList"
         component={PaymentCardListScreen}
-        options={{title: 'Payment Methods'}}
+        options={{title: t('profile.paymentMethods')}}
       />
       <ProfileStack.Screen
         name="TransactionHistory"
         component={TransactionHistoryScreen}
-        options={{title: 'Transaction History'}}
+        options={{title: t('profile.transactionHistory')}}
       />
       <ProfileStack.Screen
         name="TransactionDetail"
         component={TransactionDetailScreen}
-        options={{title: 'Transaction Detail'}}
+        options={{title: t('profile.transactionDetail')}}
       />
       <ProfileStack.Screen
         name="PaymentCardForm"
         component={PaymentCardFormScreen}
         options={({route}) => ({
           title: route.params?.cardId
-            ? 'Edit Payment Method'
-            : 'Add Payment Method',
-          headerBackTitle: 'Back',
+            ? t('profile.editPaymentMethod')
+            : t('profile.addPaymentMethod'),
+          headerBackTitle: t('profile.back'),
         })}
       />
       <ProfileStack.Screen
         name="EmailVerification"
         component={EmailVerificationScreen}
-        options={{title: 'Verify Email'}}
+        options={{title: t('profile.verifyEmail')}}
       />
       <ProfileStack.Screen
         name="EmailVerificationCode"
         component={EmailVerificationCodeScreen}
-        options={{title: 'Verification Code'}}
+        options={{title: t('profile.verificationCode')}}
       />
       <ProfileStack.Screen
         name="PhoneVerification"
         component={PhoneVerificationScreen}
-        options={{title: 'Verify Phone'}}
+        options={{title: t('profile.verifyPhone')}}
       />
       <ProfileStack.Screen
         name="PhoneVerificationCode"
         component={PhoneVerificationCodeScreen}
-        options={{title: 'Verification Code'}}
+        options={{title: t('profile.verificationCode')}}
       />
     </ProfileStack.Navigator>
   );
@@ -238,6 +245,8 @@ const ProfileStackNavigator = () => {
 // Favorites Stack Navigator
 const FavoritesStackNavigator = () => {
   const {colors} = useTheme();
+  const {t} = useLocale();
+
   return (
     <FavoritesStack.Navigator
       screenOptions={{
@@ -257,7 +266,7 @@ const FavoritesStackNavigator = () => {
       <FavoritesStack.Screen
         name="ProductDetail"
         component={ProductDetailScreen}
-        options={{title: 'Product Details'}}
+        options={{title: t('productDetails.title')}}
       />
     </FavoritesStack.Navigator>
   );
@@ -265,6 +274,8 @@ const FavoritesStackNavigator = () => {
 
 const CampaignsStackNavigator = () => {
   const {colors} = useTheme();
+  const {t} = useLocale();
+
   return (
     <CampaignsStack.Navigator
       screenOptions={{
@@ -284,7 +295,7 @@ const CampaignsStackNavigator = () => {
       <CampaignsStack.Screen
         name="CampaignDetail"
         component={CampaignDetailScreen}
-        options={{title: 'Details'}}
+        options={{title: t('campaignDetails.title')}}
       />
     </CampaignsStack.Navigator>
   );
@@ -295,6 +306,8 @@ const Tab = createBottomTabNavigator();
 
 const CustomerNavigator = () => {
   const {colors} = useTheme();
+  const {t} = useLocale();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -311,7 +324,7 @@ const CustomerNavigator = () => {
         component={HomeStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Home',
+          tabBarLabel: t('home.title'),
           tabBarIcon: ({color, size}) => (
             <Icon name="home" color={color} size={size} />
           ),
@@ -322,7 +335,7 @@ const CustomerNavigator = () => {
         component={CampaignsStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Campaigns',
+          tabBarLabel: t('campaigns.title'),
           tabBarIcon: ({color, size}) => (
             <Icon name="ticket" color={color} size={size} />
           ),
@@ -333,7 +346,7 @@ const CustomerNavigator = () => {
         component={CartStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Cart',
+          tabBarLabel: t('cart.title'),
           tabBarIcon: ({color, size}) => (
             <Icon name="cart" color={color} size={size} />
           ),
@@ -344,7 +357,7 @@ const CustomerNavigator = () => {
         component={FavoritesStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Favorites',
+          tabBarLabel: t('favorites.title'),
           tabBarIcon: ({color, size}) => (
             <Icon name="heart-outline" color={color} size={size} />
           ),
@@ -355,7 +368,7 @@ const CustomerNavigator = () => {
         component={ProfileStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Profile',
+          tabBarLabel: t('profile.title'),
           tabBarIcon: ({color, size}) => (
             <Icon name="account" color={color} size={size} />
           ),

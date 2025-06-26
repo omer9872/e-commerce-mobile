@@ -23,6 +23,7 @@ import {
 } from '../../services/userInformationService';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import type {Address, UserInformation} from '../../types/address';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 
 type AddressListScreenNavigationProp = StackNavigationProp<
@@ -33,6 +34,7 @@ type AddressListScreenNavigationProp = StackNavigationProp<
 const AddressListScreen = () => {
   const navigation = useNavigation<AddressListScreenNavigationProp>();
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [userInfo, setUserInfo] = useState<UserInformation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,8 +49,8 @@ const AddressListScreen = () => {
       console.error('Error fetching addresses:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to load addresses. Please try again.',
+        text1: t('errors.error'),
+        text2: t('addressList.failedToLoadAddresses'),
       });
     } finally {
       setLoading(false);
@@ -73,12 +75,12 @@ const AddressListScreen = () => {
 
   const handleDeleteAddress = async (addressId: string) => {
     Alert.alert(
-      'Delete Address',
-      'Are you sure you want to delete this address?',
+      t('addressList.deleteAddress'),
+      t('addressList.areYouSureYouWantToDeleteThisAddress'),
       [
-        {text: 'Cancel', style: 'cancel'},
+        {text: t('cancel'), style: 'cancel'},
         {
-          text: 'Delete',
+          text: t('delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -87,15 +89,15 @@ const AddressListScreen = () => {
               await fetchData(false);
               Toast.show({
                 type: 'success',
-                text1: 'Success',
-                text2: 'Address deleted successfully',
+                text1: t('success.deleted'),
+                text2: t('addressList.addressDeletedSuccessfully'),
               });
             } catch (error) {
               console.error('Error deleting address:', error);
               Toast.show({
                 type: 'error',
-                text1: 'Error',
-                text2: 'Failed to delete address. Please try again.',
+                text1: t('errors.error'),
+                text2: t('addressList.failedToDeleteAddress'),
               });
               setLoading(false);
             }
@@ -112,15 +114,15 @@ const AddressListScreen = () => {
       await fetchData(false);
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Default address updated',
+        text1: t('success.updated'),
+        text2: t('addressList.defaultAddressUpdated'),
       });
     } catch (error) {
       console.error('Error setting default address:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to update default address. Please try again.',
+        text1: t('errors.error'),
+        text2: t('addressList.failedToUpdateDefaultAddress'),
       });
       setLoading(false);
     }
@@ -143,7 +145,7 @@ const AddressListScreen = () => {
             <Text style={styles.addressName}>{item.name}</Text>
             {isDefault && (
               <View style={styles.defaultBadge}>
-                <Text style={styles.defaultText}>Default</Text>
+                <Text style={styles.defaultText}>{t('addressList.default')}</Text>
               </View>
             )}
           </View>
@@ -179,7 +181,9 @@ const AddressListScreen = () => {
           <TouchableOpacity
             style={styles.setDefaultButton}
             onPress={() => handleSetDefaultAddress(item._id!)}>
-            <Text style={styles.setDefaultText}>Set as Default</Text>
+            <Text style={styles.setDefaultText}>
+              {t('addressList.setAsDefault')}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -202,9 +206,11 @@ const AddressListScreen = () => {
                 size={60}
                 color={colors.textSecondary}
               />
-              <Text style={styles.emptyText}>No addresses found</Text>
+              <Text style={styles.emptyText}>
+                {t('addressList.noAddressesFound')}
+              </Text>
               <Text style={styles.emptySubText}>
-                Add an address to make checkout easier
+                {t('addressList.addAnAddressToMakeCheckoutEasier')}
               </Text>
             </View>
           ) : (
@@ -220,7 +226,9 @@ const AddressListScreen = () => {
           )}
           <TouchableOpacity style={styles.addButton} onPress={handleAddAddress}>
             <Icon name="plus" size={24} color="#FFF" />
-            <Text style={styles.addButtonText}>Add New Address</Text>
+            <Text style={styles.addButtonText}>
+              {t('addressList.addNewAddress')}
+            </Text>
           </TouchableOpacity>
         </>
       )}
@@ -279,7 +287,7 @@ const getStyles = (colors: any) =>
       marginLeft: 8,
     },
     defaultText: {
-      color: colors.primary,
+      color: colors.text,
       fontSize: 12,
       fontWeight: '600',
     },

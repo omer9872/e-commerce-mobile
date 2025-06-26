@@ -20,6 +20,7 @@ import Toast from 'react-native-toast-message';
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
 import type {IProduct, IProductVariant} from 'src/types/product';
 import {useFavorites} from '../../contexts/FavoritesContext';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useCart} from '../../contexts/CartContext';
 import Image from '../../components/Image';
@@ -41,6 +42,7 @@ const ProductDetailScreen = () => {
   } = useCart();
   const {addToFavorites, removeFromFavorites, isInFavorites} = useFavorites();
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const {productId} = route.params;
   const width = Dimensions.get('window').width;
@@ -63,7 +65,10 @@ const ProductDetailScreen = () => {
       setProduct(response.data);
     } catch (error) {
       console.error('Error fetching product details:', error);
-      Alert.alert('Error', 'Failed to load product details. Please try again.');
+      Alert.alert(
+        t('errors.unknownError'),
+        t('errors.unknownErrorDescription'),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -78,15 +83,15 @@ const ProductDetailScreen = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Added to Cart',
-        text2: `${product.name} has been added to your cart`,
+        text1: t('productDetails.addedToCart'),
+        text2: `${product.name} ${t('productDetails.hasBeenAddedToYourCart')}`,
       });
     } catch (error) {
       console.error('Error adding to cart:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to add item to cart. Please try again.',
+        text1: t('errors.unknownError'),
+        text2: t('errors.unknownErrorDescription'),
       });
     } finally {
       setIsCartQuantityLoading(false);
@@ -102,15 +107,17 @@ const ProductDetailScreen = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Removed from Cart',
-        text2: `${product.name} has been removed from your cart`,
+        text1: t('productDetails.removedFromCart'),
+        text2: `${product.name} ${t(
+          'productDetails.hasBeenRemovedFromYourCart',
+        )}`,
       });
     } catch (error) {
       console.error('Error removing from cart:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to remove item from cart. Please try again.',
+        text1: t('errors.unknownError'),
+        text2: t('errors.unknownErrorDescription'),
       });
     } finally {
       setIsCartQuantityLoading(false);
@@ -126,23 +133,27 @@ const ProductDetailScreen = () => {
         await removeFromFavorites(product._id);
         Toast.show({
           type: 'success',
-          text1: 'Removed from Favorites',
-          text2: `${product.name} has been removed from your favorites`,
+          text1: t('productDetails.removedFromFavorites'),
+          text2: `${product.name} ${t(
+            'productDetails.hasBeenRemovedFromYourFavorites',
+          )}`,
         });
       } else {
         await addToFavorites(product._id);
         Toast.show({
           type: 'success',
-          text1: 'Added to Favorites',
-          text2: `${product.name} has been added to your favorites`,
+          text1: t('productDetails.addedToFavorites'),
+          text2: `${product.name} ${t(
+            'productDetails.hasBeenAddedToYourFavorites',
+          )}`,
         });
       }
     } catch (error) {
       console.error('Error toggling favorites:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to update favorites. Please try again.',
+        text1: t('errors.unknownError'),
+        text2: t('errors.unknownErrorDescription'),
       });
     } finally {
       setIsFavoritesLoading(false);
@@ -163,8 +174,8 @@ const ProductDetailScreen = () => {
       console.error('Error updating quantity:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to update quantity. Please try again.',
+        text1: t('errors.unknownError'),
+        text2: t('errors.unknownErrorDescription'),
       });
     } finally {
       setIsCartQuantityLoading(false);
@@ -222,13 +233,15 @@ const ProductDetailScreen = () => {
                 styles.variantStock,
                 isOutOfStock ? styles.outOfStockText : null,
               ]}>
-              {isOutOfStock ? 'Out of Stock' : `Stock: ${variant.stock}`}
+              {isOutOfStock
+                ? t('productDetails.outOfStock')
+                : `${t('productDetails.stock')}: ${variant.stock}`}
             </Text>
           </View>
         </View>
         {isInCart && (
           <View style={styles.inCartBadge}>
-            <Text style={styles.inCartText}>In Cart</Text>
+            <Text style={styles.inCartText}>{t('productDetails.inCart')}</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -250,7 +263,7 @@ const ProductDetailScreen = () => {
   if (!product) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Product not found</Text>
+        <Text style={styles.errorText}>{t('productDetails.notFound')}</Text>
       </View>
     );
   }
@@ -284,14 +297,18 @@ const ProductDetailScreen = () => {
 
         {product.variants && product.variants.length > 0 && (
           <View style={styles.variantsContainer}>
-            <Text style={styles.variantsTitle}>Available Variants</Text>
+            <Text style={styles.variantsTitle}>
+              {t('productDetails.availableVariants')}
+            </Text>
             {product.variants.map(renderVariantItem)}
           </View>
         )}
 
         {selectedSKU && currentSKUCartItem && (
           <View style={styles.quantityContainer}>
-            <Text style={styles.quantityTitle}>Quantity in Cart</Text>
+            <Text style={styles.quantityTitle}>
+              {t('productDetails.quantityInCart')}
+            </Text>
             <View style={styles.quantityControls}>
               <TouchableOpacity
                 style={[
@@ -350,7 +367,9 @@ const ProductDetailScreen = () => {
                   color="#FFFFFF"
                 />
                 <Text style={styles.addToCartButtonText}>
-                  {isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
+                  {isAddedToCart
+                    ? t('productDetails.removeFromCart')
+                    : t('productDetails.addToCart')}
                 </Text>
               </View>
             )}
@@ -376,8 +395,8 @@ const ProductDetailScreen = () => {
                 />
                 <Text style={styles.favoriteButtonText}>
                   {isInFavorites(product._id)
-                    ? 'Remove from Favorites'
-                    : 'Add to Favorites'}
+                    ? t('productDetails.removeFromFavorites')
+                    : t('productDetails.addToFavorites')}
                 </Text>
               </View>
             )}
@@ -411,6 +430,7 @@ const getStyles = (colors: any) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      backgroundColor: colors.background,
     },
     errorContainer: {
       flex: 1,

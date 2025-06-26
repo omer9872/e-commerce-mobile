@@ -14,6 +14,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useState, useEffect} from 'react';
 
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
@@ -22,6 +23,7 @@ import {api} from '../../services/api';
 const EditProfileScreen = () => {
   const navigation = useNavigation();
   const {user, updateUser} = useAuth();
+  const {t} = useLocale();
   const {colors} = useTheme();
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
@@ -48,11 +50,14 @@ const EditProfileScreen = () => {
         lastName,
       });
       await updateUser(response.data);
-      Alert.alert('Success', 'Profile updated successfully');
+      Alert.alert(
+        t('success.updated'),
+        t('editProfile.profileUpdatedSuccessfully'),
+      );
       navigation.goBack();
     } catch (error) {
       console.error('Error updating profile:', error);
-      Alert.alert('Error', 'Failed to update profile. Please try again.');
+      Alert.alert(t('errors.error'), t('editProfile.failedToUpdateProfile'));
     } finally {
       setIsLoading(false);
     }
@@ -66,22 +71,22 @@ const EditProfileScreen = () => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Name</Text>
+            <Text style={styles.label}>{t('editProfile.name')}</Text>
             <TextInput
               style={styles.input}
               value={firstName}
               onChangeText={setFirstName}
-              placeholder="Enter your first name"
+              placeholder={t('editProfile.namePlaceholder')}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Last Name</Text>
+            <Text style={styles.label}>{t('editProfile.lastName')}</Text>
             <TextInput
               style={styles.input}
               value={lastName}
               onChangeText={setLastName}
-              placeholder="Enter your last name"
+              placeholder={t('editProfile.lastNamePlaceholder')}
             />
           </View>
 
@@ -92,7 +97,9 @@ const EditProfileScreen = () => {
             {isLoading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.saveButtonText}>Save Changes</Text>
+              <Text style={styles.saveButtonText}>
+                {t('editProfile.saveChanges')}
+              </Text>
             )}
           </TouchableOpacity>
         </View>

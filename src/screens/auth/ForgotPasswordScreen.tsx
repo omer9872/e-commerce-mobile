@@ -31,6 +31,7 @@ const ForgotPasswordScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const {colors} = useTheme();
+  
 
   const validateEmail = () => {
     if (!email) {

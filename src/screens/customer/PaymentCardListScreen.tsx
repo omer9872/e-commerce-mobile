@@ -24,6 +24,7 @@ import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavig
 import {fetchUserInformation} from '../../services/userInformationService';
 import type {PaymentCard} from '../../types/paymentCard';
 import type {UserInformation} from '../../types/address';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 
 type PaymentCardListScreenNavigationProp = StackNavigationProp<
@@ -49,6 +50,7 @@ const getCardIcon = (cardAssociation: string) => {
 const PaymentCardListScreen = () => {
   const navigation = useNavigation<PaymentCardListScreenNavigationProp>();
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [userInfo, setUserInfo] = useState<UserInformation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,8 +65,8 @@ const PaymentCardListScreen = () => {
       console.error('Error fetching payment cards:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to load payment methods. Please try again.',
+        text1: t('errors.error'),
+        text2: t('paymentCardList.failedToLoadPaymentMethods'),
       });
     } finally {
       setLoading(false);
@@ -85,12 +87,12 @@ const PaymentCardListScreen = () => {
 
   const handleDeletePaymentCard = async (cardId: string) => {
     Alert.alert(
-      'Delete Payment Method',
-      'Are you sure you want to delete this payment method?',
+      t('paymentCardList.deletePaymentMethod'),
+      t('paymentCardList.areYouSureYouWantToDeleteThisPaymentMethod'),
       [
-        {text: 'Cancel', style: 'cancel'},
+        {text: t('paymentCardList.cancel'), style: 'cancel'},
         {
-          text: 'Delete',
+          text: t('paymentCardList.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -99,15 +101,15 @@ const PaymentCardListScreen = () => {
               await fetchData(false);
               Toast.show({
                 type: 'success',
-                text1: 'Success',
-                text2: 'Payment method deleted successfully',
+                text1: t('success.success'),
+                text2: t('paymentCardList.paymentMethodDeletedSuccessfully'),
               });
             } catch (error) {
               console.error('Error deleting payment card:', error);
               Toast.show({
                 type: 'error',
-                text1: 'Error',
-                text2: 'Failed to delete payment method. Please try again.',
+                text1: t('errors.error'),
+                text2: t('paymentCardList.failedToDeletePaymentMethod'),
               });
               setLoading(false);
             }
@@ -124,15 +126,15 @@ const PaymentCardListScreen = () => {
       await fetchData(false);
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Default payment method updated',
+        text1: t('success.success'),
+        text2: t('paymentCardList.defaultPaymentMethodUpdated'),
       });
     } catch (error) {
       console.error('Error setting default payment card:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to update default payment method. Please try again.',
+        text1: t('errors.error'),
+        text2: t('paymentCardList.failedToUpdateDefaultPaymentMethod'),
       });
       setLoading(false);
     }
@@ -160,7 +162,9 @@ const PaymentCardListScreen = () => {
             <Text style={styles.cardType}>{item.cardAlias}</Text>
             {isDefault && (
               <View style={styles.defaultBadge}>
-                <Text style={styles.defaultText}>Default</Text>
+                <Text style={styles.defaultText}>
+                  {t('paymentCardList.default')}
+                </Text>
               </View>
             )}
           </View>
@@ -185,7 +189,9 @@ const PaymentCardListScreen = () => {
           <TouchableOpacity
             style={styles.setDefaultButton}
             onPress={() => handleSetDefaultPaymentCard(item._id)}>
-            <Text style={styles.setDefaultText}>Set as Default</Text>
+            <Text style={styles.setDefaultText}>
+              {t('paymentCardList.setAsDefault')}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -208,9 +214,11 @@ const PaymentCardListScreen = () => {
                 size={60}
                 color={colors.textSecondary}
               />
-              <Text style={styles.emptyText}>No payment methods found</Text>
+              <Text style={styles.emptyText}>
+                {t('paymentCardList.noPaymentMethodsFound')}
+              </Text>
               <Text style={styles.emptySubText}>
-                Add a payment method to make checkout easier
+                {t('paymentCardList.addAPaymentMethodToMakeCheckoutEasier')}
               </Text>
             </View>
           ) : (
@@ -227,7 +235,9 @@ const PaymentCardListScreen = () => {
             style={styles.addButton}
             onPress={handleAddPaymentCard}>
             <Icon name="plus" size={24} color="#FFF" />
-            <Text style={styles.addButtonText}>Add Payment Method</Text>
+            <Text style={styles.addButtonText}>
+              {t('paymentCardList.addPaymentMethod')}
+            </Text>
           </TouchableOpacity>
         </>
       )}

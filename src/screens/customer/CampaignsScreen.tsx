@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import {useLocale} from '../../contexts/LocaleContext';
 import {IPaginatedResponsePayload} from '../../types';
 import {useTheme} from '../../contexts/ThemeContext';
 import Image from '../../components/Image';
@@ -48,6 +49,7 @@ const CampaignsScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [campaigns, setCampaigns] = useState<
     IPaginatedResponsePayload<Campaign>
@@ -110,7 +112,7 @@ const CampaignsScreen = () => {
       <StatusBar barStyle="dark-content" />
       <View style={styles.subContainer}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Campaigns</Text>
+          <Text style={styles.headerTitle}>{t('campaigns.title')}</Text>
         </View>
 
         {isLoading ? (
@@ -128,9 +130,11 @@ const CampaignsScreen = () => {
             ListEmptyComponent={
               <View style={[styles.flex, styles.centerContent]}>
                 <Icon name="gift-outline" size={64} color={colors.gray} />
-                <Text style={styles.emptyText}>No active campaigns</Text>
+                <Text style={styles.emptyText}>
+                  {t('campaigns.noActiveCampaigns')}
+                </Text>
                 <Text style={styles.emptySubtext}>
-                  Check back later for new campaigns
+                  {t('campaigns.checkBackLaterForNewCampaigns')}
                 </Text>
               </View>
             }

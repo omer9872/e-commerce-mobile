@@ -13,9 +13,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import QRCode from 'react-native-qrcode-svg';
 
+import {useLocale} from '../../contexts/LocaleContext';
 import LayoutHeader from '../../components/LayoutHeader';
 import {useTheme} from '../../contexts/ThemeContext';
-import {useAuth} from '../../contexts/AuthContext';
 import {api} from '../../services/api';
 
 interface TransactionCodeResponse {
@@ -27,8 +27,8 @@ interface TransactionCodeResponse {
 }
 
 const QRCodeScreen = () => {
-  const {user} = useAuth();
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +54,7 @@ const QRCodeScreen = () => {
       setQrValue(response.data.code);
     } catch (error) {
       console.error('Error fetching QR code:', error);
-      setError('Failed to generate QR code. Please try again.');
+      setError(t('qrCode.failedToGenerateQRCodePleaseTryAgain'));
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ const QRCodeScreen = () => {
 
     try {
       await Share.share({
-        message: `My Loyalty App QR Code: ${qrValue}`,
+        message: `${t('qrCode.myLoyaltyAppQRCode')}: ${qrValue}`,
       });
     } catch (error) {
       console.error('Error sharing QR code:', error);
@@ -85,12 +85,12 @@ const QRCodeScreen = () => {
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
-        <LayoutHeader title="Generate Code" />
+        <LayoutHeader title={t('qrCode.generateCode')} />
 
         <View style={styles.content}>
-          <Text style={styles.title}>Your QR Code</Text>
+          <Text style={styles.title}>{t('qrCode.yourQRCode')}</Text>
           <Text style={styles.subtitle}>
-            Show this to merchants to earn or redeem points
+            {t('qrCode.showThisToMerchantsToEarnOrRedeemPoints')}
           </Text>
 
           <View style={styles.qrContainer}>
@@ -102,7 +102,9 @@ const QRCodeScreen = () => {
                 <TouchableOpacity
                   style={styles.refreshButton}
                   onPress={handleRefresh}>
-                  <Text style={styles.refreshButtonText}>Try Again</Text>
+                  <Text style={styles.refreshButtonText}>
+                    {t('qrCode.tryAgain')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -119,7 +121,9 @@ const QRCodeScreen = () => {
                   <TouchableOpacity
                     style={styles.showCodeButton}
                     onPress={() => setShowQRCode(true)}>
-                    <Text style={styles.showCodeButtonText}>Show Code</Text>
+                    <Text style={styles.showCodeButtonText}>
+                      {t('qrCode.showCode')}
+                    </Text>
                   </TouchableOpacity>
                 )}
               </>
@@ -131,12 +135,12 @@ const QRCodeScreen = () => {
               style={styles.actionButton}
               onPress={handleRefresh}>
               <Icon name="refresh" size={20} color={colors.primary} />
-              <Text style={styles.actionText}>Refresh</Text>
+              <Text style={styles.actionText}>{t('qrCode.refresh')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
               <Icon name="share-variant" size={20} color={colors.primary} />
-              <Text style={styles.actionText}>Share</Text>
+              <Text style={styles.actionText}>{t('qrCode.share')}</Text>
             </TouchableOpacity>
           </View>
         </View>

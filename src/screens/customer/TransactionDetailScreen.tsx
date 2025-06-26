@@ -29,6 +29,7 @@ import {
 } from '../../types/transaction';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactionById} from '../../services/transactionService';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import Image from '../../components/Image';
 
@@ -80,6 +81,7 @@ const TransactionDetailScreen = () => {
   const navigation = useNavigation();
   const {transactionId} = route.params;
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [transaction, setTransaction] = useState<ITransaction | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,8 +96,10 @@ const TransactionDetailScreen = () => {
         console.log(error);
         Toast.show({
           type: 'error',
-          text1: 'Error',
-          text2: 'Failed to load transaction details. Please try again.',
+          text1: t('transactionDetail.error'),
+          text2: t(
+            'transactionDetail.failedToLoadTransactionDetailsPleaseTryAgain',
+          ),
         });
       } finally {
         setLoading(false);
@@ -119,11 +123,15 @@ const TransactionDetailScreen = () => {
     return (
       <View style={styles.errorContainer}>
         <Icon name="alert-circle-outline" size={60} color="#F44336" />
-        <Text style={styles.errorText}>Transaction not found</Text>
+        <Text style={styles.errorText}>
+          {t('transactionDetail.transactionNotFound')}
+        </Text>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>Go Back</Text>
+          <Text style={styles.backButtonText}>
+            {t('transactionDetail.goBack')}
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -142,7 +150,9 @@ const TransactionDetailScreen = () => {
           <View style={[styles.iconContainer, {backgroundColor: '#E8F5E9'}]}>
             <Icon name={'check'} size={30} color={'#4CAF50'} />
           </View>
-          <Text style={styles.transactionType}>Payment</Text>
+          <Text style={styles.transactionType}>
+            {t('transactionDetail.payment')}
+          </Text>
         </View>
 
         <View style={styles.divider} />
@@ -153,17 +163,19 @@ const TransactionDetailScreen = () => {
         </View> */}
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Date</Text>
+          <Text style={styles.detailLabel}>{t('transactionDetail.date')}</Text>
           <Text style={styles.detailValueRight}>{formattedDate}</Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Time</Text>
+          <Text style={styles.detailLabel}>{t('transactionDetail.time')}</Text>
           <Text style={styles.detailValueRight}>{formattedTime}</Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Payment Method</Text>
+          <Text style={styles.detailLabel}>
+            {t('transactionDetail.paymentMethod')}
+          </Text>
           <Text style={styles.detailValueRight}>
             {
               PaymentMethodText[
@@ -174,7 +186,9 @@ const TransactionDetailScreen = () => {
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Payment Status</Text>
+          <Text style={styles.detailLabel}>
+            {t('transactionDetail.paymentStatus')}
+          </Text>
           <View style={styles.statusContainer}>
             <View
               style={[
@@ -207,7 +221,9 @@ const TransactionDetailScreen = () => {
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Shipping Type</Text>
+          <Text style={styles.detailLabel}>
+            {t('transactionDetail.shippingType')}
+          </Text>
           <Text style={styles.detailValueRight}>
             {
               ShippingTypeText[
@@ -218,7 +234,9 @@ const TransactionDetailScreen = () => {
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Shipping Status</Text>
+          <Text style={styles.detailLabel}>
+            {t('transactionDetail.shippingStatus')}
+          </Text>
           <View style={styles.statusContainer}>
             <View
               style={[
@@ -252,7 +270,9 @@ const TransactionDetailScreen = () => {
 
         {transaction.items && transaction.items.length > 0 && (
           <View style={styles.itemsContainer}>
-            <Text style={styles.itemsTitle}>Items</Text>
+            <Text style={styles.itemsTitle}>
+              {t('transactionDetail.items')}
+            </Text>
             {transaction.items.map((item: ITransactionItem, index: number) => (
               <View
                 key={index}
@@ -273,7 +293,9 @@ const TransactionDetailScreen = () => {
               </View>
             ))}
             <View style={styles.itemRow}>
-              <Text style={styles.totalName}>Total</Text>
+              <Text style={styles.totalName}>
+                {t('transactionDetail.total')}
+              </Text>
               <Text style={styles.moneyAmount}>
                 {(transaction?.totalAmount ?? 0).toFixed(2)}₺
               </Text>

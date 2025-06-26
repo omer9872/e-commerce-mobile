@@ -12,12 +12,14 @@ import {useRoute} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import {Campaign} from '../../types/campaign';
 import Image from '../../components/Image';
 import {api} from '../../services/api';
 
 const CampaignDetailScreen = () => {
+  const {t} = useLocale();
   const route = useRoute();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,8 +39,8 @@ const CampaignDetailScreen = () => {
       console.log(error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to fetch campaign details',
+        text1: t('errors.unknownError'),
+        text2: t('errors.unknownErrorDescription'),
       });
     } finally {
       setLoading(false);
@@ -58,7 +60,7 @@ const CampaignDetailScreen = () => {
   if (!campaign) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <Text style={styles.errorText}>Campaign not found</Text>
+        <Text style={styles.errorText}>{t('campaignDetails.notFound')}</Text>
       </View>
     );
   }
@@ -78,18 +80,20 @@ const CampaignDetailScreen = () => {
           <Text style={styles.campaignDescription}>{campaign.description}</Text>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Duration</Text>
+            <Text style={styles.sectionTitle}>
+              {t('campaignDetails.duration')}
+            </Text>
             <View style={styles.durationContainer}>
               <View style={styles.dateContainer}>
                 <Icon name="calendar-start" size={20} color={colors.primary} />
                 <Text style={styles.dateText}>
-                  Start: {formatDate(campaign.startDate)}
+                  {t('campaignDetails.start')}: {formatDate(campaign.startDate)}
                 </Text>
               </View>
               <View style={styles.dateContainer}>
                 <Icon name="calendar-end" size={20} color={colors.primary} />
                 <Text style={styles.dateText}>
-                  End: {formatDate(campaign.endDate)}
+                  {t('campaignDetails.end')}: {formatDate(campaign.endDate)}
                 </Text>
               </View>
             </View>

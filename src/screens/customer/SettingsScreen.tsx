@@ -14,10 +14,12 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
+import {useLocale} from '../../contexts/LocaleContext';
 
 const SettingsScreen = () => {
   const {colors, isDark, toggleTheme} = useTheme();
   const {signOut} = useAuth();
+  const {locale, setLocale, t} = useLocale();
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
 
@@ -26,30 +28,56 @@ const SettingsScreen = () => {
   const toggleEmailNotifications = () =>
     setEmailNotifications(previousState => !previousState);
 
+  const handleLanguageChange = () => {
+    Alert.alert(
+      t('settings.language.title'),
+      t('settings.language.description'),
+      [
+        {
+          text: t('settings.language.turkish'),
+          onPress: () => setLocale('tr'),
+          style: locale === 'tr' ? 'default' : 'cancel',
+        },
+        {
+          text: t('settings.language.english'),
+          onPress: () => setLocale('en'),
+          style: locale === 'en' ? 'default' : 'cancel',
+        },
+        {text: t('settings.language.cancel'), style: 'cancel'},
+      ],
+    );
+  };
+
+  const getLanguageDisplayName = () => {
+    return locale === 'tr'
+      ? t('settings.language.turkish')
+      : t('settings.language.english');
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut();
       // Navigation will be handled by the AuthContext
     } catch (error) {
       console.error('Error signing out:', error);
-      Alert.alert('Error', 'Failed to sign out. Please try again.');
+      Alert.alert(t('errors.unknownError'), t('errors.unknownError'));
     }
   };
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete Account',
-      'Are you sure you want to delete your account? This action cannot be undone.',
+      t('settings.account.deleteAccount'),
+      t('settings.account.deleteAccountDescription'),
       [
-        {text: 'Cancel', style: 'cancel'},
+        {text: t('settings.account.cancel'), style: 'cancel'},
         {
-          text: 'Delete',
+          text: t('settings.account.delete'),
           style: 'destructive',
           onPress: () => {
             // Implement account deletion logic here
             Alert.alert(
-              'Feature Not Implemented',
-              'Account deletion is not yet implemented.',
+              t('settings.account.featureNotImplemented'),
+              t('settings.account.featureNotImplementedDescription'),
             );
           },
         },
@@ -64,9 +92,13 @@ const SettingsScreen = () => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Notifications</Text>
+            <Text style={styles.sectionTitle}>
+              {t('settings.notifications.title')}
+            </Text>
             <View style={styles.settingItem}>
-              <Text style={styles.settingLabel}>Push Notifications</Text>
+              <Text style={styles.settingLabel}>
+                {t('settings.notifications.pushNotifications')}
+              </Text>
               <Switch
                 value={pushNotifications}
                 onValueChange={togglePushNotifications}
@@ -75,7 +107,9 @@ const SettingsScreen = () => {
               />
             </View>
             <View style={styles.settingItem}>
-              <Text style={styles.settingLabel}>Email Notifications</Text>
+              <Text style={styles.settingLabel}>
+                {t('settings.notifications.emailNotifications')}
+              </Text>
               <Switch
                 value={emailNotifications}
                 onValueChange={toggleEmailNotifications}
@@ -88,9 +122,13 @@ const SettingsScreen = () => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Appearance</Text>
+            <Text style={styles.sectionTitle}>
+              {t('settings.appearance.title')}
+            </Text>
             <View style={styles.settingItem}>
-              <Text style={styles.settingLabel}>Dark Mode</Text>
+              <Text style={styles.settingLabel}>
+                {t('settings.appearance.darkMode')}
+              </Text>
               <Switch
                 value={isDark}
                 onValueChange={toggleTheme}
@@ -98,14 +136,29 @@ const SettingsScreen = () => {
                 thumbColor={isDark ? colors.card : colors.background}
               />
             </View>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={handleLanguageChange}>
+              <Text style={styles.settingLabel}>
+                {t('settings.language.title')}
+              </Text>
+              <View style={styles.languageSelector}>
+                <Text style={[styles.languageText, {color: colors.text}]}>
+                  {getLanguageDisplayName()}
+                </Text>
+                <Icon name="chevron-right" size={20} color={colors.text} />
+              </View>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Account</Text>
+            <Text style={styles.sectionTitle}>
+              {t('settings.account.title')}
+            </Text>
             <TouchableOpacity style={styles.button} onPress={handleSignOut}>
               <Icon name="logout" size={24} color={colors.error} />
               <Text style={[styles.buttonText, {color: colors.error}]}>
-                Sign Out
+                {t('settings.account.signOut')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -113,7 +166,7 @@ const SettingsScreen = () => {
               onPress={handleDeleteAccount}>
               <Icon name="delete" size={24} color={colors.error} />
               <Text style={[styles.buttonText, {color: colors.error}]}>
-                Delete Account
+                {t('settings.account.deleteAccount')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -156,6 +209,14 @@ const getStyles = (colors: any) =>
     settingLabel: {
       fontSize: 16,
       color: colors.text,
+    },
+    languageSelector: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    languageText: {
+      fontSize: 16,
+      marginRight: 8,
     },
     button: {
       flexDirection: 'row',

@@ -15,11 +15,13 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {IFavoritesItem, IProduct} from '../../types/index';
 import {useFavorites} from '../../contexts/FavoritesContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import Image from '../../components/Image';
 
 const FavoritesScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const {t} = useLocale();
   const insets = useSafeAreaInsets();
   const {isLoading, favorites, removeFromFavorites} = useFavorites();
   const {colors} = useTheme();
@@ -58,7 +60,7 @@ const FavoritesScreen = () => {
       <StatusBar barStyle="dark-content" />
       <View style={styles.subContainer}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Favorites</Text>
+          <Text style={styles.headerTitle}>{t('favorites.title')}</Text>
         </View>
 
         {isLoading ? (
@@ -76,9 +78,9 @@ const FavoritesScreen = () => {
             ListEmptyComponent={
               <View style={[styles.flex, styles.centerContent]}>
                 <Icon name="heart-outline" size={64} color={colors.gray} />
-                <Text style={styles.emptyText}>No favorites yet</Text>
+                <Text style={styles.emptyText}>{t('favorites.noFavorites')}</Text>
                 <Text style={styles.emptySubtext}>
-                  Add products to your favorites to see them here
+                  {t('favorites.addProductsToFavorites')}
                 </Text>
               </View>
             }

@@ -19,9 +19,9 @@ import {
 import type {StackNavigationProp} from '@react-navigation/stack';
 
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
-import {colors} from '../../theme/colors';
 import {api} from '../../services/api';
 
 type RegisterScreenNavigationProp = StackNavigationProp<
@@ -35,6 +35,7 @@ const RegisterScreen = () => {
   const route = useRoute<RegisterScreenRouteProp>();
   const {userType} = route.params;
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -113,36 +114,36 @@ const RegisterScreen = () => {
         <View style={styles.content}>
           <Text style={styles.title}>
             {userType === 'customer'
-              ? 'Customer Registration'
-              : 'Merchant Registration'}
+              ? t('register.customerRegistration')
+              : t('register.merchantRegistration')}
           </Text>
 
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>First Name</Text>
+              <Text style={styles.label}>{t('register.firstName')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your first name"
+                placeholder={t('register.firstName')}
                 value={firstName}
                 onChangeText={setFirstName}
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Last Name</Text>
+              <Text style={styles.label}>{t('register.lastName')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your last name"
+                placeholder={t('register.lastName')}
                 value={lastName}
                 onChangeText={setLastName}
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label}>{t('register.phoneNumber')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your phone number"
+                placeholder={t('register.phoneNumber')}
                 keyboardType="phone-pad"
                 value={phone}
                 onChangeText={setPhone}
@@ -150,10 +151,10 @@ const RegisterScreen = () => {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>{t('register.password')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Create a password"
+                placeholder={t('register.password')}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
@@ -161,10 +162,10 @@ const RegisterScreen = () => {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Confirm Password</Text>
+              <Text style={styles.label}>{t('register.confirmPassword')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Confirm your password"
+                placeholder={t('register.confirmPassword')}
                 secureTextEntry
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
@@ -178,15 +179,19 @@ const RegisterScreen = () => {
               {isLoading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.registerButtonText}>Register</Text>
+                <Text style={styles.registerButtonText}>
+                  {t('register.register')}
+                </Text>
               )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account?</Text>
+            <Text style={styles.footerText}>
+              {t('register.alreadyHaveAccount')}
+            </Text>
             <TouchableOpacity onPress={navigateToLogin}>
-              <Text style={styles.loginText}>Login</Text>
+              <Text style={styles.loginText}>{t('register.login')}</Text>
             </TouchableOpacity>
           </View>
         </View>

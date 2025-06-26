@@ -20,6 +20,7 @@ import Toast from 'react-native-toast-message';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import type {PaymentCardFormData} from '../../types/paymentCard';
 import {addPaymentCard} from '../../services/paymentCardService';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 
@@ -29,6 +30,7 @@ type PaymentCardFormScreenNavigationProp = StackNavigationProp<
 >;
 
 const PaymentCardFormScreen = () => {
+  const {t} = useLocale();
   const navigation = useNavigation<PaymentCardFormScreenNavigationProp>();
   const {colors} = useTheme();
 
@@ -99,8 +101,8 @@ const PaymentCardFormScreen = () => {
     if (!formData.cardAlias.trim()) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Card alias is required',
+        text1: t('errors.error'),
+        text2: t('paymentCardForm.cardAliasRequired'),
       });
       return false;
     }
@@ -108,8 +110,8 @@ const PaymentCardFormScreen = () => {
     if (!formData.cardHolderName.trim()) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Cardholder name is required',
+        text1: t('errors.error'),
+        text2: t('paymentCardForm.cardHolderNameRequired'),
       });
       return false;
     }
@@ -117,8 +119,8 @@ const PaymentCardFormScreen = () => {
     if (formData.cardNumber.replace(/\s/g, '').length < 16) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Please enter a valid card number',
+        text1: t('errors.error'),
+        text2: t('paymentCardForm.pleaseEnterAValidCardNumber'),
       });
       return false;
     }
@@ -126,8 +128,8 @@ const PaymentCardFormScreen = () => {
     if (!formData.expireMonth || !formData.expireYear) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Expiry date is required',
+        text1: t('errors.error'),
+        text2: t('paymentCardForm.expiryDateRequired'),
       });
       return false;
     }
@@ -146,8 +148,8 @@ const PaymentCardFormScreen = () => {
     ) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Card has expired',
+        text1: t('errors.error'),
+        text2: t('paymentCardForm.cardHasExpired'),
       });
       return false;
     }
@@ -155,8 +157,8 @@ const PaymentCardFormScreen = () => {
     if (!formData.cvc || formData.cvc.length < 3) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Please enter a valid CVV',
+        text1: t('errors.error'),
+        text2: t('paymentCardForm.pleaseEnterAValidCVV'),
       });
       return false;
     }
@@ -180,16 +182,16 @@ const PaymentCardFormScreen = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Payment method added successfully',
+        text1: t('success.success'),
+        text2: t('paymentCardForm.paymentMethodAddedSuccessfully'),
       });
       navigation.goBack();
     } catch (error) {
       console.error('Error saving payment card:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to save payment method. Please try again.',
+        text1: t('errors.error'),
+        text2: t('paymentCardForm.failedToSavePaymentMethod'),
       });
     } finally {
       setSubmitting(false);
@@ -207,30 +209,32 @@ const PaymentCardFormScreen = () => {
       <ScrollView style={styles.container}>
         <View style={styles.formContainer}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Card Alias</Text>
+            <Text style={styles.label}>{t('paymentCardForm.cardAlias')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g., My Visa Card"
+              placeholder={t('paymentCardForm.cardAliasPlaceholder')}
               value={formData.cardAlias}
               onChangeText={text => handleChange('cardAlias', text)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Cardholder Name</Text>
+            <Text style={styles.label}>
+              {t('paymentCardForm.cardHolderName')}
+            </Text>
             <TextInput
               style={styles.input}
-              placeholder="Name on card"
+              placeholder={t('paymentCardForm.cardHolderNamePlaceholder')}
               value={formData.cardHolderName}
               onChangeText={text => handleChange('cardHolderName', text)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Card Number</Text>
+            <Text style={styles.label}>{t('paymentCardForm.cardNumber')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="1234 5678 9012 3456"
+              placeholder={t('paymentCardForm.cardNumberPlaceholder')}
               value={formData.cardNumber}
               onChangeText={text =>
                 handleChange('cardNumber', formatCardNumber(text))
@@ -241,10 +245,12 @@ const PaymentCardFormScreen = () => {
 
           <View style={styles.row}>
             <View style={[styles.inputGroup, {flex: 1, marginRight: 8}]}>
-              <Text style={styles.label}>Expiry Month</Text>
+              <Text style={styles.label}>
+                {t('paymentCardForm.expiryMonth')}
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder="MM"
+                placeholder={t('paymentCardForm.expiryMonthPlaceholder')}
                 value={formData.expireMonth}
                 onChangeText={text =>
                   handleChange('expireMonth', formatExpiryMonth(text))
@@ -255,10 +261,12 @@ const PaymentCardFormScreen = () => {
             </View>
 
             <View style={[styles.inputGroup, {flex: 1, marginRight: 8}]}>
-              <Text style={styles.label}>Expiry Year</Text>
+              <Text style={styles.label}>
+                {t('paymentCardForm.expiryYear')}
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder="YYYY"
+                placeholder={t('paymentCardForm.expiryYearPlaceholder')}
                 value={formData.expireYear}
                 onChangeText={text =>
                   handleChange('expireYear', formatExpiryYear(text))
@@ -269,10 +277,10 @@ const PaymentCardFormScreen = () => {
             </View>
 
             <View style={[styles.inputGroup, {flex: 1}]}>
-              <Text style={styles.label}>CVV</Text>
+              <Text style={styles.label}>{t('paymentCardForm.cvc')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="123"
+                placeholder={t('paymentCardForm.cvcPlaceholder')}
                 value={formData.cvc}
                 onChangeText={text => handleChange('cvc', formatCVV(text))}
                 keyboardType="number-pad"
@@ -290,8 +298,9 @@ const PaymentCardFormScreen = () => {
               style={styles.securityIcon}
             />
             <Text style={styles.securityText}>
-              Your card information is securely processed and stored by our
-              payment provider.
+              {t(
+                'paymentCardForm.yourCardInformationIsSecurelyProcessedAndStoredByOurPaymentProvider',
+              )}
             </Text>
           </View>
 
@@ -302,7 +311,9 @@ const PaymentCardFormScreen = () => {
             {submitting ? (
               <ActivityIndicator size="small" color="#FFF" />
             ) : (
-              <Text style={styles.submitButtonText}>Add Payment Method</Text>
+              <Text style={styles.submitButtonText}>
+                {t('paymentCardForm.addPaymentMethod')}
+              </Text>
             )}
           </TouchableOpacity>
         </View>

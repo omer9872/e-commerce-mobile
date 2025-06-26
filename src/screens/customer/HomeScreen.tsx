@@ -20,6 +20,7 @@ import {useNavigation} from '@react-navigation/native';
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
 import type {IProductCategory} from '../../types/category';
 import LayoutHeader from '../../components/LayoutHeader';
+import {useLocale} from '../../contexts/LocaleContext';
 import ProductCard from '../../components/ProductCard';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
@@ -42,6 +43,7 @@ interface ProductResponse {
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const {t} = useLocale();
   const {colors} = useTheme();
   const {user} = useAuth();
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -308,11 +310,11 @@ const HomeScreen = () => {
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
         <LayoutHeader
-          title="Home"
+          title={t('home.title')}
           customComponent={
             <View style={styles.header}>
               <Text style={styles.greeting}>
-                Hello, {user?.firstName || 'User'}
+                {t('home.hello')} {user?.firstName || 'User'}
               </Text>
               <View style={styles.avatarContainer}>
                 <Avatar size={40} id={user?.image} />
@@ -353,7 +355,7 @@ const HomeScreen = () => {
               />
               <TextInput
                 style={styles.searchInput}
-                placeholder="Search products..."
+                placeholder={t('home.searchProducts')}
                 placeholderTextColor={colors.textSecondary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
@@ -376,7 +378,7 @@ const HomeScreen = () => {
 
           {/* Categories Section */}
           <View style={styles.categoriesContainer}>
-            <Text style={styles.sectionTitle}>Categories</Text>
+            <Text style={styles.sectionTitle}>{t('home.categories')}</Text>
             {isCategoriesLoading ? (
               <ActivityIndicator size="small" color={colors.primary} />
             ) : (
@@ -407,12 +409,14 @@ const HomeScreen = () => {
           {/* Active Filters Display */}
           {hasActiveFilters && (
             <View style={styles.activeFiltersContainer}>
-              <Text style={styles.activeFiltersLabel}>Active filters:</Text>
+              <Text style={styles.activeFiltersLabel}>
+                {t('home.activeFilters')}:
+              </Text>
               <View style={styles.filtersRow}>
                 {searchQuery && (
                   <View style={styles.filterChip}>
                     <Text style={styles.filterChipText}>
-                      Search: {searchQuery}
+                      {t('home.search')}: {searchQuery}
                     </Text>
                     <TouchableOpacity onPress={clearSearch}>
                       <Icon name="close" size={16} color={colors.primary} />
@@ -459,7 +463,9 @@ const HomeScreen = () => {
                       setSelectedSubcategory(null);
                       setSearchQuery('');
                     }}>
-                    <Text style={styles.clearAllText}>Clear all</Text>
+                    <Text style={styles.clearAllText}>
+                      {t('home.clearAll')}
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -493,7 +499,7 @@ const HomeScreen = () => {
               ? `${
                   categories.find(cat => cat._id === selectedCategory)?.name
                 } Products`
-              : 'Available Products'}
+              : t('home.availableProducts')}
           </Text>
 
           {isLoading ? (

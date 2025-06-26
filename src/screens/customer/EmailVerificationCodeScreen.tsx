@@ -22,6 +22,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {userService} from '../../services/userService';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
 
@@ -39,6 +40,7 @@ const CODE_LENGTH = 6;
 
 const EmailVerificationCodeScreen = () => {
   const {user, updateUser} = useAuth();
+  const {t} = useLocale();
   const navigation = useNavigation<EmailVerificationCodeScreenNavigationProp>();
   const route = useRoute<EmailVerificationCodeScreenRouteProp>();
   const insets = useSafeAreaInsets();
@@ -88,7 +90,11 @@ const EmailVerificationCodeScreen = () => {
 
   const handleVerifyCode = async () => {
     if (code.length !== CODE_LENGTH) {
-      setError(`Please enter the ${CODE_LENGTH}-digit verification code`);
+      setError(
+        t('emailVerificationCode.pleaseEnterTheVerificationCode', {
+          codeLength: CODE_LENGTH,
+        }),
+      );
       return;
     }
 
@@ -155,10 +161,11 @@ const EmailVerificationCodeScreen = () => {
         {success ? (
           <View style={styles.successContainer}>
             <Icon name="check-circle" size={80} color={colors.success} />
-            <Text style={styles.successTitle}>Email Verified!</Text>
+            <Text style={styles.successTitle}>
+              {t('emailVerificationCode.emailVerified')}
+            </Text>
             <Text style={styles.successMessage}>
-              Your email has been successfully verified. Redirecting to
-              profile...
+              {t('emailVerificationCode.yourEmailHasBeenSuccessfullyVerified')}
             </Text>
           </View>
         ) : (
@@ -167,10 +174,13 @@ const EmailVerificationCodeScreen = () => {
               <Icon name="email-outline" size={60} color={colors.primary} />
             </View>
 
-            <Text style={styles.title}>Enter Verification Code</Text>
+            <Text style={styles.title}>
+              {t('emailVerificationCode.enterVerificationCode')}
+            </Text>
             <Text style={styles.description}>
-              We've sent a verification code to {email}. Please enter the code
-              below.
+              {t('emailVerificationCode.weHaveSentAVerificationCodeTo', {
+                email,
+              })}
             </Text>
 
             <View style={styles.codeContainer}>
@@ -202,7 +212,9 @@ const EmailVerificationCodeScreen = () => {
               {isLoading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Verify Code</Text>
+                <Text style={styles.buttonText}>
+                  {t('emailVerificationCode.verifyCode')}
+                </Text>
               )}
             </TouchableOpacity>
 
@@ -212,11 +224,15 @@ const EmailVerificationCodeScreen = () => {
                   onPress={handleResendCode}
                   disabled={isLoading}
                   style={styles.resendButton}>
-                  <Text style={styles.resendText}>Resend Code</Text>
+                  <Text style={styles.resendText}>
+                    {t('emailVerificationCode.resendCode')}
+                  </Text>
                 </TouchableOpacity>
               ) : (
                 <Text style={styles.countdownText}>
-                  Resend code in {countdown} seconds
+                  {t('emailVerificationCode.resendCodeIn', {
+                    countdown,
+                  })}
                 </Text>
               )}
             </View>

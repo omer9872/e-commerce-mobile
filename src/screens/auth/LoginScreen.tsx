@@ -18,6 +18,7 @@ import {
 import type {StackNavigationProp} from '@react-navigation/stack';
 
 import type {AuthStackParamList} from '../../navigation/AuthNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
@@ -34,6 +35,7 @@ const LoginScreen = () => {
   const {userType} = route.params;
   const {signInViaPhoneNumber, signInViaEmail} = useAuth();
   const {colors} = useTheme();
+  const {t} = useLocale();
 
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -42,17 +44,17 @@ const LoginScreen = () => {
 
   const screenParams = {
     customer: {
-      title: 'Customer Login',
+      title: t('login.customerLogin'),
       phone: true,
       email: false,
     },
     merchant: {
-      title: 'Merchant Login',
+      title: t('login.merchantLogin'),
       phone: false,
       email: true,
     },
     carrier: {
-      title: 'Carrier Login',
+      title: t('login.carrierLogin'),
       phone: false,
       email: true,
     },
@@ -61,7 +63,10 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     if (userType === 'customer') {
       if (!phone || !password) {
-        Alert.alert('Error', 'Please enter both phone and password');
+        Alert.alert(
+          t('login.error'),
+          t('login.pleaseEnterBothPhoneAndPassword'),
+        );
         return;
       }
 
@@ -71,16 +76,16 @@ const LoginScreen = () => {
         // Auth context will handle navigation based on user type
       } catch (error) {
         console.log(error);
-        Alert.alert(
-          'Login Failed',
-          'Invalid phone or password. Please try again.',
-        );
+        Alert.alert(t('login.loginFailed'), t('login.invalidPhoneOrPassword'));
       } finally {
         setIsLoading(false);
       }
     } else {
       if (!email || !password) {
-        Alert.alert('Error', 'Please enter both email and password');
+        Alert.alert(
+          t('login.error'),
+          t('login.pleaseEnterBothEmailAndPassword'),
+        );
         return;
       }
 
@@ -89,10 +94,7 @@ const LoginScreen = () => {
         await signInViaEmail({email, password});
         // Auth context will handle navigation based on user type
       } catch (error) {
-        Alert.alert(
-          'Login Failed',
-          'Invalid email or password. Please try again.',
-        );
+        Alert.alert(t('login.loginFailed'), t('login.invalidEmailOrPassword'));
         console.error(error);
       } finally {
         setIsLoading(false);
@@ -118,10 +120,10 @@ const LoginScreen = () => {
         <View style={styles.form}>
           {screenParams[userType].phone ? (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Phone</Text>
+              <Text style={styles.label}>{t('login.phone')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your phone number"
+                placeholder={t('login.enterYourPhoneNumber')}
                 keyboardType="phone-pad"
                 value={phone}
                 onChangeText={setPhone}
@@ -129,10 +131,10 @@ const LoginScreen = () => {
             </View>
           ) : (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t('login.email')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder={t('login.enterYourEmail')}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -142,10 +144,10 @@ const LoginScreen = () => {
           )}
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>{t('login.password')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your password"
+              placeholder={t('login.enterYourPassword')}
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -159,15 +161,15 @@ const LoginScreen = () => {
             {isLoading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.loginButtonText}>Login</Text>
+              <Text style={styles.loginButtonText}>{t('login.login')}</Text>
             )}
           </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account?</Text>
+          <Text style={styles.footerText}>{t('login.dontHaveAnAccount')}</Text>
           <TouchableOpacity onPress={navigateToRegister}>
-            <Text style={styles.registerText}>Register</Text>
+            <Text style={styles.registerText}>{t('login.register')}</Text>
           </TouchableOpacity>
         </View>
       </View>

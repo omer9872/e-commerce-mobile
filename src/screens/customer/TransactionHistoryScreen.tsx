@@ -24,6 +24,7 @@ import {
 } from '../../types/transaction';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactions} from '../../services/transactionService';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 
 type TransactionHistoryScreenNavigationProp = StackNavigationProp<
@@ -62,7 +63,7 @@ const PaymentStatusColors = {
 const TransactionHistoryScreen = () => {
   const navigation = useNavigation<TransactionHistoryScreenNavigationProp>();
   const {colors} = useTheme();
-
+  const {t} = useLocale();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -93,8 +94,8 @@ const TransactionHistoryScreen = () => {
       } catch (error) {
         Toast.show({
           type: 'error',
-          text1: 'Error',
-          text2: 'Failed to load transactions. Please try again.',
+          text1: t('errors.unknownError'),
+          text2: t('transactionHistory.failedToLoadTransactionsPleaseTryAgain'),
         });
       } finally {
         setLoading(false);
@@ -139,12 +140,16 @@ const TransactionHistoryScreen = () => {
           <Icon name={'receipt'} size={24} color={colors.primary} />
         </View>
         <View style={styles.transactionDetails}>
-          <Text style={styles.transactionType}>Payment</Text>
+          <Text style={styles.transactionType}>
+            {t('transactionHistory.payment')}
+          </Text>
           <Text style={styles.transactionDate}>
             {formattedDate} at {formattedTime}
           </Text>
           <View style={styles.statusContainer}>
-            <Text style={styles.transactionStatus}>Payment Status:</Text>
+            <Text style={styles.transactionStatus}>
+              {t('transactionHistory.paymentStatus')}:
+            </Text>
             <Text
               style={{
                 ...styles.statusText,
@@ -154,7 +159,9 @@ const TransactionHistoryScreen = () => {
             </Text>
           </View>
           <View style={styles.statusContainer}>
-            <Text style={styles.transactionStatus}>Shipping Status:</Text>
+            <Text style={styles.transactionStatus}>
+              {t('transactionHistory.shippingStatus')}:
+            </Text>
             <Text
               style={{
                 ...styles.statusText,
@@ -198,9 +205,11 @@ const TransactionHistoryScreen = () => {
     return (
       <View style={styles.emptyContainer}>
         <Icon name="history" size={60} color="#BDBDBD" />
-        <Text style={styles.emptyText}>No transactions yet</Text>
+        <Text style={styles.emptyText}>
+          {t('transactionHistory.noTransactionsYet')}
+        </Text>
         <Text style={styles.emptySubText}>
-          Your transaction history will appear here
+          {t('transactionHistory.yourTransactionHistoryWillAppearHere')}
         </Text>
       </View>
     );

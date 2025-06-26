@@ -13,6 +13,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import LayoutHeader from '../../components/LayoutHeader';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
@@ -25,6 +26,7 @@ type ProfileScreenNavigationProp = StackNavigationProp<
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const {t} = useLocale();
   const {user, signOut} = useAuth();
   const {colors} = useTheme();
   const insets = useSafeAreaInsets();
@@ -71,7 +73,7 @@ const ProfileScreen = () => {
   return (
     <View style={{...styles.container, paddingTop: insets.top}}>
       <View style={styles.subContainer}>
-        <LayoutHeader title="My Profile" />
+        <LayoutHeader title={t('profile.title')} />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -99,14 +101,18 @@ const ProfileScreen = () => {
                 onPress={navigateToEmailVerification}
                 style={[styles.validationItem]}>
                 <Icon name="check-circle" size={20} color={colors.primary} />
-                <Text style={styles.validationText}>Email Verified</Text>
+                <Text style={styles.validationText}>
+                  {t('profile.emailVerified')}
+                </Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 onPress={navigateToEmailVerification}
                 style={[styles.validationItem]}>
                 <Icon name="close-circle" size={20} color={colors.error} />
-                <Text style={styles.validationText}>Email Not Verified</Text>
+                <Text style={styles.validationText}>
+                  {t('profile.emailNotVerified')}
+                </Text>
               </TouchableOpacity>
             )}
             {user?.verification?.phone ? (
@@ -114,14 +120,18 @@ const ProfileScreen = () => {
                 onPress={navigateToPhoneVerification}
                 style={[styles.validationItem]}>
                 <Icon name="check-circle" size={20} color={colors.primary} />
-                <Text style={styles.validationText}>Phone Verified</Text>
+                <Text style={styles.validationText}>
+                  {t('profile.phoneVerified')}
+                </Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 onPress={navigateToPhoneVerification}
                 style={[styles.validationItem]}>
                 <Icon name="close-circle" size={20} color={colors.error} />
-                <Text style={styles.validationText}>Phone Not Verified</Text>
+                <Text style={styles.validationText}>
+                  {t('profile.phoneNotVerified')}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -131,35 +141,39 @@ const ProfileScreen = () => {
               style={styles.actionButton}
               onPress={navigateToEditProfile}>
               <Icon name="account-edit" size={24} color={colors.primary} />
-              <Text style={styles.actionText}>Edit Profile</Text>
+              <Text style={styles.actionText}>{t('profile.editProfile')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionButton}
               onPress={navigateToAddresses}>
               <Icon name="map-marker" size={24} color={colors.primary} />
-              <Text style={styles.actionText}>My Addresses</Text>
+              <Text style={styles.actionText}>{t('profile.myAddresses')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionButton}
               onPress={navigateToPaymentCards}>
               <Icon name="credit-card" size={24} color={colors.primary} />
-              <Text style={styles.actionText}>Payment Methods</Text>
+              <Text style={styles.actionText}>
+                {t('profile.paymentMethods')}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionButton}
               onPress={navigateToTransactionHistory}>
               <Icon name="history" size={24} color={colors.primary} />
-              <Text style={styles.actionText}>Transaction History</Text>
+              <Text style={styles.actionText}>
+                {t('profile.transactionHistory')}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionButton}
               onPress={navigateToSettings}>
               <Icon name="cog" size={24} color={colors.primary} />
-              <Text style={styles.actionText}>Settings</Text>
+              <Text style={styles.actionText}>{t('profile.settings')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -167,7 +181,7 @@ const ProfileScreen = () => {
               onPress={handleSignOut}>
               <Icon name="logout" size={24} color={colors.error} />
               <Text style={[styles.actionText, {color: colors.error}]}>
-                Sign Out
+                {t('profile.signOut')}
               </Text>
             </TouchableOpacity>
           </View>

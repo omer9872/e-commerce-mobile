@@ -21,6 +21,7 @@ import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import {useLocale} from '../../contexts/LocaleContext';
 import {userService} from '../../services/userService';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
@@ -40,6 +41,7 @@ const RESEND_COOLDOWN = 60; // seconds
 
 const PhoneVerificationCodeScreen = () => {
   const navigation = useNavigation<PhoneVerificationCodeScreenNavigationProp>();
+  const {t} = useLocale();
   const route = useRoute<PhoneVerificationCodeScreenRouteProp>();
   const {phone} = route.params;
   const {fetchMe} = useAuth();
@@ -97,7 +99,9 @@ const PhoneVerificationCodeScreen = () => {
   const handleVerifyCode = async () => {
     if (code.length !== VERIFICATION_CODE_LENGTH) {
       setError(
-        `Please enter all ${VERIFICATION_CODE_LENGTH} digits of the verification code`,
+        t('phoneVerificationCode.pleaseEnterAllDigitsOfTheVerificationCode', {
+          verificationCodeLength: VERIFICATION_CODE_LENGTH,
+        }),
       );
       return;
     }
@@ -118,7 +122,9 @@ const PhoneVerificationCodeScreen = () => {
       console.error('Error verifying phone:', err);
       setError(
         err.response?.data?.message ||
-          'Failed to verify code. Please check the code and try again.',
+          t(
+            'phoneVerificationCode.failedToVerifyCodePleaseCheckTheCodeAndTryAgain',
+          ),
       );
     } finally {
       setLoading(false);
@@ -139,7 +145,9 @@ const PhoneVerificationCodeScreen = () => {
       console.error('Error resending verification code:', err);
       setError(
         err.response?.data?.message ||
-          'Failed to resend verification code. Please try again.',
+          t(
+            'phoneVerificationCode.failedToResendVerificationCodePleaseTryAgain',
+          ),
       );
     } finally {
       setLoading(false);
@@ -158,10 +166,13 @@ const PhoneVerificationCodeScreen = () => {
         {success ? (
           <View style={styles.successContainer}>
             <Icon name="check-circle" size={80} color={colors.success} />
-            <Text style={styles.successTitle}>Phone Number Verified!</Text>
+            <Text style={styles.successTitle}>
+              {t('phoneVerificationCode.phoneNumberVerified')}
+            </Text>
             <Text style={styles.successMessage}>
-              Your phone number has been successfully verified. Redirecting to
-              profile...
+              {t(
+                'phoneVerificationCode.yourPhoneNumberHasBeenSuccessfullyVerifiedRedirectingToProfile',
+              )}
             </Text>
           </View>
         ) : (
@@ -170,9 +181,13 @@ const PhoneVerificationCodeScreen = () => {
               <Icon name="cellphone-message" size={60} color={colors.primary} />
             </View>
 
-            <Text style={styles.title}>Enter Verification Code</Text>
+            <Text style={styles.title}>
+              {t('phoneVerificationCode.enterVerificationCode')}
+            </Text>
             <Text style={styles.description}>
-              We've sent a verification code to {phone}. Please enter it below.
+              {t('phoneVerificationCode.weHaveSentAVerificationCodeTo', {
+                phone,
+              })}
             </Text>
 
             <View style={styles.codeContainer}>
@@ -209,17 +224,25 @@ const PhoneVerificationCodeScreen = () => {
               {loading ? (
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
-                <Text style={styles.buttonText}>Verify Code</Text>
+                <Text style={styles.buttonText}>
+                  {t('phoneVerificationCode.verifyCode')}
+                </Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.resendContainer}>
-              <Text style={styles.resendText}>Didn't receive the code? </Text>
+              <Text style={styles.resendText}>
+                {t('phoneVerificationCode.didNotReceiveTheCode')}
+              </Text>
               {resendActive ? (
-                <Text style={styles.cooldownText}>Resend in {cooldown}s</Text>
+                <Text style={styles.cooldownText}>
+                  {t('phoneVerificationCode.resendIn', {cooldown})}
+                </Text>
               ) : (
                 <TouchableOpacity onPress={handleResendCode} disabled={loading}>
-                  <Text style={styles.resendButtonText}>Resend Code</Text>
+                  <Text style={styles.resendButtonText}>
+                    {t('phoneVerificationCode.resendCode')}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>

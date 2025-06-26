@@ -22,12 +22,12 @@ import {fetchUserInformation} from '../../services/userInformationService';
 import type {IProductVariant} from '../../types/product';
 import type {PaymentCard} from '../../types/paymentCard';
 import type {UserInformation} from '../../types/address';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useCart} from '../../contexts/CartContext';
 import type {Address} from '../../types/address';
 import type {ICartItem} from '../../types/cart';
 import Image from '../../components/Image';
-import {colors} from '../../theme/colors';
 
 const CartScreen = () => {
   const {colors} = useTheme();
@@ -36,13 +36,13 @@ const CartScreen = () => {
     removeFromCart,
     updateQuantity,
     clearCart,
-    totalItems,
     totalPrice,
     subtotal,
     totalDiscount,
     isLoading,
   } = useCart();
   const navigation = useNavigation<NavigationProp<any>>();
+  const {t} = useLocale();
   const insets = useSafeAreaInsets();
   const [token, setToken] = React.useState<string | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -264,12 +264,12 @@ const CartScreen = () => {
     <View style={[styles.container, {paddingTop: insets.top}]}>
       <View style={styles.subContainer}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Shopping Cart</Text>
+          <Text style={styles.headerTitle}>{t('cart.title')}</Text>
         </View>
 
         {items.length > 0 && (
           <TouchableOpacity onPress={handleClearCart} style={styles.clearCart}>
-            <Text style={styles.clearCartText}>Clear Cart</Text>
+            <Text style={styles.clearCartText}>{t('cart.clearCart')}</Text>
           </TouchableOpacity>
         )}
 
@@ -280,11 +280,11 @@ const CartScreen = () => {
         ) : items.length === 0 ? (
           <View style={styles.emptyCartContainer}>
             <Icon name="cart-outline" size={80} color={colors.textSecondary} />
-            <Text style={styles.emptyCartText}>Your cart is empty</Text>
+            <Text style={styles.emptyCartText}>{t('cart.emptyCart')}</Text>
             <TouchableOpacity
               style={styles.shopButton}
               onPress={() => navigation.navigate('HomeTab' as never)}>
-              <Text style={styles.shopButtonText}>Shop Now</Text>
+              <Text style={styles.shopButtonText}>{t('cart.shopNow')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -296,12 +296,12 @@ const CartScreen = () => {
             <View style={styles.footer}>
               <View style={styles.totalsContainer}>
                 <View style={styles.totalRow}>
-                  <Text style={styles.totalLabel}>Subtotal:</Text>
+                  <Text style={styles.totalLabel}>{t('cart.subtotal')}:</Text>
                   <Text style={styles.totalValue}>{subtotal.toFixed(2)} ₺</Text>
                 </View>
                 {totalDiscount > 0 && (
                   <View style={styles.totalRow}>
-                    <Text style={styles.totalLabel}>Discount:</Text>
+                    <Text style={styles.totalLabel}>{t('cart.discount')}:</Text>
                     <Text style={[styles.totalValue, styles.discountValue]}>
                       -{totalDiscount.toFixed(2)} ₺
                     </Text>
@@ -309,7 +309,7 @@ const CartScreen = () => {
                 )}
                 <View style={[styles.totalRow, styles.finalTotalRow]}>
                   <Text style={[styles.totalLabel, styles.finalTotalLabel]}>
-                    Total:
+                    {t('cart.total')}:
                   </Text>
                   <Text style={[styles.totalValue, styles.finalTotalValue]}>
                     {totalPrice.toFixed(2)} ₺
@@ -322,7 +322,9 @@ const CartScreen = () => {
                   style={[styles.checkoutButton, styles.payButton]}
                   onPress={handlePayWithCardClick}>
                   <Icon name="cart-check" size={24} color={colors.white} />
-                  <Text style={styles.checkoutButtonText}>Complete Order</Text>
+                  <Text style={styles.checkoutButtonText}>
+                    {t('cart.completeOrder')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -339,14 +341,18 @@ const CartScreen = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Transaction Complete</Text>
+              <Text style={styles.modalTitle}>
+                {t('cart.transactionComplete')}
+              </Text>
               <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                 <Icon name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.codeContainer}>
-              <Text style={styles.codeLabel}>Your Transaction Code:</Text>
+              <Text style={styles.codeLabel}>
+                {t('cart.yourTransactionCode')}:
+              </Text>
               {transactionCode && (
                 <QRCode
                   value={transactionCode}
@@ -357,12 +363,12 @@ const CartScreen = () => {
               )}
               <Text style={styles.codeValue}>{transactionCode}</Text>
               <Text style={styles.codeInstructions}>
-                Please show this code to the merchant to complete your purchase.
+                {t('cart.pleaseShowCodeToMerchant')}
               </Text>
             </View>
 
             <TouchableOpacity style={styles.doneButton} onPress={closeModal}>
-              <Text style={styles.doneButtonText}>Done</Text>
+              <Text style={styles.doneButtonText}>{t('cart.done')}</Text>
             </TouchableOpacity>
           </View>
         </View>

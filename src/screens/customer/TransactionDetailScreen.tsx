@@ -311,13 +311,13 @@ const getStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F5F5F5',
+      backgroundColor: colors.background,
     },
     loaderContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#F5F5F5',
+      backgroundColor: colors.background,
     },
     errorContainer: {
       flex: 1,
@@ -329,28 +329,28 @@ const getStyles = (colors: any) =>
     errorText: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: '#424242',
+      color: colors.text,
       marginTop: 16,
       marginBottom: 24,
     },
     backButton: {
-      backgroundColor: '#5C6BC0',
+      backgroundColor: colors.primary,
       paddingVertical: 12,
       paddingHorizontal: 24,
       borderRadius: 8,
     },
     backButtonText: {
-      color: 'white',
+      color: colors.text,
       fontSize: 16,
       fontWeight: '600',
     },
     card: {
-      backgroundColor: 'white',
+      backgroundColor: colors.card,
       borderRadius: 8,
       margin: 16,
       padding: 20,
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: colors.black,
       shadowOffset: {width: 0, height: 1},
       shadowOpacity: 0.2,
       shadowRadius: 1.41,
@@ -371,17 +371,17 @@ const getStyles = (colors: any) =>
     transactionType: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: '#212121',
+      color: colors.text,
     },
     moneyAmount: {
       fontSize: 18,
-      color: '#424242',
+      color: colors.text,
       marginTop: 4,
       fontWeight: 'bold',
     },
     divider: {
       height: 1,
-      backgroundColor: '#E0E0E0',
+      backgroundColor: colors.border,
       marginBottom: 20,
     },
     detailColumn: {
@@ -396,17 +396,17 @@ const getStyles = (colors: any) =>
     },
     detailLabel: {
       fontSize: 16,
-      color: '#757575',
+      color: colors.text,
     },
     detailValueLeft: {
       fontSize: 16,
-      color: '#212121',
+      color: colors.text,
       fontWeight: '500',
       textAlign: 'left',
     },
     detailValueRight: {
       fontSize: 16,
-      color: '#212121',
+      color: colors.text,
       fontWeight: '500',
       textAlign: 'right',
     },
@@ -430,7 +430,7 @@ const getStyles = (colors: any) =>
     itemsTitle: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: '#212121',
+      color: colors.text,
       marginBottom: 12,
     },
     itemRow: {
@@ -440,25 +440,26 @@ const getStyles = (colors: any) =>
     },
     itemName: {
       fontSize: 16,
-      color: '#212121',
+      color: colors.text,
     },
     itemSKUName: {
       fontSize: 14,
-      color: '#757575',
+      color: colors.text,
     },
     totalName: {
       fontSize: 16,
-      color: '#212121',
+      color: colors.text,
       fontWeight: 'bold',
     },
     itemPrice: {
       fontSize: 16,
-      color: '#212121',
+      color: colors.text,
       fontWeight: '500',
     },
     itemImageContainer: {
       flexDirection: 'row',
       alignItems: 'center',
+      gap: 10,
     },
     itemImage: {
       width: 50,

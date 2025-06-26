@@ -5,9 +5,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
@@ -23,6 +21,7 @@ import {addPaymentCard} from '../../services/paymentCardService';
 import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import TextInput from '../../components/TextInput';
+import Button from '../../components/Button';
 
 type PaymentCardFormScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -304,18 +303,11 @@ const PaymentCardFormScreen = () => {
             </Text>
           </View>
 
-          <TouchableOpacity
-            style={[styles.submitButton, submitting && styles.disabledButton]}
+          <Button
+            title={t('paymentCardForm.addPaymentMethod')}
+            loading={submitting}
             onPress={handleSubmit}
-            disabled={submitting}>
-            {submitting ? (
-              <ActivityIndicator size="small" color="#FFF" />
-            ) : (
-              <Text style={styles.submitButtonText}>
-                {t('paymentCardForm.addPaymentMethod')}
-              </Text>
-            )}
-          </TouchableOpacity>
+            disabled={submitting}></Button>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -347,12 +339,11 @@ const getStyles = (colors: any) =>
       paddingVertical: 10,
       fontSize: 16,
       color: colors.text,
-      borderWidth: 1,
-      borderColor: '#E1E1E1',
     },
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'flex-end',
     },
     securityNote: {
       flexDirection: 'row',

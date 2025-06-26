@@ -327,6 +327,7 @@ const getStyles = (colors: any) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      backgroundColor: colors.background,
     },
     formContainer: {
       padding: 16,

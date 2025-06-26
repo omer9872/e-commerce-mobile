@@ -100,6 +100,11 @@ const tr = {
     transactionHistory: 'İşlem Geçmişi',
     settings: 'Ayarlar',
     signOut: 'Çıkış Yap',
+    transactionDetail: 'İşlem Detayı',
+    addPaymentMethod: 'Ödeme Yöntemi Ekle',
+    addNewAddress: 'Yeni Adres Ekle',
+    editAddress: 'Adresi Düzenle',
+    back: 'Geri',
   },
   favorites: {
     title: 'Favorilerim',
@@ -433,6 +438,8 @@ const tr = {
     },
   },
   errors: {
+    error: 'Hata',
+    isRequired: 'Bu alan gereklidir',
     networkError: 'Ağ hatası. Lütfen bağlantınızı kontrol edin.',
     serverError: 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.',
     unknownError: 'Bilinmeyen bir hata oluştu.',

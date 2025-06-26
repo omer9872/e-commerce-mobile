@@ -254,7 +254,7 @@ const getStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F5F5F5',
+      backgroundColor: colors.background,
     },
     listContent: {
       padding: 16,
@@ -267,7 +267,7 @@ const getStyles = (colors: any) =>
     },
     transactionItem: {
       flexDirection: 'row',
-      backgroundColor: 'white',
+      backgroundColor: colors.card,
       borderRadius: 8,
       padding: 16,
       marginBottom: 12,
@@ -281,7 +281,7 @@ const getStyles = (colors: any) =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: '#F5F5F5',
+      backgroundColor: colors.background,
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: 12,
@@ -292,11 +292,11 @@ const getStyles = (colors: any) =>
     transactionType: {
       fontSize: 16,
       fontWeight: '600',
-      color: '#212121',
+      color: colors.text,
     },
     transactionDate: {
       fontSize: 14,
-      color: '#757575',
+      color: colors.text,
       marginTop: 2,
     },
     statusContainer: {
@@ -306,7 +306,7 @@ const getStyles = (colors: any) =>
     },
     transactionStatus: {
       fontSize: 14,
-      color: '#757575',
+      color: colors.text,
       marginRight: 4,
     },
     statusText: {
@@ -323,7 +323,7 @@ const getStyles = (colors: any) =>
     },
     moneyAmount: {
       fontSize: 14,
-      color: '#757575',
+      color: colors.text,
       marginTop: 4,
     },
     loaderContainer: {
@@ -342,12 +342,12 @@ const getStyles = (colors: any) =>
     emptyText: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: '#424242',
+      color: colors.text,
       marginTop: 16,
     },
     emptySubText: {
       fontSize: 14,
-      color: '#757575',
+      color: colors.text,
       marginTop: 8,
       textAlign: 'center',
     },

@@ -94,6 +94,11 @@ const en = {
     transactionHistory: 'Transaction History',
     settings: 'Settings',
     signOut: 'Sign Out',
+    transactionDetail: 'Transaction Detail',
+    addPaymentMethod: 'Add Payment Method',
+    addNewAddress: 'Add New Address',
+    editAddress: 'Edit Address',
+    back: 'Back',
   },
   favorites: {
     title: 'Favorites',
@@ -422,6 +427,8 @@ const en = {
     },
   },
   errors: {
+    error: 'Error',
+    isRequired: 'This field is required',
     networkError: 'Network error. Please check your connection.',
     serverError: 'Server error. Please try again later.',
     unknownError: 'An unknown error occurred.',

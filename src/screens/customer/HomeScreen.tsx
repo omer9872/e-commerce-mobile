@@ -9,7 +9,6 @@ import {
   RefreshControl,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,6 +22,7 @@ import LayoutHeader from '../../components/LayoutHeader';
 import {useLocale} from '../../contexts/LocaleContext';
 import ProductCard from '../../components/ProductCard';
 import {useTheme} from '../../contexts/ThemeContext';
+import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
 import type {IProduct} from '../../types/product';
 import Avatar from '../../components/Avatar';

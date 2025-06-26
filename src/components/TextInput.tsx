@@ -4,11 +4,13 @@ import {
   TextInputProps as RNTextInputProps,
 } from 'react-native';
 
-import {colors} from '../theme/colors';
+import {useTheme} from '../contexts/ThemeContext';
 
 interface TextInputProps extends RNTextInputProps {}
 
 const TextInput = ({...props}: TextInputProps) => {
+  const {colors} = useTheme();
+  const styles = getStyles(colors);
   return (
     <RNTextInput
       style={styles.input}
@@ -18,14 +20,15 @@ const TextInput = ({...props}: TextInputProps) => {
   );
 };
 
-const styles = StyleSheet.create({
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: colors.text,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      color: colors.text,
+    },
+  });
 
 export default TextInput;

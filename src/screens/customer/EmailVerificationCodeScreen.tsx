@@ -7,11 +7,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  TextInput as RNTextInput,
   StatusBar,
   ScrollView,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   useNavigation,
   useRoute,
@@ -21,6 +19,7 @@ import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
+import CodeInput, {type CodeInputRef} from '../../components/CodeInput';
 import {userService} from '../../services/userService';
 import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
@@ -43,7 +42,6 @@ const EmailVerificationCodeScreen = () => {
   const {t} = useLocale();
   const navigation = useNavigation<EmailVerificationCodeScreenNavigationProp>();
   const route = useRoute<EmailVerificationCodeScreenRouteProp>();
-  const insets = useSafeAreaInsets();
   const {email} = route.params;
   const {colors} = useTheme();
 
@@ -54,7 +52,7 @@ const EmailVerificationCodeScreen = () => {
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
-  const inputRefs = useRef<Array<RNTextInput | null>>([]);
+  const codeInputRef = useRef<CodeInputRef>(null);
 
   useEffect(() => {
     if (countdown > 0 && !canResend) {
@@ -65,31 +63,23 @@ const EmailVerificationCodeScreen = () => {
     }
   }, [countdown, canResend]);
 
-  const handleCodeChange = (text: string, index: number) => {
-    // Allow only digits
-    const digit = text.replace(/[^0-9]/g, '');
+  const handleCodeChange = (newCode: string) => {
+    setCode(newCode);
+    setError(null); // Clear error when user starts typing
+  };
 
-    // Update the code state
-    const newCode = code.split('');
-    newCode[index] = digit;
-    const updatedCode = newCode.join('');
-    setCode(updatedCode);
-
-    // Auto-focus to next input if a digit was entered
-    if (digit && index < CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
+  const handleCodeComplete = (completedCode: string) => {
+    setCode(completedCode);
+    // Auto-verify when code is complete
+    if (completedCode.length === CODE_LENGTH) {
+      handleVerifyCode(completedCode);
     }
   };
 
-  const handleKeyPress = (e: any, index: number) => {
-    // Handle backspace
-    if (e.nativeEvent.key === 'Backspace' && index > 0 && !code[index]) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
+  const handleVerifyCode = async (codeToVerify?: string) => {
+    const verificationCode = codeToVerify || code;
 
-  const handleVerifyCode = async () => {
-    if (code.length !== CODE_LENGTH) {
+    if (verificationCode.length !== CODE_LENGTH) {
       setError(
         t('emailVerificationCode.pleaseEnterTheVerificationCode', {
           codeLength: CODE_LENGTH,
@@ -102,7 +92,7 @@ const EmailVerificationCodeScreen = () => {
     setIsLoading(true);
 
     try {
-      await userService.verifyEmail(code);
+      await userService.verifyEmail(verificationCode);
 
       // Update user in context with verified email status
       if (user) {
@@ -127,6 +117,8 @@ const EmailVerificationCodeScreen = () => {
         error.response?.data?.message ||
           'Invalid verification code. Please try again.',
       );
+      // Clear the code input on error
+      codeInputRef.current?.clear();
     } finally {
       setIsLoading(false);
     }
@@ -139,6 +131,8 @@ const EmailVerificationCodeScreen = () => {
       setCanResend(false);
       setCountdown(60);
       setError(null);
+      setCode('');
+      codeInputRef.current?.clear();
     } catch (error: any) {
       console.error('Error resending code:', error);
       setError(
@@ -183,31 +177,21 @@ const EmailVerificationCodeScreen = () => {
               })}
             </Text>
 
-            <View style={styles.codeContainer}>
-              {Array(CODE_LENGTH)
-                .fill(0)
-                .map((_, index) => (
-                  <RNTextInput
-                    key={index}
-                    ref={(ref: RNTextInput | null) => {
-                      inputRefs.current[index] = ref;
-                    }}
-                    style={styles.codeInput}
-                    maxLength={1}
-                    keyboardType="number-pad"
-                    value={code[index] || ''}
-                    onChangeText={text => handleCodeChange(text, index)}
-                    onKeyPress={e => handleKeyPress(e, index)}
-                    onFocus={() => setError(null)}
-                  />
-                ))}
-            </View>
+            <CodeInput
+              ref={codeInputRef}
+              length={CODE_LENGTH}
+              onCodeChange={handleCodeChange}
+              onCodeComplete={handleCodeComplete}
+              autoFocus
+              error={!!error}
+              style={styles.codeContainer}
+            />
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
-              onPress={handleVerifyCode}
+              onPress={() => handleVerifyCode()}
               disabled={isLoading || code.length !== CODE_LENGTH}>
               {isLoading ? (
                 <ActivityIndicator color="#fff" />
@@ -278,21 +262,8 @@ const getStyles = (colors: any) =>
       marginBottom: 30,
     },
     codeContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
       marginVertical: 20,
       width: '100%',
-    },
-    codeInput: {
-      width: 40,
-      height: 50,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 8,
-      textAlign: 'center',
-      fontSize: 20,
-      marginHorizontal: 5,
-      backgroundColor: colors.card,
     },
     errorText: {
       color: colors.error,

@@ -19,11 +19,13 @@ import Toast from 'react-native-toast-message';
 import QRCode from 'react-native-qrcode-svg';
 
 import {fetchUserInformation} from '../../services/userInformationService';
-import type {IProductVariant} from '../../types/product';
+import currencyFormatter from '../../utils/currencyFormatter';
+import type {IProductVariant, IProductVariantOption} from '../../types/product';
 import type {PaymentCard} from '../../types/paymentCard';
 import type {UserInformation} from '../../types/address';
 import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
+import IconButton from '../../components/IconButton';
 import {useCart} from '../../contexts/CartContext';
 import type {Address} from '../../types/address';
 import type {ICartItem} from '../../types/cart';
@@ -206,8 +208,11 @@ const CartScreen = () => {
       (v: IProductVariant) => v.sku === item.sku,
     );
     const variantOptions = variant
-      ? Object.entries(variant.options)
-          .map(([key, value]) => `${key}: ${value}`)
+      ? (variant.options ?? [])
+          .map(
+            (variantOption: IProductVariantOption) =>
+              `${variantOption.name}: ${variantOption.value}`,
+          )
           .join(', ')
       : '';
 
@@ -221,10 +226,11 @@ const CartScreen = () => {
           {variantOptions ? (
             <Text style={styles.variantText}>{variantOptions}</Text>
           ) : null}
-          <Text style={styles.price}>{item.price} ₺</Text>
+          <Text style={styles.price}>
+            {currencyFormatter.format(item.price)}
+          </Text>
           <View style={styles.quantityContainer}>
-            <TouchableOpacity
-              style={styles.quantityButton}
+            <IconButton
               onPress={() =>
                 handleUpdateQuantity(
                   item.product._id,
@@ -232,21 +238,26 @@ const CartScreen = () => {
                   item.quantity - 1,
                 )
               }
-              disabled={item.quantity <= 1}>
-              <Text style={styles.quantityButtonText}>-</Text>
-            </TouchableOpacity>
+              disabled={item.quantity <= 1}
+              size="small"
+              icon={<Icon name="minus" size={16} color={colors.text} />}
+            />
             <Text style={styles.quantity}>{item.quantity}</Text>
-            <TouchableOpacity
-              style={styles.quantityButton}
+            <IconButton
               onPress={() =>
                 handleUpdateQuantity(
                   item.product._id,
                   item.sku,
                   item.quantity + 1,
                 )
-              }>
-              <Text style={styles.quantityButtonText}>+</Text>
-            </TouchableOpacity>
+              }
+              size="small"
+              disabled={
+                (item.product.variants?.find(v => v.sku === item.sku)?.stock ||
+                  0) <= item.quantity
+              }
+              icon={<Icon name="plus" size={16} color={colors.text} />}
+            />
           </View>
         </View>
         <TouchableOpacity
@@ -297,13 +308,15 @@ const CartScreen = () => {
               <View style={styles.totalsContainer}>
                 <View style={styles.totalRow}>
                   <Text style={styles.totalLabel}>{t('cart.subtotal')}:</Text>
-                  <Text style={styles.totalValue}>{subtotal.toFixed(2)} ₺</Text>
+                  <Text style={styles.totalValue}>
+                    {currencyFormatter.format(subtotal)}
+                  </Text>
                 </View>
                 {totalDiscount > 0 && (
                   <View style={styles.totalRow}>
                     <Text style={styles.totalLabel}>{t('cart.discount')}:</Text>
                     <Text style={[styles.totalValue, styles.discountValue]}>
-                      -{totalDiscount.toFixed(2)} ₺
+                      -{currencyFormatter.format(totalDiscount)}
                     </Text>
                   </View>
                 )}
@@ -312,7 +325,7 @@ const CartScreen = () => {
                     {t('cart.total')}:
                   </Text>
                   <Text style={[styles.totalValue, styles.finalTotalValue]}>
-                    {totalPrice.toFixed(2)} ₺
+                    {currencyFormatter.format(totalPrice)}
                   </Text>
                 </View>
               </View>

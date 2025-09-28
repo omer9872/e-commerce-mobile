@@ -3,7 +3,7 @@ export interface IProductCategory {
   name: string;
   description?: string;
   image?: string;
-  parent?: IProductCategory | string;
+  parent?: IProductCategory;
   subCategories?: IProductCategory[];
 
   createdAt: Date;

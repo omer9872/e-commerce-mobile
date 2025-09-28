@@ -33,11 +33,10 @@ const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const route = useRoute<LoginScreenRouteProp>();
   const {userType} = route.params;
-  const {signInViaPhoneNumber, signInViaEmail} = useAuth();
+  const {signInViaEmail} = useAuth();
   const {colors} = useTheme();
   const {t} = useLocale();
 
-  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,60 +44,27 @@ const LoginScreen = () => {
   const screenParams = {
     customer: {
       title: t('login.customerLogin'),
-      phone: true,
-      email: false,
-    },
-    merchant: {
-      title: t('login.merchantLogin'),
-      phone: false,
-      email: true,
     },
     carrier: {
       title: t('login.carrierLogin'),
-      phone: false,
-      email: true,
     },
   };
 
   const handleLogin = async () => {
-    if (userType === 'customer') {
-      if (!phone || !password) {
-        Alert.alert(
-          t('login.error'),
-          t('login.pleaseEnterBothPhoneAndPassword'),
-        );
-        return;
-      }
+    if (!email || !password) {
+      Alert.alert(t('login.error'), t('login.pleaseEnterBothEmailAndPassword'));
+      return;
+    }
 
-      try {
-        setIsLoading(true);
-        await signInViaPhoneNumber({phone, password});
-        // Auth context will handle navigation based on user type
-      } catch (error) {
-        console.log(error);
-        Alert.alert(t('login.loginFailed'), t('login.invalidPhoneOrPassword'));
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      if (!email || !password) {
-        Alert.alert(
-          t('login.error'),
-          t('login.pleaseEnterBothEmailAndPassword'),
-        );
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        await signInViaEmail({email, password});
-        // Auth context will handle navigation based on user type
-      } catch (error) {
-        Alert.alert(t('login.loginFailed'), t('login.invalidEmailOrPassword'));
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
+    try {
+      setIsLoading(true);
+      await signInViaEmail({email, password});
+      // Auth context will handle navigation based on user type
+    } catch (error) {
+      Alert.alert(t('login.loginFailed'), t('login.invalidEmailOrPassword'));
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -118,30 +84,17 @@ const LoginScreen = () => {
         <Text style={styles.title}>{screenParams[userType].title}</Text>
 
         <View style={styles.form}>
-          {screenParams[userType].phone ? (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('login.phone')}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder={t('login.enterYourPhoneNumber')}
-                keyboardType="phone-pad"
-                value={phone}
-                onChangeText={setPhone}
-              />
-            </View>
-          ) : (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('login.email')}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder={t('login.enterYourEmail')}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
-          )}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>{t('login.email')}</Text>
+            <TextInput
+              style={styles.input}
+              placeholder={t('login.enterYourEmail')}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>{t('login.password')}</Text>

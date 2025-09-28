@@ -14,8 +14,9 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import type {IFavoritesItem, IProduct} from '../../types/index';
+import currencyFormatter from '../../utils/currencyFormatter';
 import {useFavorites} from '../../contexts/FavoritesContext';
-import { useLocale } from '../../contexts/LocaleContext';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import Image from '../../components/Image';
 
@@ -32,6 +33,14 @@ const FavoritesScreen = () => {
 
   const styles = getStyles(colors);
 
+  const getFirstVariantPrice = (item: IFavoritesItem) => {
+    const pVariants = item.product.variants ?? [];
+    if (pVariants.length > 1) {
+      return pVariants[0].price;
+    }
+    return 0;
+  };
+
   const renderFavoriteItem = ({item}: {item: IFavoritesItem}) => (
     <TouchableOpacity
       style={styles.favoriteItem}
@@ -43,7 +52,7 @@ const FavoritesScreen = () => {
           {item.product.name}
         </Text>
         <Text style={styles.productPrice}>
-          {item.product.price.toFixed(2)} ₺
+          {currencyFormatter.format(getFirstVariantPrice(item))}
         </Text>
       </View>
 
@@ -78,7 +87,9 @@ const FavoritesScreen = () => {
             ListEmptyComponent={
               <View style={[styles.flex, styles.centerContent]}>
                 <Icon name="heart-outline" size={64} color={colors.gray} />
-                <Text style={styles.emptyText}>{t('favorites.noFavorites')}</Text>
+                <Text style={styles.emptyText}>
+                  {t('favorites.noFavorites')}
+                </Text>
                 <Text style={styles.emptySubtext}>
                   {t('favorites.addProductsToFavorites')}
                 </Text>

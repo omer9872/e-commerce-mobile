@@ -4,7 +4,7 @@ export * from './product';
 export * from './paymentCard';
 export * from './user';
 export * from './cart';
-export * from './category';
+export * from './productCategory';
 export * from './transaction';
 export * from './transactionCode';
 export * from './loyaltySummary';

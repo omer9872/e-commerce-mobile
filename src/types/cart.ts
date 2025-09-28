@@ -1,5 +1,5 @@
 import type {IProduct} from './product';
-import {Campaign} from './campaign';
+import {ICampaign} from './campaign';
 
 export interface ICartItem {
   product: IProduct;
@@ -8,7 +8,7 @@ export interface ICartItem {
   price: number;
   discount: number;
   total: number;
-  appliedCampaigns?: Campaign[];
+  appliedCampaigns?: ICampaign[];
 }
 
 export interface ICart {

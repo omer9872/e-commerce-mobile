@@ -17,7 +17,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
-import type {IProductCategory} from '../../types/category';
+import type {IProductCategory} from '../../types/productCategory';
 import LayoutHeader from '../../components/LayoutHeader';
 import {useLocale} from '../../contexts/LocaleContext';
 import ProductCard from '../../components/ProductCard';

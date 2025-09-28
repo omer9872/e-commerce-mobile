@@ -17,10 +17,16 @@ import {type RouteProp, useRoute} from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 import Toast from 'react-native-toast-message';
 
+import type {
+  IProduct,
+  IProductVariant,
+  IProductVariantOption,
+} from '../../types/product';
 import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
-import type {IProduct, IProductVariant} from 'src/types/product';
+import currencyFormatter from '../../utils/currencyFormatter';
 import {useFavorites} from '../../contexts/FavoritesContext';
 import {useLocale} from '../../contexts/LocaleContext';
+import IconButton from '../../components/IconButton';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useCart} from '../../contexts/CartContext';
 import Image from '../../components/Image';
@@ -192,6 +198,14 @@ const ProductDetailScreen = () => {
     }
   }, [selectedSKU, cartItems]);
 
+  const getFirstVariantPrice = () => {
+    const pVariants = product?.variants ?? [];
+    if (pVariants.length > 1) {
+      return pVariants[0].price;
+    }
+    return 0;
+  };
+
   const styles = getStyles(colors);
 
   const renderCarouselItem = (item: string) => {
@@ -219,24 +233,22 @@ const ProductDetailScreen = () => {
         disabled={isOutOfStock}>
         <View style={styles.variantContent}>
           <View>
-            {Object.entries(variant.options).map(([key, value]) => (
-              <Text key={key} style={styles.variantOption}>
-                {key}: {value}
+            {variant.options.map((option: IProductVariantOption) => (
+              <Text key={option.name} style={styles.variantOption}>
+                {option.name}: {option.value}
               </Text>
             ))}
             <Text style={styles.variantSku}>SKU: {variant.sku}</Text>
           </View>
           <View style={styles.variantInfo}>
-            <Text style={styles.variantPrice}>{variant.price} ₺</Text>
-            <Text
-              style={[
-                styles.variantStock,
-                isOutOfStock ? styles.outOfStockText : null,
-              ]}>
-              {isOutOfStock
-                ? t('productDetails.outOfStock')
-                : `${t('productDetails.stock')}: ${variant.stock}`}
+            <Text style={styles.variantPrice}>
+              {currencyFormatter.format(variant.price)}
             </Text>
+            {isOutOfStock && (
+              <Text style={styles.outOfStockText}>
+                {isOutOfStock && t('productDetails.outOfStock')}
+              </Text>
+            )}
           </View>
         </View>
         {isInCart && (
@@ -287,12 +299,6 @@ const ProductDetailScreen = () => {
       )}
       <View style={styles.contentContainer}>
         <Text style={styles.productName}>{product.name}</Text>
-        <Text style={styles.price}>
-          {selectedSKU
-            ? product.variants?.find(v => v.sku === selectedSKU)?.price
-            : product.price}{' '}
-          ₺
-        </Text>
         <Text style={styles.description}>{product.description}</Text>
 
         {product.variants && product.variants.length > 0 && (
@@ -310,97 +316,51 @@ const ProductDetailScreen = () => {
               {t('productDetails.quantityInCart')}
             </Text>
             <View style={styles.quantityControls}>
-              <TouchableOpacity
-                style={[
-                  styles.quantityButton,
-                  quantity <= 1 && styles.quantityButtonDisabled,
-                ]}
+              <IconButton
                 onPress={() => handleQuantityChange(quantity - 1)}
-                disabled={quantity <= 1}>
-                {isCartQuantityLoading ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
-                ) : (
-                  <Icon name="minus" size={20} color={colors.text} />
-                )}
-              </TouchableOpacity>
+                disabled={quantity <= 1 || isCartQuantityLoading}
+                icon={<Icon name="minus" size={16} color={colors.text} />}
+              />
               <Text style={styles.quantityText}>{quantity}</Text>
-              <TouchableOpacity
-                style={[
-                  styles.quantityButton,
-                  product.variants?.find(v => v.sku === selectedSKU)?.stock ===
-                    quantity && styles.quantityButtonDisabled,
-                ]}
+              <IconButton
                 onPress={() => handleQuantityChange(quantity + 1)}
                 disabled={
                   (product.variants?.find(v => v.sku === selectedSKU)?.stock ||
                     0) <= quantity || isCartQuantityLoading
-                }>
-                {isCartQuantityLoading ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
-                ) : (
-                  <Icon name="plus" size={20} color={colors.text} />
-                )}
-              </TouchableOpacity>
+                }
+                icon={<Icon name="plus" size={16} color={colors.text} />}
+              />
             </View>
-            <Text style={styles.stockText}>
-              {product.variants?.find(v => v.sku === selectedSKU)?.stock} items
-              available
-            </Text>
           </View>
         )}
 
         <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={[
-              styles.addToCartButton,
-              isAddedToCart ? styles.removeFromCartButton : null,
-            ]}
+          <IconButton
             onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
-            disabled={isCartLoading || !selectedSKU}>
-            {isCartLoading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <View style={styles.addToCartButtonContent}>
-                <Icon
-                  name={isAddedToCart ? 'cart-remove' : 'cart-plus'}
-                  size={20}
-                  color="#FFFFFF"
-                />
-                <Text style={styles.addToCartButtonText}>
-                  {isAddedToCart
-                    ? t('productDetails.removeFromCart')
-                    : t('productDetails.addToCart')}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
+            loading={isCartLoading}
+            disabled={!selectedSKU}
+            variant={isAddedToCart ? 'secondary' : 'primary'}
+            icon={
+              isAddedToCart ? (
+                <Icon name="cart-remove" size={20} color={colors.text} />
+              ) : (
+                <Icon name="cart-plus" size={20} color={colors.text} />
+              )
+            }
+          />
 
-          <TouchableOpacity
-            style={[
-              styles.favoriteButton,
-              isInFavorites(product._id)
-                ? styles.removeFromFavoritesButton
-                : null,
-            ]}
+          <IconButton
             onPress={handleToggleFavorites}
-            disabled={isFavoritesLoading}>
-            {isFavoritesLoading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <View style={styles.favoriteButtonContent}>
-                <Icon
-                  name={isInFavorites(product._id) ? 'heart' : 'heart-outline'}
-                  size={20}
-                  color="#FFFFFF"
-                />
-                <Text style={styles.favoriteButtonText}>
-                  {isInFavorites(product._id)
-                    ? t('productDetails.removeFromFavorites')
-                    : t('productDetails.addToFavorites')}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
+            loading={isFavoritesLoading}
+            variant={isInFavorites(product._id) ? 'secondary' : 'primary'}
+            icon={
+              isInFavorites(product._id) ? (
+                <Icon name="heart" size={20} color={colors.text} />
+              ) : (
+                <Icon name="heart-outline" size={20} color={colors.text} />
+              )
+            }
+          />
         </View>
       </View>
     </ScrollView>
@@ -463,7 +423,9 @@ const getStyles = (colors: any) =>
       lineHeight: 24,
     },
     actionsContainer: {
+      display: 'flex',
       flexDirection: 'row',
+      justifyContent: 'center',
       gap: 12,
       marginTop: 20,
     },
@@ -560,17 +522,13 @@ const getStyles = (colors: any) =>
       color: colors.primary,
       marginBottom: 4,
     },
-    variantStock: {
-      fontSize: 12,
-      color: colors.textSecondary,
-    },
     outOfStockText: {
+      fontSize: 12,
       color: colors.error,
     },
     inCartBadge: {
-      position: 'absolute',
-      top: 8,
-      right: 8,
+      marginTop: 4,
+      alignSelf: 'flex-end',
       backgroundColor: colors.primary,
       paddingHorizontal: 8,
       paddingVertical: 4,
@@ -599,7 +557,7 @@ const getStyles = (colors: any) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 8,
+      marginVertical: 8,
     },
     quantityButton: {
       width: 40,

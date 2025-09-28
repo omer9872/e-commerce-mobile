@@ -1,4 +1,6 @@
-import {IUser} from './user';
+import {IPayment} from './payment';
+import {IProduct} from './product';
+import {Carrier} from './carrier';
 
 export enum PaymentMethod {
   CREDIT_CARD = 'credit_card',
@@ -24,31 +26,36 @@ export enum ShippingStatus {
   CANCELLED = 'cancelled',
 }
 
-export interface ITransactionItem {
-  product: {
-    _id: string;
-    name: string;
-    price: number;
-    images: string[];
-    isRefundable: boolean;
-  };
+export enum ShippingStatusLabel {
+  pending = 'Pending',
+  shipped = 'Shipped',
+  on_the_way = 'On the way',
+  delivered = 'Delivered',
+  cancelled = 'Cancelled',
+}
+
+export interface ITransactionProduct {
+  product: string | IProduct;
   quantity: number;
   sku: string;
 }
 
 export interface ITransaction {
   _id: string;
-  user: string | IUser;
-  items: ITransactionItem[];
+
+  user: string;
+
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   totalAmount: number;
-  payment?: string;
+  payment?: IPayment;
+
   shippingType: ShippingType;
   shippingStatus: ShippingStatus;
-  carrier?: string;
-  createdAt: string;
+  carrier?: string | Carrier;
+
+  createdAt: Date;
   createdBy?: string;
-  updatedAt?: string;
+  updatedAt?: Date;
   updatedBy?: string;
 }

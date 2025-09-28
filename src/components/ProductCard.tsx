@@ -16,6 +16,7 @@ import {useCart} from '../contexts/CartContext';
 import Toast from 'react-native-toast-message';
 import {useEffect, useState} from 'react';
 
+import currencyFormatter from '../utils/currencyFormatter';
 import {useTheme} from '../contexts/ThemeContext';
 import {IProduct} from '../types/product';
 import Image from '../components/Image';
@@ -39,11 +40,6 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
   const {colors} = useTheme();
-  // Check if product is already in cart
-  useEffect(() => {
-    const isInCart = items.some(item => item.product._id === product._id);
-    setIsAddedToCart(isInCart);
-  }, [items, product._id]);
 
   const handleToggleFavorites = async () => {
     if (isFavoritesLoading) return;
@@ -87,6 +83,20 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
 
   const styles = getStyles(colors);
 
+  const getFirstVariantPrice = () => {
+    const pVariants = product.variants ?? [];
+    if (pVariants.length > 1) {
+      return pVariants[0].price;
+    }
+    return 0;
+  };
+
+  // Check if product is already in cart
+  useEffect(() => {
+    const isInCart = items.some(item => item.product._id === product._id);
+    setIsAddedToCart(isInCart);
+  }, [items, product._id]);
+
   return (
     <TouchableOpacity
       style={[styles.container, style]}
@@ -120,7 +130,7 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
         )}
         <View style={styles.amountContainer}>
           <Text style={styles.amountText}>
-            {product.price} <Text style={styles.amountLabel}>₺</Text>
+            {currencyFormatter.format(getFirstVariantPrice())}
           </Text>
         </View>
       </View>

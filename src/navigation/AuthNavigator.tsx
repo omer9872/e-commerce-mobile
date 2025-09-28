@@ -7,8 +7,8 @@ import LoginScreen from '../screens/auth/LoginScreen';
 
 export type AuthStackParamList = {
   UserTypeSelection: undefined;
-  Login: {userType: 'customer' | 'merchant' | 'carrier'};
-  Register: {userType: 'customer' | 'merchant' | 'carrier'};
+  Login: {userType: 'customer' | 'carrier'};
+  Register: {userType: 'customer' | 'carrier'};
   ForgotPassword: undefined;
 };
 

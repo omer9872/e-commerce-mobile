@@ -166,6 +166,7 @@ const tr = {
     hasBeenRemovedFromYourCart: 'sepetinizden çıkarıldı',
     addedToFavorites: 'Favorilere Eklendi',
     hasBeenAddedToYourFavorites: 'favorilerinize eklendi',
+    customerReviews: 'Müşteri Yorumları',
   },
   addressForm: {
     title: 'Adres Formu',

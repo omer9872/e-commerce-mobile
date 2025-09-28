@@ -13,8 +13,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {useLocale} from '../../contexts/LocaleContext';
 import LayoutHeader from '../../components/LayoutHeader';
+import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useAuth} from '../../contexts/AuthContext';
 import Avatar from '../../components/Avatar';

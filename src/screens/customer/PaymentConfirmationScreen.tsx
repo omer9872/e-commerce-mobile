@@ -19,6 +19,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 
 import type {CustomerCartStackParamList} from '../../navigation/CustomerNavigator';
+import currencyFormatter from '../../utils/currencyFormatter';
 import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 import {useCart} from '../../contexts/CartContext';
@@ -113,7 +114,7 @@ const PaymentConfirmationScreen = () => {
       <View style={styles.confirmationItemDetails}>
         <Text style={styles.confirmationItemQuantity}>x{item.quantity}</Text>
         <Text style={styles.confirmationItemPrice}>
-          ${(item.product.price * item.quantity).toFixed(2)}
+          {currencyFormatter.format(item.price * item.quantity)}
         </Text>
       </View>
     </View>
@@ -209,7 +210,7 @@ const PaymentConfirmationScreen = () => {
                 {t('paymentConfirmation.total')}
               </Text>
               <Text style={styles.totalItemPrice}>
-                ${totalPrice.toFixed(2)}
+                {currencyFormatter.format(totalPrice)}
               </Text>
             </View>
           </View>
@@ -341,7 +342,6 @@ const getStyles = (colors: any) =>
       fontSize: 14,
       fontWeight: '600',
       color: colors.text,
-      width: 60,
       textAlign: 'right',
     },
     totalItem: {

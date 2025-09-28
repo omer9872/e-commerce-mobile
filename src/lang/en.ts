@@ -158,6 +158,7 @@ const en = {
     hasBeenAddedToYourCart: 'has been added to your cart',
     removedFromCart: 'Removed from Cart',
     hasBeenRemovedFromYourCart: 'has been removed from your cart',
+    customerReviews: 'Customer Reviews',
   },
   addressForm: {
     title: 'Address Form',

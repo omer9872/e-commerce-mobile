@@ -1,33 +1,64 @@
+export enum ProductDiscountType {
+  PERCENTAGE = "percentage",
+  FIXED = "fixed",
+}
+
+export interface IProductDiscount {
+  type: ProductDiscountType;
+  value: number;
+}
+
 export interface IProductOption {
-  name: string; // e.g., "Color", "Size"
-  values: string[]; // e.g., ["Red", "Blue"] or ["S", "M", "L"]
-  required: boolean; // whether this option is required for purchase
+  name: string;
+  values: string[];
+}
+
+export interface IProductVariantOption {
+  name: string;
+  value: string;
 }
 
 export interface IProductVariant {
-  options: {
-    [key: string]: string; // e.g., { "Color": "Red", "Size": "M" }
-  };
-  price: number; // optional price override for this variant
-  stock: number; // stock level for this specific variant
-  sku: string; // unique identifier for this variant
+  options: IProductVariantOption[];
+  price: number;
+  stock: number;
+  volumetricWeight: number;
+  sku: string;
 }
 
-export interface IProduct {
+export type IProduct = {
   _id: string;
+  merchant: {
+    _id: string;
+    user: string;
+    website: string;
+    logo: string;
+  };
   name: string;
-  description?: string;
-  price: number;
+  description: string;
   barcode: string;
   images: string[];
-  categories: string[];
+  categories: {
+    _id: string;
+    name: string;
+    description: string;
+    image: string | null;
+  }[];
   isRefundable: boolean;
-  refundableDays?: number;
+  refundableDays: number | null;
+  brand: {
+    _id: string;
+    name: string;
+    logo: string;
+    website: string;
+  } | null;
+  discount: IProductDiscount | null;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
   options: IProductOption[];
   variants: IProductVariant[];
-
-  createdAt: Date;
-  createdBy?: string;
-  updatedAt: Date;
-  updatedBy?: string;
-}
+  averageRating: number;
+  reviewCount: number;
+};

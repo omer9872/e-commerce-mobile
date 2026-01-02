@@ -24,6 +24,7 @@ import {
 } from '../../types/transaction';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactions} from '../../services/transactionService';
+import priceFormatter from '../../utils/currencyFormatter';
 import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
 
@@ -32,26 +33,12 @@ type TransactionHistoryScreenNavigationProp = StackNavigationProp<
   'TransactionHistory'
 >;
 
-const ShippingStatusText = {
-  [ShippingStatus.PENDING]: 'Pending',
-  [ShippingStatus.SHIPPED]: 'Shipped',
-  [ShippingStatus.ON_THE_WAY]: 'On the way',
-  [ShippingStatus.DELIVERED]: 'Delivered',
-  [ShippingStatus.CANCELLED]: 'Cancelled',
-};
-
 const ShippingStatusColors = {
   [ShippingStatus.PENDING]: '#FFC107',
   [ShippingStatus.SHIPPED]: '#4CAF50',
   [ShippingStatus.ON_THE_WAY]: '#4CAF50',
   [ShippingStatus.DELIVERED]: '#4CAF50',
   [ShippingStatus.CANCELLED]: '#F44336',
-};
-
-const PaymentStatusText = {
-  [PaymentStatus.PENDING]: 'Pending',
-  [PaymentStatus.COMPLETED]: 'Completed',
-  [PaymentStatus.FAILED]: 'Failed',
 };
 
 const PaymentStatusColors = {
@@ -129,8 +116,7 @@ const TransactionHistoryScreen = () => {
 
   const renderTransactionItem = ({item}: {item: ITransaction}) => {
     const date = new Date(item.createdAt);
-    const formattedDate = dayjs(date).format('MMMM ddd, YYYY');
-    const formattedTime = dayjs(date).format('hh:mm');
+    const formattedDate = dayjs(date).format('MMMM ddd, YYYY - hh:mm');
 
     return (
       <TouchableOpacity
@@ -143,9 +129,7 @@ const TransactionHistoryScreen = () => {
           <Text style={styles.transactionType}>
             {t('transactionHistory.payment')}
           </Text>
-          <Text style={styles.transactionDate}>
-            {formattedDate} at {formattedTime}
-          </Text>
+          <Text style={styles.transactionDate}>{formattedDate}</Text>
           <View style={styles.statusContainer}>
             <Text style={styles.transactionStatus}>
               {t('transactionHistory.paymentStatus')}:
@@ -155,7 +139,7 @@ const TransactionHistoryScreen = () => {
                 ...styles.statusText,
                 color: PaymentStatusColors[item.paymentStatus],
               }}>
-              {PaymentStatusText[item.paymentStatus]}
+              {t(`common.enums.paymentStatus.${item.paymentStatus}`)}
             </Text>
           </View>
           <View style={styles.statusContainer}>
@@ -167,7 +151,7 @@ const TransactionHistoryScreen = () => {
                 ...styles.statusText,
                 color: ShippingStatusColors[item.shippingStatus],
               }}>
-              {ShippingStatusText[item.shippingStatus]}
+              {t(`common.enums.shippingStatus.${item.shippingStatus}`)}
             </Text>
           </View>
         </View>
@@ -179,11 +163,11 @@ const TransactionHistoryScreen = () => {
                 color: colors.primary,
               },
             ]}>
-            {item.totalAmount.toFixed(2)}₺
+            {priceFormatter.format(item.totalAmount)}
           </Text>
           {item.totalAmount > 0 && (
             <Text style={styles.moneyAmount}>
-              {item.totalAmount.toFixed(2)}₺
+              {priceFormatter.format(item.totalAmount)}
             </Text>
           )}
         </View>

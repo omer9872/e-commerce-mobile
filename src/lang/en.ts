@@ -13,6 +13,65 @@ const en = {
     back: 'Back',
     next: 'Next',
     done: 'Done',
+    enums: {
+      paymentStatus: {
+        pending: 'Pending',
+        failed: 'Failed',
+        completed: 'Completed',
+      },
+      shippingStatus: {
+        pending: 'Pending',
+        shipped: 'Shipped',
+        on_the_way: 'On the Way',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled',
+      },
+      paymentMethods: {
+        credit_card: 'Credit Card',
+        cash: 'Cash',
+      },
+      shippingTypes: {
+        carrier: 'Carrier',
+        self_pickup: 'Self Pickup',
+      },
+      campaignType: {
+        DISCOUNT_PERCENTAGE: 'Discount Percentage',
+        DISCOUNT_FIXED: 'Discount Fixed',
+        FREE_ITEM: 'Free Item',
+        BUY_X_GET_Y: 'Buy X Get Y',
+      },
+      campaignTargetType: {
+        PRODUCT: 'Product',
+        PRODUCT_CATEGORY: 'Product Category',
+        ALL_PRODUCTS: 'All Products',
+      },
+      feedbackType: {
+        COMPLAINT: 'Complaint',
+        SUGGESTION: 'Suggestion',
+        QUESTION: 'Question',
+        REPORT: 'Report',
+        CONTACT: 'Contact',
+        OTHER: 'Other',
+      },
+      feedbackStatus: {
+        PENDING: 'Pending',
+        IN_PROGRESS: 'In Progress',
+        RESOLVED: 'Resolved',
+        CLOSED: 'Closed',
+      },
+      userRoles: {
+        ROOT: 'Root',
+        ADMIN: 'Admin',
+        MERCHANT: 'Merchant',
+        MERCHANT_EMPLOYEE: 'Merchant Employee',
+        CUSTOMER: 'Customer',
+        CARRIER: 'Carrier',
+      },
+      productDiscountType: {
+        PERCENTAGE: 'Percentage',
+        FIXED: 'Fixed',
+      },
+    },
   },
   userTypeSelection: {
     title: 'Welcome to Loyalty App',
@@ -158,7 +217,7 @@ const en = {
     hasBeenAddedToYourCart: 'has been added to your cart',
     removedFromCart: 'Removed from Cart',
     hasBeenRemovedFromYourCart: 'has been removed from your cart',
-    customerReviews: 'Customer Reviews',
+    customerReviews: 'Reviews',
   },
   addressForm: {
     title: 'Address Form',

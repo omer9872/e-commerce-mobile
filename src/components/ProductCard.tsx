@@ -123,11 +123,6 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
             />
           </TouchableOpacity>
         </View>
-        {product.description && (
-          <Text style={styles.description} numberOfLines={2}>
-            {product.description}
-          </Text>
-        )}
         <View style={styles.amountContainer}>
           <Text style={styles.amountText}>
             {currencyFormatter.format(getFirstVariantPrice())}

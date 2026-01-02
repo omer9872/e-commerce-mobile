@@ -13,6 +13,65 @@ const tr = {
     back: 'Geri',
     next: 'İleri',
     done: 'Tamam',
+    enums: {
+      paymentStatus: {
+        pending: 'Beklemede',
+        failed: 'Başarısız',
+        completed: 'Tamamlandı',
+      },
+      shippingStatus: {
+        pending: 'Beklemede',
+        shipped: 'Kargoya Verildi',
+        on_the_way: 'Yolda',
+        delivered: 'Teslim Edildi',
+        cancelled: 'İptal Edildi',
+      },
+      paymentMethods: {
+        credit_card: 'Kredi Kartı',
+        cash: 'Nakit',
+      },
+      shippingTypes: {
+        carrier: 'Kargo',
+        self_pickup: 'Self Servis',
+      },
+      campaignType: {
+        DISCOUNT_PERCENTAGE: 'İndirim Yüzdesi',
+        DISCOUNT_FIXED: 'İndirim Tutarı',
+        FREE_ITEM: 'Ücretsiz Ürün',
+        BUY_X_GET_Y: 'X Satın Al, Y Ücretsiz',
+      },
+      campaignTargetType: {
+        PRODUCT: 'Ürün',
+        PRODUCT_CATEGORY: 'Ürün Kategorisi',
+        ALL_PRODUCTS: 'Tüm Ürünler',
+      },
+      feedbackType: {
+        COMPLAINT: 'Şikayet',
+        SUGGESTION: 'Öneri',
+        QUESTION: 'Soru',
+        REPORT: 'Rapor',
+        CONTACT: 'İletişim',
+        OTHER: 'Diğer',
+      },
+      feedbackStatus: {
+        PENDING: 'Beklemede',
+        IN_PROGRESS: 'İşleniyor',
+        RESOLVED: 'Çözüldü',
+        CLOSED: 'Kapandı',
+      },
+      userRoles: {
+        ROOT: 'Yönetici',
+        ADMIN: 'Admin',
+        MERCHANT: 'Mağaza',
+        MERCHANT_EMPLOYEE: 'Mağaza Çalışanı',
+        CUSTOMER: 'Müşteri',
+        CARRIER: 'Kargo',
+      },
+      productDiscountType: {
+        PERCENTAGE: 'Yüzde',
+        FIXED: 'Tutar',
+      },
+    },
   },
   userTypeSelection: {
     title: "Loyalty App'a Hoş Geldiniz",
@@ -166,7 +225,7 @@ const tr = {
     hasBeenRemovedFromYourCart: 'sepetinizden çıkarıldı',
     addedToFavorites: 'Favorilere Eklendi',
     hasBeenAddedToYourFavorites: 'favorilerinize eklendi',
-    customerReviews: 'Müşteri Yorumları',
+    customerReviews: 'Yorumlar',
   },
   addressForm: {
     title: 'Adres Formu',

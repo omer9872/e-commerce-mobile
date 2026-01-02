@@ -16,6 +16,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {type RouteProp, useRoute} from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 import Toast from 'react-native-toast-message';
+import {WebView} from 'react-native-webview';
 
 import type {
   IProduct,
@@ -56,6 +57,7 @@ const ProductDetailScreen = () => {
   const [product, setProduct] = useState<IProduct | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCartQuantityLoading, setIsCartQuantityLoading] = useState(false);
+  const [webViewHeight, setWebViewHeight] = useState(0); // Add WebView height state
   const [selectedSKU, setSelectedSKU] = useState<string>('');
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -299,7 +301,180 @@ const ProductDetailScreen = () => {
       )}
       <View style={styles.contentContainer}>
         <Text style={styles.productName}>{product.name}</Text>
-        <Text style={styles.description}>{product.description}</Text>
+
+        {product.description && (
+          <View style={styles.descriptionContainer}>
+            <WebView
+              style={{
+                height: webViewHeight,
+                backgroundColor: colors.background,
+              }}
+              source={{
+                html: `
+                  <html>
+                    <head>
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <style>
+                        * {
+                          color: ${colors.text} !important;
+                        }
+                        body {
+                          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                          font-size: 16px;
+                          line-height: 1.5;
+                          color: ${colors.text} !important;
+                          background-color: ${colors.background} !important;
+                          margin: 0;
+                        }
+                        p { 
+                          margin: 0 0 8px 0; 
+                          color: ${colors.text} !important;
+                        }
+                        br { line-height: 1.2; }
+                        h1, h2, h3, h4, h5, h6 { 
+                          color: ${colors.text} !important; 
+                          margin: 16px 0 8px 0; 
+                        }
+                        a { 
+                          color: ${colors.primary} !important; 
+                          text-decoration: underline;
+                        }
+                        img { 
+                          max-width: 100%; 
+                          height: auto; 
+                        }
+                        ul, ol {
+                          color: ${colors.text} !important;
+                          margin: 8px 0;
+                          padding-left: 20px;
+                        }
+                        li {
+                          color: ${colors.text} !important;
+                          margin-bottom: 4px;
+                        }
+                        strong, b {
+                          color: ${colors.text} !important;
+                          font-weight: bold;
+                        }
+                        em, i {
+                          color: ${colors.text} !important;
+                          font-style: italic;
+                        }
+                        span, div {
+                          color: ${colors.text} !important;
+                        }
+                        blockquote {
+                          color: ${colors.textSecondary} !important;
+                          border-left: 3px solid ${colors.primary};
+                          margin: 8px 0;
+                          padding-left: 12px;
+                          font-style: italic;
+                        }
+                        code {
+                          color: ${colors.text} !important;
+                          background-color: ${colors.surfaceVariant} !important;
+                          padding: 2px 4px;
+                          border-radius: 3px;
+                          font-family: monospace;
+                          font-size: 14px;
+                        }
+                        pre {
+                          color: ${colors.text} !important;
+                          background-color: ${colors.surfaceVariant} !important;
+                          padding: 12px;
+                          border-radius: 6px;
+                          font-family: monospace;
+                          font-size: 14px;
+                        }
+                        table {
+                          color: ${colors.text} !important;
+                          width: 100%;
+                          border-collapse: collapse;
+                          margin: 8px 0;
+                        }
+                        th, td {
+                          color: ${colors.text} !important;
+                          border: 1px solid ${colors.outline};
+                          padding: 8px;
+                          text-align: left;
+                        }
+                        th {
+                          background-color: ${colors.surfaceVariant} !important;
+                          font-weight: bold;
+                        }
+                        /* Override any inline styles that might set black text */
+                        [style*="color: black"], [style*="color: #000"], [style*="color: #000000"] {
+                          color: ${colors.text} !important;
+                        }
+                        [style*="color: white"], [style*="color: #fff"], [style*="color: #ffffff"] {
+                          color: ${colors.text} !important;
+                        }
+                        /* Override common text color classes */
+                        .text-black, .black-text {
+                          color: ${colors.text} !important;
+                        }
+                        .text-white, .white-text {
+                          color: ${colors.text} !important;
+                        }
+                      </style>
+                      <script>
+                        function updateHeight() {
+                          const height = Math.max(
+                            document.body.scrollHeight,
+                            document.body.offsetHeight,
+                            document.documentElement.clientHeight,
+                            document.documentElement.scrollHeight,
+                            document.documentElement.offsetHeight
+                          );
+                          window.ReactNativeWebView?.postMessage(JSON.stringify({
+                            type: 'setHeight',
+                            height: height
+                          }));
+                        }
+                        
+                        document.addEventListener('DOMContentLoaded', function() {
+                          updateHeight();
+                          // Update height after images load
+                          const images = document.querySelectorAll('img');
+                          let loadedImages = 0;
+                          if (images.length === 0) return;
+                          
+                          images.forEach(img => {
+                            if (img.complete) {
+                              loadedImages++;
+                              if (loadedImages === images.length) updateHeight();
+                            } else {
+                              img.onload = () => {
+                                loadedImages++;
+                                if (loadedImages === images.length) updateHeight();
+                              };
+                            }
+                          });
+                        });
+                      </script>
+                    </head>
+                    <body>${product.description}</body>
+                  </html>
+                `,
+              }}
+              javaScriptEnabled={true}
+              startInLoadingState={false}
+              scrollEnabled={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              onMessage={event => {
+                try {
+                  const data = JSON.parse(event.nativeEvent.data);
+                  if (data.type === 'setHeight') {
+                    setWebViewHeight(Math.max(data.height + 20, 6)); // Add padding and minimum height
+                  }
+                } catch (error) {
+                  console.log('Error parsing WebView message:', error);
+                }
+              }}
+            />
+          </View>
+        )}
 
         {product.variants && product.variants.length > 0 && (
           <View style={styles.variantsContainer}>
@@ -409,6 +584,13 @@ const getStyles = (colors: any) =>
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 10,
+    },
+    descriptionContainer: {},
+    descriptionText: {
+      fontSize: 16,
+      lineHeight: 24,
+      color: colors.text,
+      padding: 16,
     },
     price: {
       fontSize: 18,

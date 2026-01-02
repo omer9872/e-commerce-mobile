@@ -20,18 +20,18 @@ import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
 import {
-  ITransactionItem,
-  PaymentMethod,
   PaymentStatus,
   ShippingStatus,
-  ShippingType,
   ITransaction,
 } from '../../types/transaction';
 import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
 import {fetchTransactionById} from '../../services/transactionService';
+import currencyFormatter from '../../utils/currencyFormatter';
 import {useLocale} from '../../contexts/LocaleContext';
 import {useTheme} from '../../contexts/ThemeContext';
+import {ICampaign} from '../../types/campaign';
 import Image from '../../components/Image';
+import {IProduct} from '../../types';
 
 type TransactionDetailScreenRouteProp = RouteProp<
   CustomerProfileStackParamList,
@@ -50,30 +50,6 @@ const PaymentStatusColors = {
   [PaymentStatus.PENDING]: '#FFC107',
   [PaymentStatus.COMPLETED]: '#4CAF50',
   [PaymentStatus.FAILED]: '#F44336',
-};
-
-const ShippingTypeText = {
-  [ShippingType.CARRIER]: 'Carrier',
-  [ShippingType.SELF_PICKUP]: 'Self Pickup',
-};
-
-const ShippingStatusText = {
-  [ShippingStatus.PENDING]: 'Pending',
-  [ShippingStatus.SHIPPED]: 'Shipped',
-  [ShippingStatus.ON_THE_WAY]: 'On the way',
-  [ShippingStatus.DELIVERED]: 'Delivered',
-  [ShippingStatus.CANCELLED]: 'Cancelled',
-};
-
-const PaymentMethodText = {
-  [PaymentMethod.CREDIT_CARD]: 'Credit Card',
-  [PaymentMethod.CASH]: 'Cash',
-};
-
-const PaymentStatusText = {
-  [PaymentStatus.PENDING]: 'Pending',
-  [PaymentStatus.COMPLETED]: 'Completed',
-  [PaymentStatus.FAILED]: 'Failed',
 };
 
 const TransactionDetailScreen = () => {
@@ -177,11 +153,7 @@ const TransactionDetailScreen = () => {
             {t('transactionDetail.paymentMethod')}
           </Text>
           <Text style={styles.detailValueRight}>
-            {
-              PaymentMethodText[
-                transaction.paymentMethod as keyof typeof PaymentMethodText
-              ]
-            }
+            {t(`common.enums.paymentMethods.${transaction.paymentMethod}`)}
           </Text>
         </View>
 
@@ -211,11 +183,7 @@ const TransactionDetailScreen = () => {
                     ],
                 },
               ]}>
-              {
-                PaymentStatusText[
-                  transaction.paymentStatus as keyof typeof PaymentStatusText
-                ]
-              }
+              {t(`common.enums.paymentStatus.${transaction.paymentStatus}`)}
             </Text>
           </View>
         </View>
@@ -225,11 +193,7 @@ const TransactionDetailScreen = () => {
             {t('transactionDetail.shippingType')}
           </Text>
           <Text style={styles.detailValueRight}>
-            {
-              ShippingTypeText[
-                transaction.shippingType as keyof typeof ShippingTypeText
-              ]
-            }
+            {t(`common.enums.shippingTypes.${transaction.shippingType}`)}
           </Text>
         </View>
 
@@ -259,49 +223,67 @@ const TransactionDetailScreen = () => {
                     ],
                 },
               ]}>
-              {
-                ShippingStatusText[
-                  transaction.shippingStatus as keyof typeof ShippingStatusText
-                ]
-              }
+              {t(`common.enums.shippingStatus.${transaction.shippingStatus}`)}
             </Text>
           </View>
         </View>
 
-        {transaction.items && transaction.items.length > 0 && (
-          <View style={styles.itemsContainer}>
-            <Text style={styles.itemsTitle}>
-              {t('transactionDetail.items')}
-            </Text>
-            {transaction.items.map((item: ITransactionItem, index: number) => (
-              <View
-                key={index}
-                style={{
-                  ...styles.itemRow,
-                  ...{borderBottomWidth: 1, borderBottomColor: '#EEEEEE'},
-                }}>
-                <View style={styles.itemImageContainer}>
-                  <Image id={item.product.images[0]} style={styles.itemImage} />
-                  <View>
-                    <Text style={styles.itemName}>{item.product.name}</Text>
-                    <Text style={styles.itemSKUName}>{item.sku}</Text>
-                  </View>
-                </View>
-                <Text style={styles.itemPrice}>
-                  {(item?.product?.price ?? 0).toFixed(2)}₺ x {item.quantity}
+        {transaction.payment?.products &&
+          transaction.payment.products.length > 0 && (
+            <View style={styles.itemsContainer}>
+              <Text style={styles.itemsTitle}>
+                {t('transactionDetail.items')}
+              </Text>
+              {transaction.payment?.products.map(
+                (
+                  item: {
+                    quantity: number;
+                    sku: string;
+                    product: IProduct;
+                    appliedCampaigns: ICampaign[];
+                  },
+                  index: number,
+                ) => {
+                  const variant = item.product.variants.find(
+                    variant => variant.sku === item.sku,
+                  );
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        ...styles.itemRow,
+                        ...{borderBottomWidth: 1, borderBottomColor: '#EEEEEE'},
+                      }}>
+                      <View style={styles.itemImageContainer}>
+                        <Image
+                          id={item.product.images[0]}
+                          style={styles.itemImage}
+                        />
+                        <View>
+                          <Text style={styles.itemName}>
+                            {item.product.name}
+                          </Text>
+                          <Text style={styles.itemSKUName}>{item.sku}</Text>
+                        </View>
+                      </View>
+                      <Text style={styles.itemPrice}>
+                        {currencyFormatter.format(variant?.price ?? 0)} x{' '}
+                        {item.quantity}
+                      </Text>
+                    </View>
+                  );
+                },
+              )}
+              <View style={styles.itemRow}>
+                <Text style={styles.totalName}>
+                  {t('transactionDetail.total')}
+                </Text>
+                <Text style={styles.moneyAmount}>
+                  {currencyFormatter.format(transaction?.totalAmount ?? 0)}
                 </Text>
               </View>
-            ))}
-            <View style={styles.itemRow}>
-              <Text style={styles.totalName}>
-                {t('transactionDetail.total')}
-              </Text>
-              <Text style={styles.moneyAmount}>
-                {(transaction?.totalAmount ?? 0).toFixed(2)}₺
-              </Text>
             </View>
-          </View>
-        )}
+          )}
       </View>
     </ScrollView>
   );

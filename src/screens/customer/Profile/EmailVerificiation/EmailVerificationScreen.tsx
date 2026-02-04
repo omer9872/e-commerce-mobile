@@ -7,112 +7,111 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
+  StatusBar,
   ScrollView,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {useLocale} from '../../contexts/LocaleContext';
-import {userService} from '../../services/userService';
-import {useTheme} from '../../contexts/ThemeContext';
-import {useAuth} from '../../contexts/AuthContext';
-import TextInput from '../../components/TextInput';
+import type {CustomerProfileStackParamList} from '@/navigation/CustomerNavigator';
+import {userService} from '@/services/userService';
+import {useLocale} from '@/contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
+import TextInput from '@/components/TextInput';
+import {useAuth} from '@/contexts/AuthContext';
 
-type PhoneVerificationScreenNavigationProp = StackNavigationProp<
+type EmailVerificationScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
-  'PhoneVerification'
+  'EmailVerification'
 >;
 
-const PhoneVerificationScreen = () => {
-  const navigation = useNavigation<PhoneVerificationScreenNavigationProp>();
+const EmailVerificationScreen = () => {
   const {user, fetchMe} = useAuth();
-  const {colors} = useTheme();
   const {t} = useLocale();
-  const [phone, setPhone] = useState(user?.phone || '');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const {colors} = useTheme();
+  const navigation = useNavigation<EmailVerificationScreenNavigationProp>();
+  const insets = useSafeAreaInsets();
+  const [email, setEmail] = useState(user?.email || '');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const validatePhone = (phoneNumber: string) => {
-    // Basic phone validation - can be enhanced based on your requirements
-    const phoneRegex = /^\d{10,15}$/;
-    return phoneRegex.test(phoneNumber.replace(/\D/g, ''));
-  };
-
-  const handleSendVerification = async () => {
-    setError('');
-
-    // Remove any non-digit characters for validation
-    const cleanPhone = phone.replace(/\D/g, '');
-
-    if (!validatePhone(cleanPhone)) {
-      setError(t('phoneVerification.pleaseEnterAValidPhoneNumber'));
+  const handleSendVerificationCode = async () => {
+    if (!email || !email.trim()) {
+      setError(t('emailVerification.pleaseEnterAValidEmailAddress'));
       return;
     }
 
-    setLoading(true);
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError(t('emailVerification.pleaseEnterAValidEmailAddress'));
+      return;
+    }
+
+    setError(null);
+    setIsLoading(true);
+
     try {
-      await userService.updatePhone(phone);
+      await userService.updateEmail(email);
+
       await fetchMe();
-      navigation.navigate('PhoneVerificationCode', {phone});
-    } catch (err: any) {
-      console.error('Error sending phone verification:', err);
+
+      // Navigate to code verification screen
+      navigation.navigate('EmailVerificationCode', {email});
+    } catch (error: any) {
+      console.error('Error sending verification code:', error);
       setError(
-        err.response?.data?.message ||
-          t('phoneVerification.failedToSendVerificationCodePleaseTryAgain'),
+        error.response?.data?.message ||
+          t('emailVerification.failedToSendVerificationCode'),
       );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const styles = getStyles(colors);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled">
         <View style={styles.iconContainer}>
-          <Icon name="cellphone" size={60} color={colors.primary} />
+          <Icon name="email-outline" size={60} color={colors.primary} />
         </View>
 
         <Text style={styles.title}>
-          {t('phoneVerification.updateYourPhoneNumber')}
+          {t('emailVerification.updateYourEmailAddress')}
         </Text>
         <Text style={styles.description}>
           {t(
-            'phoneVerification.enterYourPhoneNumberToReceiveAVerificationCodeViaSMS',
+            'emailVerification.enterYourEmailAddressToReceiveAVerificationCodeViaEmail',
           )}
         </Text>
 
         <View style={styles.formContainer}>
           <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            placeholder={t('phoneVerification.enterYourPhoneNumber')}
-            keyboardType="phone-pad"
+            value={email}
+            onChangeText={setEmail}
+            placeholder={t('emailVerification.enterYourEmailAddress')}
+            keyboardType="email-address"
             autoCapitalize="none"
-            maxLength={11}
+            maxLength={255}
           />
 
           <TouchableOpacity
             style={[
               styles.button,
-              loading || !phone ? styles.buttonDisabled : null,
+              isLoading || !email ? styles.buttonDisabled : null,
             ]}
-            onPress={handleSendVerification}
-            disabled={loading || !phone}>
-            {loading ? (
+            onPress={handleSendVerificationCode}
+            disabled={isLoading || !email}>
+            {isLoading ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
               <Text style={styles.buttonText}>
-                {t('phoneVerification.sendVerificationCode')}
+                {t('emailVerification.sendVerificationCode')}
               </Text>
             )}
           </TouchableOpacity>
@@ -122,12 +121,12 @@ const PhoneVerificationScreen = () => {
           <Icon name="information-outline" size={20} color={colors.primary} />
           <Text style={styles.infoText}>
             {t(
-              'phoneVerification.weWillSendAVerificationCodeToThisPhoneNumber',
+              'emailVerification.weWillSendAVerificationCodeToThisEmailAddress',
             )}
           </Text>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -156,18 +155,18 @@ const getStyles = (colors: any) =>
       fontSize: 24,
       fontWeight: 'bold',
       color: colors.text,
-      marginBottom: 10,
       textAlign: 'center',
+      marginBottom: 10,
     },
     description: {
       fontSize: 16,
       color: colors.textSecondary,
-      marginBottom: 30,
       textAlign: 'center',
+      marginBottom: 30,
     },
     formContainer: {
+      marginTop: 10,
       width: '100%',
-      marginBottom: 20,
     },
     button: {
       backgroundColor: colors.primary,
@@ -178,7 +177,6 @@ const getStyles = (colors: any) =>
     },
     buttonDisabled: {
       backgroundColor: colors.primaryLight,
-      opacity: 0.7,
     },
     buttonText: {
       color: '#fff',
@@ -201,4 +199,4 @@ const getStyles = (colors: any) =>
     },
   });
 
-export default PhoneVerificationScreen;
+export default EmailVerificationScreen;

@@ -15,13 +15,13 @@ import type {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import type {PaymentCardFormData} from '../../types/paymentCard';
-import {addPaymentCard} from '../../services/paymentCardService';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import TextInput from '../../components/TextInput';
-import Button from '../../components/Button';
+import type {CustomerProfileStackParamList} from '@/navigation/CustomerNavigator';
+import type {PaymentCardFormData} from '@/types/paymentCard';
+import {addPaymentCard} from '@/services/paymentCardService';
+import {useLocale} from '@/contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
+import TextInput from '@/components/TextInput';
+import Button from '@/components/Button';
 
 type PaymentCardFormScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,

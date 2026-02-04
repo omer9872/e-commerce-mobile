@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState, useCallback} from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,8 @@ import {
   TouchableOpacity,
   StatusBar,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
@@ -21,12 +21,12 @@ import {
   ITransaction,
   PaymentStatus,
   ShippingStatus,
-} from '../../types/transaction';
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchTransactions} from '../../services/transactionService';
-import priceFormatter from '../../utils/currencyFormatter';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
+} from '@/types/transaction';
+import type { CustomerProfileStackParamList } from '@/navigation/CustomerNavigator';
+import { fetchTransactions } from '@/services/transactionService';
+import priceFormatter from '@/utils/currencyFormatter';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 type TransactionHistoryScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -49,8 +49,8 @@ const PaymentStatusColors = {
 
 const TransactionHistoryScreen = () => {
   const navigation = useNavigation<TransactionHistoryScreenNavigationProp>();
-  const {colors} = useTheme();
-  const {t} = useLocale();
+  const { colors } = useTheme();
+  const { t } = useLocale();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -105,7 +105,7 @@ const TransactionHistoryScreen = () => {
   }, [hasMore, loadingMore, loadTransactions, page]);
 
   const navigateToTransactionDetail = (transaction: ITransaction) => {
-    navigation.navigate('TransactionDetail', {transactionId: transaction._id});
+    navigation.navigate('TransactionDetail', { transactionId: transaction._id });
   };
 
   useEffect(() => {
@@ -114,7 +114,7 @@ const TransactionHistoryScreen = () => {
 
   const styles = getStyles(colors);
 
-  const renderTransactionItem = ({item}: {item: ITransaction}) => {
+  const renderTransactionItem = ({ item }: { item: ITransaction }) => {
     const date = new Date(item.createdAt);
     const formattedDate = dayjs(date).format('MMMM ddd, YYYY - hh:mm');
 
@@ -257,7 +257,7 @@ const getStyles = (colors: any) =>
       marginBottom: 12,
       elevation: 2,
       shadowColor: '#000',
-      shadowOffset: {width: 0, height: 1},
+      shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.2,
       shadowRadius: 1.41,
     },

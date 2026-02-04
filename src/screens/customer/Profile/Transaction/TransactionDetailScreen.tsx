@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -23,15 +23,15 @@ import {
   PaymentStatus,
   ShippingStatus,
   ITransaction,
-} from '../../types/transaction';
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchTransactionById} from '../../services/transactionService';
-import currencyFormatter from '../../utils/currencyFormatter';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import {ICampaign} from '../../types/campaign';
-import Image from '../../components/Image';
-import {IProduct} from '../../types';
+} from '@/types/transaction';
+import type { CustomerProfileStackParamList } from '@/navigation/CustomerNavigator';
+import { fetchTransactionById } from '@/services/transactionService';
+import currencyFormatter from '@/utils/currencyFormatter';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ICampaign } from '@/types/campaign';
+import Image from '@/components/Image';
+import { IProduct } from '@/types';
 
 type TransactionDetailScreenRouteProp = RouteProp<
   CustomerProfileStackParamList,
@@ -55,9 +55,9 @@ const PaymentStatusColors = {
 const TransactionDetailScreen = () => {
   const route = useRoute<TransactionDetailScreenRouteProp>();
   const navigation = useNavigation();
-  const {transactionId} = route.params;
-  const {colors} = useTheme();
-  const {t} = useLocale();
+  const { transactionId } = route.params;
+  const { colors } = useTheme();
+  const { t } = useLocale();
 
   const [transaction, setTransaction] = useState<ITransaction | null>(null);
   const [loading, setLoading] = useState(true);
@@ -123,7 +123,7 @@ const TransactionDetailScreen = () => {
 
       <View style={styles.card}>
         <View style={styles.transactionTypeContainer}>
-          <View style={[styles.iconContainer, {backgroundColor: '#E8F5E9'}]}>
+          <View style={[styles.iconContainer, { backgroundColor: '#E8F5E9' }]}>
             <Icon name={'check'} size={30} color={'#4CAF50'} />
           </View>
           <Text style={styles.transactionType}>
@@ -168,7 +168,7 @@ const TransactionDetailScreen = () => {
                 {
                   backgroundColor:
                     PaymentStatusColors[
-                      transaction.paymentStatus as keyof typeof PaymentStatusColors
+                    transaction.paymentStatus as keyof typeof PaymentStatusColors
                     ],
                 },
               ]}
@@ -179,7 +179,7 @@ const TransactionDetailScreen = () => {
                 {
                   color:
                     PaymentStatusColors[
-                      transaction.paymentStatus as keyof typeof PaymentStatusColors
+                    transaction.paymentStatus as keyof typeof PaymentStatusColors
                     ],
                 },
               ]}>
@@ -208,7 +208,7 @@ const TransactionDetailScreen = () => {
                 {
                   backgroundColor:
                     ShippingStatusColors[
-                      transaction.shippingStatus as keyof typeof ShippingStatusColors
+                    transaction.shippingStatus as keyof typeof ShippingStatusColors
                     ],
                 },
               ]}
@@ -219,7 +219,7 @@ const TransactionDetailScreen = () => {
                 {
                   color:
                     ShippingStatusColors[
-                      transaction.shippingStatus as keyof typeof ShippingStatusColors
+                    transaction.shippingStatus as keyof typeof ShippingStatusColors
                     ],
                 },
               ]}>
@@ -252,7 +252,7 @@ const TransactionDetailScreen = () => {
                       key={index}
                       style={{
                         ...styles.itemRow,
-                        ...{borderBottomWidth: 1, borderBottomColor: '#EEEEEE'},
+                        ...{ borderBottomWidth: 1, borderBottomColor: '#EEEEEE' },
                       }}>
                       <View style={styles.itemImageContainer}>
                         <Image
@@ -333,7 +333,7 @@ const getStyles = (colors: any) =>
       padding: 20,
       elevation: 2,
       shadowColor: colors.black,
-      shadowOffset: {width: 0, height: 1},
+      shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.2,
       shadowRadius: 1.41,
     },

@@ -12,11 +12,11 @@ import {
   type RouteProp,
 } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type {CustomerCartStackParamList} from '../../navigation/CustomerNavigator';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
+import type { CustomerCartStackParamList } from '@/navigation/CustomerNavigator';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 type PaymentSuccessScreenRouteProp = RouteProp<
   CustomerCartStackParamList,
@@ -26,10 +26,10 @@ type PaymentSuccessScreenRouteProp = RouteProp<
 const PaymentSuccessScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const route = useRoute<PaymentSuccessScreenRouteProp>();
-  const {t} = useLocale();
-  const {colors} = useTheme();
+  const { t } = useLocale();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const {paymentId} = route.params;
+  const { paymentId } = route.params;
 
   const handleContinueShopping = () => {
     navigation.navigate('HomeTab' as never);
@@ -47,7 +47,7 @@ const PaymentSuccessScreen = () => {
   const styles = getStyles(colors);
 
   return (
-    <View style={[styles.container, {paddingTop: insets.top}]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.iconContainer}>
           <Icon name="check-circle" size={100} color={colors.success} />

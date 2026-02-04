@@ -13,12 +13,12 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import type {IFavoritesItem, IProduct} from '../../types/index';
-import currencyFormatter from '../../utils/currencyFormatter';
-import {useFavorites} from '../../contexts/FavoritesContext';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import Image from '../../components/Image';
+import type {IFavoritesItem, IProduct} from '@/types/index';
+import currencyFormatter from '@/utils/currencyFormatter';
+import {useFavorites} from '@/contexts/FavoritesContext';
+import {useLocale} from '@/contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
+import Image from '@/components/Image';
 
 const FavoritesScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();

@@ -1,10 +1,18 @@
-import React, {createContext, useContext, useState, useEffect} from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import dayjs from 'dayjs';
+import 'dayjs/locale/tr';
+import 'dayjs/locale/en';
 
 import tr from '../lang/tr';
 import en from '../lang/en';
 
 export type Locale = 'en' | 'tr';
+
+const DEFAULT_LOCALE: Locale = 'tr';
+
+// Set initial dayjs locale
+dayjs.locale(DEFAULT_LOCALE);
 
 interface LocaleContextData {
   locale: Locale;
@@ -41,8 +49,7 @@ const getTranslation = (locale: Locale, key: string, params?: any): string => {
   return translation;
 };
 
-const DEFAULT_LOCALE = 'tr';
-export const LocaleProvider: React.FC<{children: React.ReactNode}> = ({
+export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
@@ -57,19 +64,23 @@ export const LocaleProvider: React.FC<{children: React.ReactNode}> = ({
       const storedLocale = await AsyncStorage.getItem(LOCALE_STORAGE_KEY);
       if (storedLocale && (storedLocale === 'en' || storedLocale === 'tr')) {
         setLocaleState(storedLocale as Locale);
+        dayjs.locale(storedLocale);
       } else {
         // Default to Turkish for now, we'll add device locale detection later
         setLocaleState(DEFAULT_LOCALE);
+        dayjs.locale(DEFAULT_LOCALE);
       }
     } catch (error) {
       console.error('Error loading locale from storage:', error);
       setLocaleState(DEFAULT_LOCALE);
+      dayjs.locale(DEFAULT_LOCALE);
     }
   };
 
   const setLocale = async (newLocale: Locale) => {
     try {
       setLocaleState(newLocale);
+      dayjs.locale(newLocale);
       await AsyncStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
     } catch (error) {
       console.error('Error saving locale to storage:', error);

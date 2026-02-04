@@ -493,17 +493,19 @@ const ProductDetailScreen = () => {
             <View style={styles.quantityControls}>
               <IconButton
                 onPress={() => handleQuantityChange(quantity - 1)}
+                variant="primary-outline"
                 disabled={quantity <= 1 || isCartQuantityLoading}
-                icon={<Icon name="minus" size={16} color={colors.text} />}
+                icon={<Icon name="minus" size={16} color={colors.white} />}
               />
               <Text style={styles.quantityText}>{quantity}</Text>
               <IconButton
                 onPress={() => handleQuantityChange(quantity + 1)}
+                variant="primary-outline"
                 disabled={
                   (product.variants?.find(v => v.sku === selectedSKU)?.stock ||
                     0) <= quantity || isCartQuantityLoading
                 }
-                icon={<Icon name="plus" size={16} color={colors.text} />}
+                icon={<Icon name="plus" size={16} color={colors.white} />}
               />
             </View>
           </View>
@@ -514,12 +516,12 @@ const ProductDetailScreen = () => {
             onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
             loading={isCartLoading}
             disabled={!selectedSKU}
-            variant={isAddedToCart ? 'secondary' : 'primary'}
+            variant={isAddedToCart ? 'danger' : 'primary'}
             icon={
               isAddedToCart ? (
-                <Icon name="cart-remove" size={20} color={colors.text} />
+                <Icon name="cart-remove" size={20} color={colors.white} />
               ) : (
-                <Icon name="cart-plus" size={20} color={colors.text} />
+                <Icon name="cart-plus" size={20} color={colors.white} />
               )
             }
           />
@@ -527,12 +529,12 @@ const ProductDetailScreen = () => {
           <IconButton
             onPress={handleToggleFavorites}
             loading={isFavoritesLoading}
-            variant={isInFavorites(product._id) ? 'secondary' : 'primary'}
+            variant={isInFavorites(product._id) ? 'danger' : 'primary'}
             icon={
               isInFavorites(product._id) ? (
-                <Icon name="heart" size={20} color={colors.text} />
+                <Icon name="heart" size={20} color={colors.white} />
               ) : (
-                <Icon name="heart-outline" size={20} color={colors.text} />
+                <Icon name="heart-outline" size={20} color={colors.white} />
               )
             }
           />

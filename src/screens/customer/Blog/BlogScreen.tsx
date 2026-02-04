@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,49 +10,27 @@ import {
   ActivityIndicator,
   StatusBar,
 } from 'react-native';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import {useLocale} from '../../contexts/LocaleContext';
-import {IPaginatedResponsePayload} from '../../types';
-import {useTheme} from '../../contexts/ThemeContext';
-import Image from '../../components/Image';
-import {api} from '../../services/api';
+import { useLocale } from '../../../contexts/LocaleContext';
+import { IPaginatedResponsePayload } from '../../../types';
+import { useTheme } from '../../../contexts/ThemeContext';
+import { IBlogPost } from '../../../types/blog';
+import Image from '../../../components/Image';
+import { api } from '../../../services/api';
 
-interface CampaignCondition {
-  type: 'purchase' | 'visit';
-  amount: number;
-}
 
-interface CampaignReward {
-  type: 'points' | 'discount';
-  amount: number;
-}
-
-interface Campaign {
-  _id: string;
-  name: string;
-  description: string;
-  image: string;
-  conditions: CampaignCondition[];
-  reward: CampaignReward;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const CampaignsScreen = () => {
+const BlogScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
-  const {colors} = useTheme();
-  const {t} = useLocale();
+  const { colors } = useTheme();
+  const { t } = useLocale();
 
-  const [campaigns, setCampaigns] = useState<
-    IPaginatedResponsePayload<Campaign>
+  const [blog, setBlog] = useState<
+    IPaginatedResponsePayload<IBlogPost>
   >({
     data: [],
     total: 0,
@@ -60,59 +38,49 @@ const CampaignsScreen = () => {
     limit: 10,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const fetchCampaigns = async () => {
+  const fetchBlog = async () => {
     try {
-      const response = await api.get('/campaign/active');
-      setCampaigns(response.data);
+      const response = await api.get('/blog-post');
+      setBlog(response.data);
     } catch (error) {
       console.log(error);
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Failed to fetch campaigns',
+        text2: 'Failed to fetch blog',
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCampaignPress = (campaign: Campaign) => {
-    navigation.navigate('CampaignDetail', {campaignId: campaign._id});
+  const handleCampaignPress = (blog: IBlogPost) => {
+    navigation.navigate('BlogDetail', { blogId: blog._id });
   };
 
   const styles = getStyles(colors);
 
-  const renderCondition = (condition: CampaignCondition, index: number) => (
-    <View key={index} style={styles.conditionContainer}>
-      <Text style={styles.conditionText}>
-        {condition.type === 'purchase' ? 'Purchase' : 'Visit'}{' '}
-        {condition.amount} times
-      </Text>
-    </View>
-  );
-
   useEffect(() => {
-    fetchCampaigns();
+    fetchBlog();
   }, []);
 
-  const renderCampaign = ({item}: {item: Campaign}) => (
+  const renderBlog = ({ item }: { item: IBlogPost }) => (
     <TouchableOpacity
-      style={styles.campaignCard}
+      style={styles.blogCard}
       onPress={() => handleCampaignPress(item)}>
-      <Image id={item.image} style={styles.campaignImage} />
-      <View style={styles.campaignContent}>
-        <Text style={styles.campaignName}>{item.name}</Text>
-        <Text style={styles.campaignDescription}>{item.description}</Text>
+      <Image id={item.coverImage} style={styles.blogImage} />
+      <View style={styles.blogContent}>
+        <Text style={styles.blogName}>{item.title}</Text>
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <View style={[styles.container, {paddingTop: insets.top}]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.subContainer}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('campaigns.title')}</Text>
+          <Text style={styles.headerTitle}>{t('blog.title')}</Text>
         </View>
 
         {isLoading ? (
@@ -121,20 +89,20 @@ const CampaignsScreen = () => {
           </View>
         ) : (
           <FlatList
-            data={campaigns?.data ?? []}
-            onRefresh={fetchCampaigns}
+            data={blog?.data ?? []}
+            onRefresh={fetchBlog}
             refreshing={isLoading}
-            renderItem={renderCampaign}
+            renderItem={renderBlog}
             keyExtractor={item => item._id}
             contentContainerStyle={styles.list}
             ListEmptyComponent={
               <View style={[styles.flex, styles.centerContent]}>
-                <Icon name="gift-outline" size={64} color={colors.gray} />
+                <Icon name="book-open" size={64} color={colors.gray} />
                 <Text style={styles.emptyText}>
-                  {t('campaigns.noActiveCampaigns')}
+                  {t('blog.noActiveBlog')}
                 </Text>
                 <Text style={styles.emptySubtext}>
-                  {t('campaigns.checkBackLaterForNewCampaigns')}
+                  {t('blog.checkBackLaterForNewBlog')}
                 </Text>
               </View>
             }
@@ -182,7 +150,7 @@ const getStyles = (colors: any) =>
       justifyContent: 'center',
       alignItems: 'center',
     },
-    campaignCard: {
+    blogCard: {
       backgroundColor: colors.card,
       borderRadius: 12,
       padding: 8,
@@ -196,22 +164,22 @@ const getStyles = (colors: any) =>
       shadowRadius: 4,
       elevation: 3,
     },
-    campaignImage: {
+    blogImage: {
       width: '100%',
       height: 200,
       borderRadius: 8,
       marginBottom: 12,
     },
-    campaignContent: {
-      marginTop: 6,
+    blogContent: {
+      marginVertical: 6,
     },
-    campaignName: {
+    blogName: {
       fontSize: 18,
       fontWeight: '600',
       color: colors.text,
       marginBottom: 4,
     },
-    campaignDescription: {
+    blogDescription: {
       fontSize: 14,
       color: colors.textSecondary,
       marginBottom: 6,
@@ -255,4 +223,4 @@ const getStyles = (colors: any) =>
     },
   });
 
-export default CampaignsScreen;
+export default BlogScreen;

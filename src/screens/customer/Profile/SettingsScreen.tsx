@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {useTheme} from '../../contexts/ThemeContext';
-import {useAuth} from '../../contexts/AuthContext';
-import {useLocale} from '../../contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
+import {useAuth} from '@/contexts/AuthContext';
+import {useLocale} from '@/contexts/LocaleContext';
 
 const SettingsScreen = () => {
   const {colors, isDark, toggleTheme} = useTheme();

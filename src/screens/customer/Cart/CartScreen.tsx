@@ -11,28 +11,28 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import QRCode from 'react-native-qrcode-svg';
 
-import {fetchUserInformation} from '../../services/userInformationService';
-import currencyFormatter from '../../utils/currencyFormatter';
-import type {IProductVariant, IProductVariantOption} from '../../types/product';
-import type {PaymentCard} from '../../types/paymentCard';
-import type {UserInformation} from '../../types/address';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import IconButton from '../../components/IconButton';
-import {useCart} from '../../contexts/CartContext';
-import type {Address} from '../../types/address';
-import type {ICartItem} from '../../types/cart';
-import Image from '../../components/Image';
+import type { IProductVariant, IProductVariantOption } from '@/types/product';
+import { fetchUserInformation } from '@/services/userInformationService';
+import currencyFormatter from '@/utils/currencyFormatter';
+import type { PaymentCard } from '@/types/paymentCard';
+import type { UserInformation } from '@/types/address';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import IconButton from '@/components/IconButton';
+import { useCart } from '@/contexts/CartContext';
+import type { Address } from '@/types/address';
+import type { ICartItem } from '@/types/cart';
+import Image from '@/components/Image';
 
 const CartScreen = () => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   const {
     items,
     removeFromCart,
@@ -44,7 +44,7 @@ const CartScreen = () => {
     isLoading,
   } = useCart();
   const navigation = useNavigation<NavigationProp<any>>();
-  const {t} = useLocale();
+  const { t } = useLocale();
   const insets = useSafeAreaInsets();
   const [token, setToken] = React.useState<string | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -138,8 +138,8 @@ const CartScreen = () => {
     if (items.length === 0) return;
 
     Alert.alert('Clear Cart', 'Are you sure you want to clear your cart?', [
-      {text: 'Cancel', style: 'cancel'},
-      {text: 'Clear', style: 'destructive', onPress: () => clearCart()},
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Clear', style: 'destructive', onPress: () => clearCart() },
     ]);
   };
 
@@ -158,7 +158,7 @@ const CartScreen = () => {
         'No Default Address',
         'Please set a default address before proceeding with payment.',
         [
-          {text: 'Cancel', style: 'cancel'},
+          { text: 'Cancel', style: 'cancel' },
           {
             text: 'Add Address',
             onPress: () =>
@@ -176,7 +176,7 @@ const CartScreen = () => {
         'No Default Payment Card',
         'Please set a default payment card before proceeding with payment.',
         [
-          {text: 'Cancel', style: 'cancel'},
+          { text: 'Cancel', style: 'cancel' },
           {
             text: 'Add Payment Card',
             onPress: () =>
@@ -209,11 +209,11 @@ const CartScreen = () => {
     );
     const variantOptions = variant
       ? (variant.options ?? [])
-          .map(
-            (variantOption: IProductVariantOption) =>
-              `${variantOption.name}: ${variantOption.value}`,
-          )
-          .join(', ')
+        .map(
+          (variantOption: IProductVariantOption) =>
+            `${variantOption.name}: ${variantOption.value}`,
+        )
+        .join(', ')
       : '';
 
     const styles = getStyles(colors);
@@ -272,7 +272,7 @@ const CartScreen = () => {
   const styles = getStyles(colors);
 
   return (
-    <View style={[styles.container, {paddingTop: insets.top}]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.subContainer}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('cart.title')}</Text>
@@ -458,7 +458,7 @@ const getStyles = (colors: any) =>
       padding: 12,
       marginBottom: 12,
       shadowColor: '#000',
-      shadowOffset: {width: 0, height: 1},
+      shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.1,
       shadowRadius: 2,
       elevation: 2,
@@ -596,7 +596,7 @@ const getStyles = (colors: any) =>
       maxWidth: 340,
       alignItems: 'center',
       shadowColor: '#000',
-      shadowOffset: {width: 0, height: 2},
+      shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
       elevation: 5,

@@ -21,8 +21,8 @@ import type {IProductCategory} from '../../types/productCategory';
 import LayoutHeader from '../../components/LayoutHeader';
 import {useLocale} from '../../contexts/LocaleContext';
 import ProductCard from '../../components/ProductCard';
+import SearchInput from '../../components/SearchInput';
 import {useTheme} from '../../contexts/ThemeContext';
-import TextInput from '../../components/TextInput';
 import {useAuth} from '../../contexts/AuthContext';
 import type {IProduct} from '../../types/product';
 import Avatar from '../../components/Avatar';
@@ -346,34 +346,15 @@ const HomeScreen = () => {
           }}>
           {/* Search Bar */}
           <View style={styles.searchContainer}>
-            <View style={styles.searchInputContainer}>
-              <Icon
-                name="magnify"
-                size={20}
-                color={colors.textSecondary}
-                style={styles.searchIcon}
-              />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('home.searchProducts')}
-                placeholderTextColor={colors.textSecondary}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                returnKeyType="search"
-                onSubmitEditing={handleSearch}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity
-                  onPress={clearSearch}
-                  style={styles.clearButton}>
-                  <Icon
-                    name="close-circle"
-                    size={16}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
+            <SearchInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSubmit={handleSearch}
+              onClear={clearSearch}
+              placeholder={t('home.searchProducts')}
+              debounceDelay={400}
+              loading={isSearching}
+            />
           </View>
 
           {/* Categories Section */}
@@ -551,27 +532,6 @@ const getStyles = (colors: any) =>
     searchContainer: {
       marginTop: 15,
       marginBottom: 5,
-    },
-    searchInputContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.card,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      height: 44,
-    },
-    searchIcon: {
-      marginRight: 8,
-    },
-    searchInput: {
-      flex: 1,
-      height: '100%',
-      color: colors.text,
-      fontSize: 16,
-      padding: 0,
-    },
-    clearButton: {
-      padding: 4,
     },
     searchingContainer: {
       flexDirection: 'row',

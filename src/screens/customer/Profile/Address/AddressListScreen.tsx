@@ -20,11 +20,11 @@ import {
   fetchUserInformation,
   deleteAddress,
   setDefaultAddress,
-} from '../../services/userInformationService';
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import type {Address, UserInformation} from '../../types/address';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
+} from '@/services/userInformationService';
+import type {CustomerProfileStackParamList} from '@/navigation/CustomerNavigator';
+import type {Address, UserInformation} from '@/types/address';
+import {useLocale} from '@/contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
 
 type AddressListScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,

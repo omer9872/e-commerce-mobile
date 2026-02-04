@@ -1,8 +1,9 @@
 export const colors = {
   // Light theme colors
   light: {
-    primary: '#5C6BC0',
-    primaryLight: '#E8EAF6',
+    primary: '#4859C2',
+    primaryLight: '#6172CF',
+    inversePrimary: '#7986CB',
     secondary: '#FF7043',
     background: '#F5F7FA',
     card: '#FFFFFF',
@@ -26,12 +27,12 @@ export const colors = {
     scrim: 'rgba(0, 0, 0, 0.32)',
     inverseSurface: '#2F2F2F',
     inverseOnSurface: '#FFFFFF',
-    inversePrimary: '#7986CB',
   },
   // Dark theme colors
   dark: {
-    primary: '#7986CB',
-    primaryLight: '#3F51B5',
+    primary: '#4859C2',
+    primaryLight: '#6172CF',
+    inversePrimary: '#7986CB',
     secondary: '#FF8A65',
     background: '#121212',
     card: '#1E1E1E',
@@ -55,7 +56,6 @@ export const colors = {
     scrim: 'rgba(0, 0, 0, 0.6)',
     inverseSurface: '#FFFFFF',
     inverseOnSurface: '#2F2F2F',
-    inversePrimary: '#5C6BC0',
   },
 };
 

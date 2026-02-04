@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,24 +8,24 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useRoute} from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import dayjs from 'dayjs';
 
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import {Campaign} from '../../types/campaign';
-import Image from '../../components/Image';
-import {api} from '../../services/api';
+import { useLocale } from '../../../contexts/LocaleContext';
+import { useTheme } from '../../../contexts/ThemeContext';
+import { ICampaign } from '../../../types/campaign';
+import Image from '../../../components/Image';
+import { api } from '../../../services/api';
 
 const CampaignDetailScreen = () => {
-  const {t} = useLocale();
+  const { t } = useLocale();
   const route = useRoute();
-  const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [campaign, setCampaign] = useState<ICampaign | null>(null);
   const [loading, setLoading] = useState(true);
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {campaignId} = route.params as {campaignId: string};
+  const { campaignId } = route.params as { campaignId: string };
 
   useEffect(() => {
     fetchCampaignDetails();
@@ -65,7 +65,7 @@ const CampaignDetailScreen = () => {
     );
   }
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | Date) => {
     return dayjs(dateString).format('DD MMMM YYYY');
   };
 
@@ -77,7 +77,7 @@ const CampaignDetailScreen = () => {
 
         <View style={styles.detailsContainer}>
           <Text style={styles.campaignName}>{campaign.name}</Text>
-          <Text style={styles.campaignDescription}>{campaign.description}</Text>
+          <Text style={styles.campaignDescription} >{campaign.description}</Text>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>

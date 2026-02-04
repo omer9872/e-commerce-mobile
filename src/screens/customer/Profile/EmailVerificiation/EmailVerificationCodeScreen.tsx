@@ -18,12 +18,12 @@ import {
 import type {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import CodeInput, {type CodeInputRef} from '../../components/CodeInput';
-import {userService} from '../../services/userService';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import {useAuth} from '../../contexts/AuthContext';
+import type {CustomerProfileStackParamList} from '@/navigation/CustomerNavigator';
+import CodeInput, {type CodeInputRef} from '@/components/CodeInput';
+import {userService} from '@/services/userService';
+import {useLocale} from '@/contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
+import {useAuth} from '@/contexts/AuthContext';
 
 type EmailVerificationCodeScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,

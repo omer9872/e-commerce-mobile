@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -18,13 +18,13 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 
-import type {CustomerCartStackParamList} from '../../navigation/CustomerNavigator';
-import currencyFormatter from '../../utils/currencyFormatter';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import {useCart} from '../../contexts/CartContext';
-import type {ICartItem} from '../../types/cart';
-import {api} from '../../services/api';
+import type { CustomerCartStackParamList } from '@/navigation/CustomerNavigator';
+import currencyFormatter from '@/utils/currencyFormatter';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useCart } from '@/contexts/CartContext';
+import type { ICartItem } from '@/types/cart';
+import { api } from '@/services/api';
 
 type PaymentConfirmationScreenRouteProp = RouteProp<
   CustomerCartStackParamList,
@@ -33,13 +33,13 @@ type PaymentConfirmationScreenRouteProp = RouteProp<
 
 const PaymentConfirmationScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
-  const {t} = useLocale();
+  const { t } = useLocale();
   const route = useRoute<PaymentConfirmationScreenRouteProp>();
   const [isProcessing, setIsProcessing] = useState(false);
-  const {clearCart} = useCart();
-  const {colors} = useTheme();
+  const { clearCart } = useCart();
+  const { colors } = useTheme();
 
-  const {items, totalPrice, defaultAddress, defaultPaymentCard} = route.params;
+  const { items, totalPrice, defaultAddress, defaultPaymentCard } = route.params;
 
   const handleConfirmPayment = async () => {
     try {
@@ -204,7 +204,7 @@ const PaymentConfirmationScreen = () => {
               style={[
                 styles.confirmationItem,
                 styles.totalItem,
-                {borderTopWidth: 0},
+                { borderTopWidth: 0 },
               ]}>
               <Text style={styles.totalItemLabel}>
                 {t('paymentConfirmation.total')}
@@ -251,7 +251,7 @@ const getStyles = (colors: any) =>
       borderRadius: 12,
       padding: 16,
       shadowColor: '#000',
-      shadowOffset: {width: 0, height: 1},
+      shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.1,
       shadowRadius: 2,
       elevation: 2,

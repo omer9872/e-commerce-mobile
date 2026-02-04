@@ -6,11 +6,15 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import {useTheme} from '../contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 export type ButtonVariant =
   | 'primary'
+  | 'primary-outline'
   | 'secondary'
+  | 'secondary-outline'
+  | 'danger'
+  | 'danger-outline'
   | 'outline'
   | 'ghost'
   | 'destructive'
@@ -37,7 +41,7 @@ const Button: React.FC<ButtonProps> = ({
   icon,
   style,
 }) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const getButtonColors = () => {
     const isDisabled = disabled || loading;
@@ -45,47 +49,74 @@ const Button: React.FC<ButtonProps> = ({
     switch (variant) {
       case 'primary':
         return {
-          backgroundColor: isDisabled ? colors.outline : colors.primary,
-          textColor: isDisabled ? colors.onSurfaceVariant : colors.white,
-          borderColor: isDisabled ? colors.outline : colors.primary,
+          backgroundColor: colors.primary,
+          textColor: colors.white,
+          borderColor: colors.primary,
+        };
+      case 'primary-outline':
+        return {
+          backgroundColor: 'transparent',
+          textColor: colors.primary,
+          borderColor: colors.primary,
+          borderWidth: 2,
         };
       case 'secondary':
         return {
           backgroundColor: isDisabled
             ? colors.surfaceVariant
             : colors.secondary,
-          textColor: isDisabled ? colors.onSurfaceVariant : colors.white,
-          borderColor: isDisabled ? colors.surfaceVariant : colors.secondary,
+          textColor: colors.white,
+          borderColor: colors.secondary,
+        };
+      case 'secondary-outline':
+        return {
+          backgroundColor: 'transparent',
+          textColor: colors.secondary,
+          borderColor: colors.secondary,
+          borderWidth: 2,
+        };
+      case 'danger':
+        return {
+          backgroundColor: colors.error,
+          textColor: colors.white,
+          borderColor: colors.error,
+        };
+      case 'danger-outline':
+        return {
+          backgroundColor: 'transparent',
+          textColor: colors.error,
+          borderColor: colors.error,
+          borderWidth: 2,
         };
       case 'outline':
         return {
           backgroundColor: 'transparent',
-          textColor: isDisabled ? colors.onSurfaceVariant : colors.primary,
-          borderColor: isDisabled ? colors.outline : colors.primary,
+          textColor: colors.primary,
+          borderColor: colors.primary,
         };
       case 'ghost':
         return {
           backgroundColor: 'transparent',
-          textColor: isDisabled ? colors.onSurfaceVariant : colors.primary,
+          textColor: colors.primary,
           borderColor: 'transparent',
         };
       case 'destructive':
         return {
-          backgroundColor: isDisabled ? colors.outline : colors.error,
-          textColor: isDisabled ? colors.onSurfaceVariant : colors.white,
-          borderColor: isDisabled ? colors.outline : colors.error,
+          backgroundColor: colors.error,
+          textColor: colors.white,
+          borderColor: colors.error,
         };
       case 'success':
         return {
-          backgroundColor: isDisabled ? colors.outline : '#4CAF50',
-          textColor: isDisabled ? colors.onSurfaceVariant : '#FFFFFF',
-          borderColor: isDisabled ? colors.outline : '#4CAF50',
+          backgroundColor: '#4CAF50',
+          textColor: '#FFFFFF',
+          borderColor: '#4CAF50',
         };
       default:
         return {
-          backgroundColor: isDisabled ? colors.outline : colors.primary,
-          textColor: isDisabled ? colors.onSurfaceVariant : colors.white,
-          borderColor: isDisabled ? colors.outline : colors.primary,
+          backgroundColor: colors.primary,
+          textColor: colors.white,
+          borderColor: colors.primary,
         };
     }
   };
@@ -94,12 +125,12 @@ const Button: React.FC<ButtonProps> = ({
     switch (size) {
       case 'small':
         return {
-          width: 30,
-          height: 30,
-          minWidth: 30,
-          minHeight: 30,
-          maxWidth: 30,
-          maxHeight: 30,
+          width: 34,
+          height: 34,
+          minWidth: 34,
+          minHeight: 34,
+          maxWidth: 34,
+          maxHeight: 34,
         };
       case 'large':
         return {
@@ -132,9 +163,8 @@ const Button: React.FC<ButtonProps> = ({
       style={[
         styles.button,
         {
-          backgroundColor: buttonColors.backgroundColor,
-          borderColor: buttonColors.borderColor,
           borderRadius: '100%',
+          ...buttonColors,
           ...sizeStyles,
         },
         style,

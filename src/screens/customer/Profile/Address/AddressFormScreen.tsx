@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,19 +17,19 @@ import {
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import Toast from 'react-native-toast-message';
 
 import {
   fetchUserInformation,
   addAddress,
   updateAddress,
-} from '../../services/userInformationService';
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import type {AddressFormData} from '../../types/address';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import TextInput from '../../components/TextInput';
+} from '@/services/userInformationService';
+import type { CustomerProfileStackParamList } from '@/navigation/CustomerNavigator';
+import type { AddressFormData } from '@/types/address';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import TextInput from '@/components/TextInput';
 
 type AddressFormScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -44,10 +44,10 @@ type AddressFormScreenRouteProp = RouteProp<
 const AddressFormScreen = () => {
   const navigation = useNavigation<AddressFormScreenNavigationProp>();
   const route = useRoute<AddressFormScreenRouteProp>();
-  const {addressId} = route.params || {};
+  const { addressId } = route.params || {};
   const isEditing = !!addressId;
-  const {colors} = useTheme();
-  const {t} = useLocale();
+  const { colors } = useTheme();
+  const { t } = useLocale();
 
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
@@ -184,7 +184,7 @@ const AddressFormScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{flex: 1}}
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
       <StatusBar barStyle="dark-content" />
@@ -221,7 +221,7 @@ const AddressFormScreen = () => {
           </View>
 
           <View style={styles.row}>
-            <View style={[styles.inputGroup, {flex: 1, marginRight: 8}]}>
+            <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
               <Text style={styles.label}>{t('addressForm.city')}</Text>
               <TextInput
                 style={styles.input}
@@ -231,7 +231,7 @@ const AddressFormScreen = () => {
               />
             </View>
 
-            <View style={[styles.inputGroup, {flex: 1}]}>
+            <View style={[styles.inputGroup, { flex: 1 }]}>
               <Text style={styles.label}>{t('addressForm.county')}</Text>
               <TextInput
                 style={styles.input}
@@ -263,7 +263,7 @@ const AddressFormScreen = () => {
           </View>
 
           <View style={styles.row}>
-            <View style={[styles.inputGroup, {flex: 1, marginRight: 8}]}>
+            <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
               <Text style={styles.label}>{t('addressForm.no')}</Text>
               <TextInput
                 style={styles.input}
@@ -274,7 +274,7 @@ const AddressFormScreen = () => {
               />
             </View>
 
-            <View style={[styles.inputGroup, {flex: 1}]}>
+            <View style={[styles.inputGroup, { flex: 1 }]}>
               <Text style={styles.label}>{t('addressForm.flat')}</Text>
               <TextInput
                 style={styles.input}

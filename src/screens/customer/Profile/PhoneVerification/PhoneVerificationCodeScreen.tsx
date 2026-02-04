@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, useRef, useEffect} from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,14 +17,14 @@ import {
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {useLocale} from '../../contexts/LocaleContext';
-import {userService} from '../../services/userService';
-import {useTheme} from '../../contexts/ThemeContext';
-import {useAuth} from '../../contexts/AuthContext';
+import type { CustomerProfileStackParamList } from '@/navigation/CustomerNavigator';
+import { useLocale } from '@/contexts/LocaleContext';
+import { userService } from '@/services/userService';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 type PhoneVerificationCodeScreenRouteProp = RouteProp<
   CustomerProfileStackParamList,
@@ -41,11 +41,11 @@ const RESEND_COOLDOWN = 60; // seconds
 
 const PhoneVerificationCodeScreen = () => {
   const navigation = useNavigation<PhoneVerificationCodeScreenNavigationProp>();
-  const {t} = useLocale();
+  const { t } = useLocale();
   const route = useRoute<PhoneVerificationCodeScreenRouteProp>();
-  const {phone} = route.params;
-  const {fetchMe} = useAuth();
-  const {colors} = useTheme();
+  const { phone } = route.params;
+  const { fetchMe } = useAuth();
+  const { colors } = useTheme();
 
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -122,9 +122,9 @@ const PhoneVerificationCodeScreen = () => {
       console.error('Error verifying phone:', err);
       setError(
         err.response?.data?.message ||
-          t(
-            'phoneVerificationCode.failedToVerifyCodePleaseCheckTheCodeAndTryAgain',
-          ),
+        t(
+          'phoneVerificationCode.failedToVerifyCodePleaseCheckTheCodeAndTryAgain',
+        ),
       );
     } finally {
       setLoading(false);
@@ -145,9 +145,9 @@ const PhoneVerificationCodeScreen = () => {
       console.error('Error resending verification code:', err);
       setError(
         err.response?.data?.message ||
-          t(
-            'phoneVerificationCode.failedToResendVerificationCodePleaseTryAgain',
-          ),
+        t(
+          'phoneVerificationCode.failedToResendVerificationCodePleaseTryAgain',
+        ),
       );
     } finally {
       setLoading(false);
@@ -191,7 +191,7 @@ const PhoneVerificationCodeScreen = () => {
             </Text>
 
             <View style={styles.codeContainer}>
-              {Array.from({length: VERIFICATION_CODE_LENGTH}).map(
+              {Array.from({ length: VERIFICATION_CODE_LENGTH }).map(
                 (_, index) => (
                   <RNTextInput
                     key={index}
@@ -236,7 +236,7 @@ const PhoneVerificationCodeScreen = () => {
               </Text>
               {resendActive ? (
                 <Text style={styles.cooldownText}>
-                  {t('phoneVerificationCode.resendIn', {cooldown})}
+                  {t('phoneVerificationCode.resendIn', { cooldown })}
                 </Text>
               ) : (
                 <TouchableOpacity onPress={handleResendCode} disabled={loading}>

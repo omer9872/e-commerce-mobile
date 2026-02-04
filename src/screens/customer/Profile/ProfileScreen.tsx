@@ -8,16 +8,16 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import type {StackNavigationProp} from '@react-navigation/stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import LayoutHeader from '../../components/LayoutHeader';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import {useAuth} from '../../contexts/AuthContext';
-import Avatar from '../../components/Avatar';
+import type { CustomerProfileStackParamList } from '@/navigation/CustomerNavigator';
+import LayoutHeader from '@/components/LayoutHeader';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
+import Avatar from '@/components/Avatar';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,
@@ -26,9 +26,9 @@ type ProfileScreenNavigationProp = StackNavigationProp<
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const {t} = useLocale();
-  const {user, signOut} = useAuth();
-  const {colors} = useTheme();
+  const { t } = useLocale();
+  const { user, signOut } = useAuth();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   const navigateToEditProfile = () => {
@@ -51,6 +51,10 @@ const ProfileScreen = () => {
     navigation.navigate('TransactionHistory');
   };
 
+  const navigateToFavorites = () => {
+    navigation.navigate('Favorites');
+  };
+
   const navigateToEmailVerification = () => {
     navigation.navigate('EmailVerification');
   };
@@ -71,7 +75,7 @@ const ProfileScreen = () => {
   const styles = getStyles(colors);
 
   return (
-    <View style={{...styles.container, paddingTop: insets.top}}>
+    <View style={{ ...styles.container, paddingTop: insets.top }}>
       <View style={styles.subContainer}>
         <LayoutHeader title={t('profile.title')} />
 
@@ -81,17 +85,16 @@ const ProfileScreen = () => {
           <View style={styles.userSection}>
             <Avatar id={user?.image} size={100} />
             <View style={styles.userInfoSection}>
-              <Text style={styles.userName}>{`${user?.firstName || ''} ${
-                user?.lastName || ''
-              }`}</Text>
+              <Text style={styles.userName}>{`${user?.firstName || ''} ${user?.lastName || ''
+                }`}</Text>
               <View style={styles.userInfoRow}>
                 <Icon name="email" size={20} color={colors.primary} />
                 <Text style={styles.userEmail}>{user?.email || ''}</Text>
               </View>
-              <View style={styles.userInfoRow}>
+              {user?.phone && <View style={styles.userInfoRow}>
                 <Icon name="phone" size={20} color={colors.primary} />
                 <Text style={styles.userEmail}>{user?.phone || ''}</Text>
-              </View>
+              </View>}
             </View>
           </View>
 
@@ -139,6 +142,24 @@ const ProfileScreen = () => {
           <View style={styles.actionsContainer}>
             <TouchableOpacity
               style={styles.actionButton}
+              onPress={navigateToFavorites}>
+              <Icon name="heart-outline" size={24} color={colors.primary} />
+              <Text style={styles.actionText}>
+                {t('profile.favorites')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={navigateToTransactionHistory}>
+              <Icon name="history" size={24} color={colors.primary} />
+              <Text style={styles.actionText}>
+                {t('profile.transactionHistory')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.actionButton}
               onPress={navigateToEditProfile}>
               <Icon name="account-edit" size={24} color={colors.primary} />
               <Text style={styles.actionText}>{t('profile.editProfile')}</Text>
@@ -162,15 +183,6 @@ const ProfileScreen = () => {
 
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={navigateToTransactionHistory}>
-              <Icon name="history" size={24} color={colors.primary} />
-              <Text style={styles.actionText}>
-                {t('profile.transactionHistory')}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionButton}
               onPress={navigateToSettings}>
               <Icon name="cog" size={24} color={colors.primary} />
               <Text style={styles.actionText}>{t('profile.settings')}</Text>
@@ -180,7 +192,7 @@ const ProfileScreen = () => {
               style={styles.actionButton}
               onPress={handleSignOut}>
               <Icon name="logout" size={24} color={colors.error} />
-              <Text style={[styles.actionText, {color: colors.error}]}>
+              <Text style={[styles.actionText, { color: colors.error }]}>
                 {t('profile.signOut')}
               </Text>
             </TouchableOpacity>

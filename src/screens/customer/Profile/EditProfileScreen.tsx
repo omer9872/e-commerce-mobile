@@ -14,11 +14,11 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useState, useEffect} from 'react';
 
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
-import TextInput from '../../components/TextInput';
-import {useAuth} from '../../contexts/AuthContext';
-import {api} from '../../services/api';
+import {useLocale} from '@/contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
+import TextInput from '@/components/TextInput';
+import {useAuth} from '@/contexts/AuthContext';
+import {api} from '@/services/api';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();

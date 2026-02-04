@@ -19,13 +19,13 @@ import Toast from 'react-native-toast-message';
 import {
   deletePaymentCard,
   setDefaultPaymentCard,
-} from '../../services/paymentCardService';
-import type {CustomerProfileStackParamList} from '../../navigation/CustomerNavigator';
-import {fetchUserInformation} from '../../services/userInformationService';
-import type {PaymentCard} from '../../types/paymentCard';
-import type {UserInformation} from '../../types/address';
-import {useLocale} from '../../contexts/LocaleContext';
-import {useTheme} from '../../contexts/ThemeContext';
+} from '@/services/paymentCardService';
+import type {CustomerProfileStackParamList} from '@/navigation/CustomerNavigator';
+import {fetchUserInformation} from '@/services/userInformationService';
+import type {PaymentCard} from '@/types/paymentCard';
+import type {UserInformation} from '@/types/address';
+import {useLocale} from '@/contexts/LocaleContext';
+import {useTheme} from '@/contexts/ThemeContext';
 
 type PaymentCardListScreenNavigationProp = StackNavigationProp<
   CustomerProfileStackParamList,

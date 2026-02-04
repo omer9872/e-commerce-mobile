@@ -10,16 +10,18 @@ import {
   ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useFavorites} from '../contexts/FavoritesContext';
-import {useNavigation} from '@react-navigation/native';
-import {useCart} from '../contexts/CartContext';
+import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 
-import currencyFormatter from '../utils/currencyFormatter';
-import {useTheme} from '../contexts/ThemeContext';
-import {IProduct} from '../types/product';
-import Image from '../components/Image';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import currencyFormatter from '@/utils/currencyFormatter';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import IconButton from '@/components/IconButton';
+import { useCart } from '@/contexts/CartContext';
+import { IProduct } from '@/types/product';
+import Image from '@/components/Image';
 
 interface ProductCardProps {
   product: IProduct;
@@ -27,19 +29,15 @@ interface ProductCardProps {
   style?: StyleProp<ViewStyle>;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onPress, style }) => {
   const navigation = useNavigation<any>();
   const {
-    addToCart,
-    removeFromCart,
-    items,
     isLoading: isCartLoading,
   } = useCart();
-  const {addToFavorites, removeFromFavorites, isInFavorites} = useFavorites();
-  const [isAddedToCart, setIsAddedToCart] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { addToFavorites, removeFromFavorites, isInFavorites } = useFavorites();
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
-  const {colors} = useTheme();
+  const { colors } = useTheme();
+  const { t } = useLocale();
 
   const handleToggleFavorites = async () => {
     if (isFavoritesLoading) return;
@@ -50,23 +48,22 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
         await removeFromFavorites(product._id);
         Toast.show({
           type: 'success',
-          text1: 'Removed from Favorites',
-          text2: `${product.name} has been removed from your favorites`,
+          text1: t('components.productCard.removedFromFavorites'),
+          text2: t('components.productCard.hasBeenRemovedFromYourFavorites', { productName: product.name }),
         });
       } else {
         await addToFavorites(product._id);
         Toast.show({
           type: 'success',
-          text1: 'Added to Favorites',
-          text2: `${product.name} has been added to your favorites`,
+          text1: t('components.productCard.addedToFavorites'),
+          text2: t('components.productCard.hasBeenAddedToYourFavorites', { productName: product.name }),
         });
       }
     } catch (error) {
-      console.error('Error toggling favorites:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to update favorites. Please try again.',
+        text1: t('common.errors.unknownError'),
+        text2: t('common.errors.unknownErrorDescription'),
       });
     } finally {
       setIsFavoritesLoading(false);
@@ -77,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
     if (onPress) {
       onPress();
     } else {
-      navigation.navigate('ProductDetail', {productId: product._id});
+      navigation.navigate('ProductDetail', { productId: product._id });
     }
   };
 
@@ -91,37 +88,29 @@ const ProductCard: React.FC<ProductCardProps> = ({product, onPress, style}) => {
     return 0;
   };
 
-  // Check if product is already in cart
-  useEffect(() => {
-    const isInCart = items.some(item => item.product._id === product._id);
-    setIsAddedToCart(isInCart);
-  }, [items, product._id]);
-
   return (
     <TouchableOpacity
       style={[styles.container, style]}
       onPress={handlePress}
-      disabled={isLoading || isCartLoading}>
+      disabled={isCartLoading}>
       <Image
         id={product.images[0]}
         style={styles.image}
         defaultSource={require('../assets/images/logo.jpg')}
+      />
+      <IconButton
+        icon={<Icon name={isInFavorites(product._id) ? 'heart' : 'heart-outline'} size={18} color={colors.text} />}
+        onPress={handleToggleFavorites}
+        disabled={isFavoritesLoading}
+        style={styles.favoriteButton}
+        variant='danger'
+        size="small"
       />
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.name} numberOfLines={2}>
             {product.name}
           </Text>
-          <TouchableOpacity
-            style={styles.favoriteButton}
-            onPress={handleToggleFavorites}
-            disabled={isFavoritesLoading}>
-            <Icon
-              name={isInFavorites(product._id) ? 'heart' : 'heart-outline'}
-              size={25}
-              color={isInFavorites(product._id) ? colors.error : colors.text}
-            />
-          </TouchableOpacity>
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amountText}>
@@ -142,7 +131,7 @@ const getStyles = (colors: any) =>
       marginBottom: 16,
       overflow: 'hidden',
       shadowColor: '#000',
-      shadowOffset: {width: 0, height: 2},
+      shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
@@ -178,19 +167,17 @@ const getStyles = (colors: any) =>
       justifyContent: 'space-between',
     },
     amountContainer: {
-      backgroundColor: colors.primaryLight,
-      paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 4,
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
     },
     amountText: {
       fontSize: 14,
       fontWeight: 'bold',
-      color: colors.text,
+      color: colors.inversePrimary,
     },
     amountLabel: {
       fontWeight: 'normal',
@@ -201,8 +188,9 @@ const getStyles = (colors: any) =>
       marginTop: 8,
     },
     favoriteButton: {
-      padding: 8,
-      borderRadius: 8,
+      position: 'absolute',
+      top: 10,
+      right: 10,
     },
     addToCartButton: {
       flexDirection: 'row',

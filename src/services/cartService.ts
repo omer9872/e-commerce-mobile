@@ -1,6 +1,6 @@
-import {api} from './api';
+import { api } from './api';
 
-import type {ICart} from '../types/cart';
+import type { ICart } from '../types/cart';
 
 export const cartService = {
   getCart: async (): Promise<ICart> => {
@@ -21,8 +21,8 @@ export const cartService = {
     return response.data;
   },
 
-  removeFromCart: async (sku: string): Promise<ICart> => {
-    const response = await api.delete(`/cart/${sku}`);
+  removeFromCart: async (productId: string, sku: string): Promise<ICart> => {
+    const response = await api.delete(`/cart/${productId}/${sku}`);
     return response.data;
   },
 

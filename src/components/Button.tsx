@@ -10,6 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {useTheme} from '../contexts/ThemeContext';
+import { STYLING } from '@/style/const';
 
 export type ButtonVariant = 
   | 'primary' 
@@ -105,7 +106,7 @@ const Button: React.FC<ButtonProps> = ({
         return {
           paddingHorizontal: 12,
           paddingVertical: 8,
-          borderRadius: 6,
+          borderRadius: STYLING.borderRadius.sm,
           fontSize: 14,
           iconSize: 16,
         };
@@ -113,7 +114,7 @@ const Button: React.FC<ButtonProps> = ({
         return {
           paddingHorizontal: 24,
           paddingVertical: 16,
-          borderRadius: 12,
+          borderRadius: STYLING.borderRadius.md,
           fontSize: 18,
           iconSize: 24,
         };
@@ -122,7 +123,7 @@ const Button: React.FC<ButtonProps> = ({
         return {
           paddingHorizontal: 16,
           paddingVertical: 12,
-          borderRadius: 8,
+          borderRadius: STYLING.borderRadius.lg,
           fontSize: 16,
           iconSize: 20,
         };

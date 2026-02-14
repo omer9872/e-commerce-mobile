@@ -6,7 +6,8 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { STYLING } from '@/style/const';
 
 export type ButtonVariant =
   | 'primary'
@@ -30,6 +31,7 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
+  rounded?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -40,6 +42,7 @@ const Button: React.FC<ButtonProps> = ({
   loading = false,
   icon,
   style,
+  rounded = true,
 }) => {
   const { colors } = useTheme();
 
@@ -163,7 +166,7 @@ const Button: React.FC<ButtonProps> = ({
       style={[
         styles.button,
         {
-          borderRadius: '100%',
+          borderRadius: rounded ? '100%' : STYLING.borderRadius.sm,
           ...buttonColors,
           ...sizeStyles,
         },

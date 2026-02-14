@@ -1,9 +1,9 @@
-import React, {createContext, useContext, useState, useEffect} from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Toast from 'react-native-toast-message';
 
-import {cartService} from '../services/cartService';
-import type {ICart, ICartItem} from '../types/cart';
-import {useAuth} from './AuthContext';
+import { cartService } from '../services/cartService';
+import type { ICart, ICartItem } from '../types/cart';
+import { useAuth } from './AuthContext';
 
 interface CartContextData {
   items: ICartItem[];
@@ -12,7 +12,7 @@ interface CartContextData {
     sku: string,
     quantity?: number,
   ) => Promise<void>;
-  removeFromCart: (sku: string) => Promise<void>;
+  removeFromCart: (productId: string, sku: string) => Promise<void>;
   updateQuantity: (
     productId: string,
     sku: string,
@@ -24,16 +24,24 @@ interface CartContextData {
   subtotal: number;
   totalDiscount: number;
   isLoading: boolean;
+  addCartLoading: boolean;
+  removeCartLoading: boolean;
+  updateCartLoading: boolean;
+  clearCartLoading: boolean;
 }
 
 const CartContext = createContext<CartContextData>({} as CartContextData);
 
-export const CartProvider: React.FC<{children: React.ReactNode}> = ({
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [cart, setCart] = useState<ICart | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const {isAuthenticated} = useAuth();
+  const [clearCartLoading, setClearCartLoading] = useState<boolean>(false)
+  const [addCartLoading, setAddCartLoading] = useState<boolean>(false)
+  const [removeCartLoading, setRemoveCartLoading] = useState<boolean>(false)
+  const [updateCartLoading, setUpdateCartLoading] = useState<boolean>(false)
+  const { isAuthenticated } = useAuth();
   // Load cart from API on mount
   useEffect(() => {
     if (isAuthenticated) {
@@ -59,7 +67,7 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
 
   const addToCart = async (productId: string, sku: string, quantity = 1) => {
     try {
-      setIsLoading(true);
+      setAddCartLoading(true);
       const updatedCart = await cartService.addToCart(productId, sku, quantity);
       setCart(updatedCart);
     } catch (error) {
@@ -69,14 +77,15 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
         text2: 'Please try again.',
       });
     } finally {
-      setIsLoading(false);
+      setAddCartLoading(false);
     }
   };
 
-  const removeFromCart = async (sku: string) => {
+  const removeFromCart = async (productId: string, sku: string) => {
     try {
-      setIsLoading(true);
-      const updatedCart = await cartService.removeFromCart(sku);
+      setRemoveCartLoading(true);
+      const updatedCart = await cartService.removeFromCart(productId, sku);
+      console.log('updatedCart', updatedCart);
       setCart(updatedCart);
     } catch (error) {
       Toast.show({
@@ -85,7 +94,7 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
         text2: 'Please try again.',
       });
     } finally {
-      setIsLoading(false);
+      setRemoveCartLoading(false);
     }
   };
 
@@ -95,7 +104,7 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
     quantity: number,
   ) => {
     try {
-      setIsLoading(true);
+      setUpdateCartLoading(true);
       const updatedCart = await cartService.updateQuantity(
         productId,
         sku,
@@ -109,13 +118,13 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
         text2: 'Please try again.',
       });
     } finally {
-      setIsLoading(false);
+      setUpdateCartLoading(false);
     }
   };
 
   const clearCart = async () => {
     try {
-      setIsLoading(true);
+      setClearCartLoading(true);
       const updatedCart = await cartService.clearCart();
       setCart(updatedCart);
     } catch (error) {
@@ -125,7 +134,7 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
         text2: 'Please try again.',
       });
     } finally {
-      setIsLoading(false);
+      setClearCartLoading(false);
     }
   };
 
@@ -149,6 +158,10 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
         subtotal,
         totalDiscount,
         isLoading,
+        addCartLoading,
+        removeCartLoading,
+        updateCartLoading,
+        clearCartLoading,
       }}>
       {children}
     </CartContext.Provider>
@@ -157,10 +170,8 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({
 
 export function useCart(): CartContextData {
   const context = useContext(CartContext);
-
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
-
   return context;
 }

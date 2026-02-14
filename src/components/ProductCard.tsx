@@ -12,7 +12,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useFavorites } from '@/contexts/FavoritesContext';
 import currencyFormatter from '@/utils/currencyFormatter';
@@ -21,6 +21,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import IconButton from '@/components/IconButton';
 import { useCart } from '@/contexts/CartContext';
 import { IProduct } from '@/types/product';
+import { STYLING } from '@/style/const';
 import Image from '@/components/Image';
 
 interface ProductCardProps {
@@ -105,6 +106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress, style }) =>
         style={styles.favoriteButton}
         variant='danger'
         size="small"
+        rounded={false}
       />
       <View style={styles.content}>
         <View style={styles.header}>
@@ -127,7 +129,7 @@ const getStyles = (colors: any) =>
     container: {
       flexDirection: 'column',
       backgroundColor: colors.card,
-      borderRadius: 12,
+      borderRadius: STYLING.borderRadius.md,
       marginBottom: 16,
       overflow: 'hidden',
       shadowColor: '#000',
@@ -189,8 +191,8 @@ const getStyles = (colors: any) =>
     },
     favoriteButton: {
       position: 'absolute',
-      top: 10,
-      right: 10,
+      top: 6,
+      right: 6,
     },
     addToCartButton: {
       flexDirection: 'row',

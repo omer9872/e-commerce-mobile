@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState, useCallback, useRef} from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,22 +12,22 @@ import {
   Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import type {StackNavigationProp} from '@react-navigation/stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
-import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
-import type {IProductCategory} from '../../types/productCategory';
+import type { CustomerHomeStackParamList } from '../../navigation/CustomerNavigator';
+import type { IProductCategory } from '../../types/productCategory';
 import LayoutHeader from '../../components/LayoutHeader';
-import {useLocale} from '../../contexts/LocaleContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import ProductCard from '../../components/ProductCard';
 import SearchInput from '../../components/SearchInput';
-import {useTheme} from '../../contexts/ThemeContext';
-import {useAuth} from '../../contexts/AuthContext';
-import type {IProduct} from '../../types/product';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import type { IProduct } from '../../types/product';
 import Avatar from '../../components/Avatar';
 import Image from '../../components/Image';
-import {api} from '../../services/api';
+import { api } from '../../services/api';
 
 type HomeScreenNavigationProp = StackNavigationProp<
   CustomerHomeStackParamList,
@@ -43,9 +43,9 @@ interface ProductResponse {
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const {t} = useLocale();
-  const {colors} = useTheme();
-  const {user} = useAuth();
+  const { t } = useLocale();
+  const { colors } = useTheme();
+  const { user } = useAuth();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<IProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -144,7 +144,7 @@ const HomeScreen = () => {
   };
 
   const handleProductPress = (productId: string) => {
-    navigation.navigate('ProductDetail', {productId});
+    navigation.navigate('ProductDetail', { productId });
   };
 
   const handleCategoryPress = (categoryId: string) => {
@@ -307,7 +307,7 @@ const HomeScreen = () => {
   const styles = getStyles(colors);
 
   return (
-    <View style={{...styles.container, paddingTop: insets.top}}>
+    <View style={{ ...styles.container, paddingTop: insets.top }}>
       <View style={styles.subContainer}>
         <LayoutHeader
           title={t('home.title')}
@@ -334,8 +334,8 @@ const HomeScreen = () => {
               colors={[colors.primary]}
             />
           }
-          onScrollEndDrag={({nativeEvent}) => {
-            const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
+          onScrollEndDrag={({ nativeEvent }) => {
+            const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
             const paddingToBottom = 20;
             if (
               layoutMeasurement.height + contentOffset.y >=
@@ -456,31 +456,26 @@ const HomeScreen = () => {
           {/* Products Section */}
           <Text style={styles.sectionTitle}>
             {searchQuery
-              ? `Search Results${
-                  selectedSubcategory
-                    ? ` in ${
-                        selectedCategoryObject?.subCategories?.find(
-                          sub => sub._id === selectedSubcategory,
-                        )?.name
-                      }`
-                    : selectedCategory
-                    ? ` in ${
-                        categories.find(cat => cat._id === selectedCategory)
-                          ?.name
-                      }`
-                    : ''
+              ? `Search Results${selectedSubcategory
+                ? ` in ${selectedCategoryObject?.subCategories?.find(
+                  sub => sub._id === selectedSubcategory,
+                )?.name
                 }`
+                : selectedCategory
+                  ? ` in ${categories.find(cat => cat._id === selectedCategory)
+                    ?.name
+                  }`
+                  : ''
+              }`
               : selectedSubcategory
-              ? `${
-                  selectedCategoryObject?.subCategories?.find(
-                    sub => sub._id === selectedSubcategory,
-                  )?.name
+                ? `${selectedCategoryObject?.subCategories?.find(
+                  sub => sub._id === selectedSubcategory,
+                )?.name
                 } Products`
-              : selectedCategory
-              ? `${
-                  categories.find(cat => cat._id === selectedCategory)?.name
-                } Products`
-              : t('home.availableProducts')}
+                : selectedCategory
+                  ? `${categories.find(cat => cat._id === selectedCategory)?.name
+                  } Products`
+                  : t('home.availableProducts')}
           </Text>
 
           {isLoading ? (
@@ -563,7 +558,6 @@ const getStyles = (colors: any) =>
     productRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: 16,
     },
     productCard: {
       width: '48%',

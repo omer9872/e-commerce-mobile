@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,25 +13,26 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {type RouteProp, useRoute} from '@react-navigation/native';
+import { type RouteProp, useRoute } from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 import Toast from 'react-native-toast-message';
-import {WebView} from 'react-native-webview';
+import { WebView } from 'react-native-webview';
 
 import type {
   IProduct,
   IProductVariant,
   IProductVariantOption,
-} from '../../types/product';
-import type {CustomerHomeStackParamList} from '../../navigation/CustomerNavigator';
-import currencyFormatter from '../../utils/currencyFormatter';
-import {useFavorites} from '../../contexts/FavoritesContext';
-import {useLocale} from '../../contexts/LocaleContext';
-import IconButton from '../../components/IconButton';
-import {useTheme} from '../../contexts/ThemeContext';
-import {useCart} from '../../contexts/CartContext';
-import Image from '../../components/Image';
-import {api} from '../../services/api';
+} from '@/types/product';
+import type { CustomerHomeStackParamList } from '@/navigation/CustomerNavigator';
+import currencyFormatter from '@/utils/currencyFormatter';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import { useLocale } from '@/contexts/LocaleContext';
+import IconButton from '@/components/IconButton';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useCart } from '@/contexts/CartContext';
+import Image from '@/components/Image';
+import { api } from '@/services/api';
+import { STYLING } from '@/style/const';
 
 type ProductDetailScreenRouteProp = RouteProp<
   CustomerHomeStackParamList,
@@ -45,13 +46,15 @@ const ProductDetailScreen = () => {
     removeFromCart,
     updateQuantity,
     items,
-    isLoading: isCartLoading,
+    addCartLoading,
+    removeCartLoading,
+    updateCartLoading,
   } = useCart();
-  const {addToFavorites, removeFromFavorites, isInFavorites} = useFavorites();
-  const {colors} = useTheme();
-  const {t} = useLocale();
+  const { addToFavorites, removeFromFavorites, isInFavorites } = useFavorites();
+  const { colors } = useTheme();
+  const { t } = useLocale();
 
-  const {productId} = route.params;
+  const { productId } = route.params;
   const width = Dimensions.get('window').width;
 
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -60,12 +63,9 @@ const ProductDetailScreen = () => {
   const [webViewHeight, setWebViewHeight] = useState(0); // Add WebView height state
   const [selectedSKU, setSelectedSKU] = useState<string>('');
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
-  const [quantity, setQuantity] = useState(1);
 
-  // Find cart item that matches the current product and selected variant
+  // Find cart items that match the current product
   const cartItems = items.filter(item => item.product._id === productId);
-  const currentSKUCartItem = cartItems.find(item => item.sku === selectedSKU);
-  const isAddedToCart = !!currentSKUCartItem;
 
   const fetchProductDetails = async () => {
     try {
@@ -82,12 +82,12 @@ const ProductDetailScreen = () => {
     }
   };
 
-  const handleAddToCart = async () => {
-    if (!product || isAddedToCart || isCartQuantityLoading) return;
+  const handleAddToCart = async (sku: string, qty: number = 1) => {
+    if (!product || isCartQuantityLoading) return;
 
     try {
       setIsCartQuantityLoading(true);
-      await addToCart(product._id, selectedSKU, quantity);
+      await addToCart(product._id, sku, qty);
 
       Toast.show({
         type: 'success',
@@ -106,12 +106,12 @@ const ProductDetailScreen = () => {
     }
   };
 
-  const handleRemoveFromCart = async () => {
-    if (!product || !isAddedToCart || isCartQuantityLoading) return;
+  const handleRemoveFromCart = async (sku: string) => {
+    if (!product || isCartQuantityLoading) return;
 
     try {
       setIsCartQuantityLoading(true);
-      await removeFromCart(selectedSKU);
+      await removeFromCart(product._id, sku);
 
       Toast.show({
         type: 'success',
@@ -168,16 +168,16 @@ const ProductDetailScreen = () => {
     }
   };
 
-  const handleQuantityChange = async (newQuantity: number) => {
-    if (!product || !selectedSKU || !currentSKUCartItem) return;
-    if (newQuantity < 1) return;
-    const selectedVariant = product.variants?.find(v => v.sku === selectedSKU);
-    if (selectedVariant && newQuantity > selectedVariant.stock) return;
+  const handleQuantityChange = async (sku: string, newQuantity: number) => {
+    if (!product || newQuantity < 1) return;
+    const variant = product.variants?.find(v => v.sku === sku);
+    if (variant && newQuantity > variant.stock) return;
+    const cartItem = cartItems.find(item => item.sku === sku);
+    if (!cartItem) return;
 
     try {
       setIsCartQuantityLoading(true);
-      await updateQuantity(product._id, selectedSKU, newQuantity);
-      setQuantity(newQuantity);
+      await updateQuantity(product._id, sku, newQuantity);
     } catch (error) {
       console.error('Error updating quantity:', error);
       Toast.show({
@@ -189,16 +189,6 @@ const ProductDetailScreen = () => {
       setIsCartQuantityLoading(false);
     }
   };
-
-  // Update quantity when SKU changes
-  useEffect(() => {
-    if (selectedSKU) {
-      const cartItem = cartItems.find(item => item.sku === selectedSKU);
-      setQuantity(cartItem?.quantity || 1);
-    } else {
-      setQuantity(1);
-    }
-  }, [selectedSKU, cartItems]);
 
   const getFirstVariantPrice = () => {
     const pVariants = product?.variants ?? [];
@@ -221,19 +211,23 @@ const ProductDetailScreen = () => {
   const renderVariantItem = (variant: IProductVariant) => {
     const isSelected = selectedSKU === variant.sku;
     const isOutOfStock = variant.stock === 0;
-    const isInCart = cartItems.some(item => item.sku === variant.sku);
+    const variantCartItem = cartItems.find(item => item.sku === variant.sku);
+    const isInCart = !!variantCartItem;
+    const variantQuantity = variantCartItem?.quantity ?? 1;
 
     return (
-      <TouchableOpacity
+      <View
         key={variant.sku}
         style={[
           styles.variantItem,
           isSelected && styles.selectedVariant,
           isOutOfStock && styles.outOfStockVariant,
-        ]}
-        onPress={() => !isOutOfStock && setSelectedSKU(variant.sku)}
-        disabled={isOutOfStock}>
-        <View style={styles.variantContent}>
+        ]}>
+        <TouchableOpacity
+          style={styles.variantContent}
+          onPress={() => !isOutOfStock && setSelectedSKU(variant.sku)}
+          disabled={isOutOfStock}
+          activeOpacity={0.7}>
           <View>
             {variant.options.map((option: IProductVariantOption) => (
               <Text key={option.name} style={styles.variantOption}>
@@ -246,19 +240,59 @@ const ProductDetailScreen = () => {
             <Text style={styles.variantPrice}>
               {currencyFormatter.format(variant.price)}
             </Text>
-            {isOutOfStock && (
-              <Text style={styles.outOfStockText}>
-                {isOutOfStock && t('productDetails.outOfStock')}
-              </Text>
+            {!isInCart && (
+              <IconButton
+                size="small"
+                onPress={() => handleAddToCart(variant.sku, 1)}
+                loading={addCartLoading}
+                variant="primary"
+                rounded={false}
+                icon={
+                  <Icon name="cart-plus" size={20} color={colors.white} />
+                }
+              />
             )}
           </View>
-        </View>
+        </TouchableOpacity>
+
         {isInCart && (
-          <View style={styles.inCartBadge}>
-            <Text style={styles.inCartText}>{t('productDetails.inCart')}</Text>
+          <View style={styles.variantActionsRow}>
+            <View style={styles.quantityControls}>
+              <IconButton
+                size="small"
+                onPress={() => handleQuantityChange(variant.sku, variantQuantity - 1)}
+                variant="primary-outline"
+                disabled={variantQuantity <= 1 || updateCartLoading}
+                icon={<Icon name="minus" size={16} color={colors.white} />}
+                rounded={false}
+              />
+              <Text style={styles.quantityText}>{variantQuantity}</Text>
+              <IconButton
+                size="small"
+                onPress={() =>
+                  handleQuantityChange(variant.sku, variantQuantity + 1)
+                }
+                variant="primary-outline"
+                disabled={
+                  variant.stock <= variantQuantity || updateCartLoading
+                }
+                icon={<Icon name="plus" size={16} color={colors.white} />}
+                rounded={false}
+              />
+            </View>
+            <IconButton
+              size="small"
+              onPress={() => handleRemoveFromCart(variant.sku)}
+              loading={removeCartLoading}
+              variant="danger"
+              rounded={false}
+              icon={
+                <Icon name="cart-remove" size={20} color={colors.white} />
+              }
+            />
           </View>
         )}
-      </TouchableOpacity>
+      </View>
     );
   };
 
@@ -294,13 +328,28 @@ const ProductDetailScreen = () => {
             autoPlay={false}
             data={product.images}
             scrollAnimationDuration={1000}
-            renderItem={({item}) => renderCarouselItem(item)}
-            customConfig={() => ({type: 'positive', viewCount: 5})}
+            renderItem={({ item }) => renderCarouselItem(item)}
+            customConfig={() => ({ type: 'positive', viewCount: 5 })}
           />
         </View>
       )}
       <View style={styles.contentContainer}>
-        <Text style={styles.productName}>{product.name}</Text>
+        <View style={styles.productHeader}>
+          <Text style={styles.productName}>{product.name}</Text>
+          <IconButton
+            onPress={handleToggleFavorites}
+            loading={isFavoritesLoading}
+            variant={isInFavorites(product._id) ? 'danger' : 'primary'}
+            rounded={false}
+            icon={
+              isInFavorites(product._id) ? (
+                <Icon name="heart" size={25} color={colors.white} />
+              ) : (
+                <Icon name="heart-outline" size={25} color={colors.white} />
+              )
+            }
+          />
+        </View>
 
         {product.description && (
           <View style={styles.descriptionContainer}>
@@ -484,61 +533,6 @@ const ProductDetailScreen = () => {
             {product.variants.map(renderVariantItem)}
           </View>
         )}
-
-        {selectedSKU && currentSKUCartItem && (
-          <View style={styles.quantityContainer}>
-            <Text style={styles.quantityTitle}>
-              {t('productDetails.quantityInCart')}
-            </Text>
-            <View style={styles.quantityControls}>
-              <IconButton
-                onPress={() => handleQuantityChange(quantity - 1)}
-                variant="primary-outline"
-                disabled={quantity <= 1 || isCartQuantityLoading}
-                icon={<Icon name="minus" size={16} color={colors.white} />}
-              />
-              <Text style={styles.quantityText}>{quantity}</Text>
-              <IconButton
-                onPress={() => handleQuantityChange(quantity + 1)}
-                variant="primary-outline"
-                disabled={
-                  (product.variants?.find(v => v.sku === selectedSKU)?.stock ||
-                    0) <= quantity || isCartQuantityLoading
-                }
-                icon={<Icon name="plus" size={16} color={colors.white} />}
-              />
-            </View>
-          </View>
-        )}
-
-        <View style={styles.actionsContainer}>
-          <IconButton
-            onPress={isAddedToCart ? handleRemoveFromCart : handleAddToCart}
-            loading={isCartLoading}
-            disabled={!selectedSKU}
-            variant={isAddedToCart ? 'danger' : 'primary'}
-            icon={
-              isAddedToCart ? (
-                <Icon name="cart-remove" size={20} color={colors.white} />
-              ) : (
-                <Icon name="cart-plus" size={20} color={colors.white} />
-              )
-            }
-          />
-
-          <IconButton
-            onPress={handleToggleFavorites}
-            loading={isFavoritesLoading}
-            variant={isInFavorites(product._id) ? 'danger' : 'primary'}
-            icon={
-              isInFavorites(product._id) ? (
-                <Icon name="heart" size={20} color={colors.white} />
-              ) : (
-                <Icon name="heart-outline" size={20} color={colors.white} />
-              )
-            }
-          />
-        </View>
       </View>
     </ScrollView>
   );
@@ -561,7 +555,7 @@ const getStyles = (colors: any) =>
       width: '100%',
       height: '100%',
       resizeMode: 'cover',
-      borderRadius: 10,
+      borderRadius: STYLING.borderRadius.md,
     },
     loadingContainer: {
       flex: 1,
@@ -581,11 +575,17 @@ const getStyles = (colors: any) =>
     contentContainer: {
       padding: 20,
     },
+    productHeader: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
     productName: {
       fontSize: 24,
       fontWeight: 'bold',
       color: colors.text,
-      marginBottom: 10,
     },
     descriptionContainer: {},
     descriptionText: {
@@ -611,7 +611,7 @@ const getStyles = (colors: any) =>
       flexDirection: 'row',
       justifyContent: 'center',
       gap: 12,
-      marginTop: 20,
+      marginTop: 8,
     },
     favoriteButton: {
       flex: 1,
@@ -670,7 +670,7 @@ const getStyles = (colors: any) =>
     },
     variantItem: {
       backgroundColor: colors.background,
-      borderRadius: 8,
+      borderRadius: STYLING.borderRadius.md,
       padding: 12,
       marginBottom: 8,
       borderWidth: 2,
@@ -698,13 +698,15 @@ const getStyles = (colors: any) =>
       color: colors.textSecondary,
     },
     variantInfo: {
-      alignItems: 'flex-end',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 10
     },
     variantPrice: {
       fontSize: 16,
       fontWeight: 'bold',
       color: colors.primary,
-      marginBottom: 4,
     },
     outOfStockText: {
       fontSize: 12,
@@ -716,17 +718,26 @@ const getStyles = (colors: any) =>
       backgroundColor: colors.primary,
       paddingHorizontal: 8,
       paddingVertical: 4,
-      borderRadius: 4,
+      borderRadius: STYLING.borderRadius.sm,
     },
     inCartText: {
       color: '#FFFFFF',
       fontSize: 12,
       fontWeight: '600',
     },
+    variantActionsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingTop: 8,
+      marginTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
     quantityContainer: {
       marginTop: 20,
       backgroundColor: colors.background,
-      borderRadius: 8,
+      borderRadius: STYLING.borderRadius.md,
       padding: 16,
       borderWidth: 1,
       borderColor: colors.border,
@@ -741,12 +752,11 @@ const getStyles = (colors: any) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      marginVertical: 8,
     },
     quantityButton: {
       width: 40,
       height: 40,
-      borderRadius: 20,
+      borderRadius: STYLING.borderRadius.md,
       backgroundColor: colors.primaryLight,
       justifyContent: 'center',
       alignItems: 'center',
@@ -758,7 +768,7 @@ const getStyles = (colors: any) =>
       fontSize: 18,
       fontWeight: '600',
       color: colors.text,
-      marginHorizontal: 20,
+      marginHorizontal: 10,
       minWidth: 30,
       textAlign: 'center',
     },

@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {useTheme} from '../contexts/ThemeContext';
+import { STYLING } from '@/style/const';
 
 interface SearchInputProps extends Omit<TextInputProps, 'onChangeText'> {
   /** Current value of the search input */
@@ -140,7 +141,7 @@ const getStyles = (colors: any) =>
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.card,
-      borderRadius: 8,
+      borderRadius: STYLING.borderRadius.md,
       paddingHorizontal: 12,
       height: 44,
     },
